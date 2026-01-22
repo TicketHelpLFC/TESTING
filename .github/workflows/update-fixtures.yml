@@ -2,8 +2,8 @@ name: Update LFC fixtures (nightly)
 
 on:
   schedule:
-    - cron: "15 2 * * *"
-  workflow_dispatch: {}
+    - cron: "15 2 * * *"  # Runs at 2:15 AM UTC daily
+  workflow_dispatch: {}    # Allows manual triggering
 
 permissions:
   contents: write
@@ -31,15 +31,20 @@ jobs:
 
       - name: Commit and push if changed
         run: |
-          if git diff --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
-
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add data/*.json public/data/*.json
-          git add scripts/fetch-lfc-ics.mjs
-          git commit -m "chore: update LFC fixtures (auto)"
+          # Check if there are changes
+          if git diff --quiet data/; then
+            echo "✅ No changes to commit - fixtures are up to date"
+            exit 0
+          fi
+
+          # Stage and commit changes
+          git add data/*.json
+          git commit -m "chore: update LFC fixtures (auto-generated)"
+          
+          # Push changes
           git push
+
+          echo "✅ Fixtures updated and pushed successfully"
