@@ -4,7 +4,7 @@ import path from "node:path";
 
 const DATA_DIR = "data";
 const PUBLIC_DATA_DIR = path.join("public", "data");
-const INDEX_OUT = path.join(DATA_DIR, "lfc-fixtures-index.json");
+const INDEX_OUT = path.join("public", "data", "lfc-fixtures-index.json");
 const PUBLIC_INDEX_OUT = path.join(PUBLIC_DATA_DIR, "lfc-fixtures-index.json");
 
 const ICS_URL = process.env.LFC_ICS_URL;
@@ -173,6 +173,27 @@ async function main() {
 
   const text = await res.text();
   const fixturesAll = parseICS(text);
+// After: const fixtures = parseICS(text)....
+const FROM = "2025-08-01";
+const TO   = "2026-07-31";
+
+const seasonFixtures = fixtures
+  .filter(f => f.date >= FROM && f.date <= TO)
+  .sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
+
+fs.mkdirSync(path.dirname(OUT), { recursive: true });
+
+// Write the season file (what your app needs)
+const seasonOut = path.join("public", "data", "lfc-fixtures-2025-26.json");
+fs.writeFileSync(seasonOut, JSON.stringify({
+  generatedAt: new Date().toISOString(),
+  source: "google-ics",
+  seasonWindow: { from: FROM, to: TO },
+  count: seasonFixtures.length,
+  fixtures: seasonFixtures
+}, null, 2), "utf8");
+
+console.log(`Saved season to ${seasonOut} (${seasonFixtures.length} fixtures)`);
 
   // Group by seasonId
   const bySeason = new Map();
