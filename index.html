@@ -320,8 +320,16 @@ body{
 .chip.active[data-credit="yes"]{border-color: rgba(46,204,113,.6); background: rgba(46,204,113,.2)}
 .chip.active[data-credit="no"]{border-color: rgba(255,77,77,.6); background: rgba(255,77,77,.2)}
 .chip.active[data-credit="unsure"]{border-color: rgba(59,130,246,.6); background: rgba(59,130,246,.2)}
-.chip.active[data-attended="yes"]{border-color: rgba(46,204,113,.6); background: rgba(46,204,113,.2)}
-.chip.active[data-attended="no"]{border-color: rgba(255,77,77,.6); background: rgba(255,77,77,.2)}
+.chip.active[data-attended="yes"]{
+  border-color: rgba(255,255,255,.6);
+  background: rgba(255,255,255,.08);
+  color: #ffffff;
+}
+.chip.active[data-attended="no"]{
+  border-color: rgba(249,115,22,.75);
+  background: rgba(249,115,22,.18);
+  color: #fdba74;
+}
 .chip.comp-chip{font-weight:800}
 .chip.comp-chip[data-comp="PL"]{border-color: rgba(155,89,182,.7); color: #d9c3f4}
 .chip.comp-chip[data-comp="UCL"]{border-color: rgba(52,152,219,.7); color: #b9dcf6}
