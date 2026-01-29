@@ -256,6 +256,20 @@ body{
   box-shadow: 0 10px 18px rgba(0,0,0,.25);
 }
 
+.matchItem{
+  position:relative;
+  padding-bottom:52px;
+}
+
+.itemCornerTags{
+  position:absolute;
+  right:12px;
+  bottom:12px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
 .item.fixtureTracked{
   border-color: rgba(241,196,15,.45);
   background: rgba(241,196,15,.04);
@@ -276,6 +290,16 @@ body{
 .badge.bad{border-color: rgba(255,77,77,.5)}
 .badge.neutral{border-color: rgba(154,160,166,.45)}
 .badge.red{border-color: rgba(227,27,35,.55)}
+.badge.attended-yes{
+  border-color: rgba(255,255,255,.6);
+  color:#ffffff;
+  background: rgba(255,255,255,.08);
+}
+.badge.attended-no{
+  border-color: rgba(249,115,22,.75);
+  color:#fdba74;
+  background: rgba(249,115,22,.18);
+}
 .badge.comp-pl{border-color: rgba(155,89,182,.7); color: #d9c3f4;}
 .badge.comp-ucl{border-color: rgba(52,152,219,.7); color: #b9dcf6;}
 .badge.comp-lc{border-color: rgba(46,204,113,.7); color: #c9f2de;}
@@ -916,6 +940,14 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
                 <option value="hosp_credit">Hospitality (credit)</option>
                 <option value="hosp_nocredit">Hospitality (no credit)</option>
                 <option value="scan_nocredit">Scan in (no credit)</option>
+              </select>
+            </div>
+
+            <div>
+              <div class="fieldLabel">Attended</div>
+              <select id="attended" class="select">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
               </select>
             </div>
 
@@ -1736,7 +1768,7 @@ if (matches.length === 0) {
 
 function matchCard(m) {
   const div = document.createElement("div");
-  div.className = "item";
+  div.className = "item matchItem";
   div.tabIndex = 0;
   div.role = "button";
 
@@ -1753,18 +1785,12 @@ function matchCard(m) {
   left.appendChild(title);
   left.appendChild(meta);
 
-  const ha = (m.venue === "A") ? "A" : "H";
-  const haPill = document.createElement("div");
-  haPill.className = `pill ${ha === "H" ? "ha-home" : "ha-away"}`;
-  haPill.textContent = ha;
-
   const credit = badgeForCredit(m);
   const creditBadge = document.createElement("div");
   creditBadge.className = `badge ${credit.cls}`;
   creditBadge.textContent = credit.text;
 
   top.appendChild(left);
-  top.appendChild(haPill);
 
   const badges = document.createElement("div");
   badges.className = "itemBadges";
@@ -1775,15 +1801,30 @@ function matchCard(m) {
     cost.textContent = `${formatGBP(m.amountPaid)}`;
     badges.appendChild(cost);
   }
-  const comp = document.createElement("div");
-  comp.className = `badge ${competitionBadgeClass(m.competition)}`;
-  comp.textContent = competitionLabel(m.competition);
-
   badges.appendChild(creditBadge);
-  badges.appendChild(comp);
+
+  if (m.attended === "yes" || m.attended === "no") {
+    const attended = document.createElement("div");
+    attended.className = `badge ${m.attended === "yes" ? "attended-yes" : "attended-no"}`;
+    attended.textContent = m.attended === "yes" ? "Att" : "Not Att";
+    badges.appendChild(attended);
+  }
 
   div.appendChild(top);
   div.appendChild(badges);
+
+  const cornerTags = document.createElement("div");
+  cornerTags.className = "itemCornerTags";
+  const compTag = document.createElement("div");
+  compTag.className = `pill comp-pill ${competitionBadgeClass(m.competition)}`;
+  compTag.textContent = competitionLabel(m.competition);
+  const ha = (m.venue === "A") ? "A" : "H";
+  const haPill = document.createElement("div");
+  haPill.className = `pill ${ha === "H" ? "ha-home" : "ha-away"}`;
+  haPill.textContent = ha;
+  cornerTags.appendChild(compTag);
+  cornerTags.appendChild(haPill);
+  div.appendChild(cornerTags);
 
   if (m.notes && m.notes.trim()) {
     const notes = document.createElement("div");
@@ -1847,6 +1888,7 @@ function clearForm() {
   $("venue").value = "H";
   $("competition").value = "PL";
     $("ticketAction").value = "credit";
+  $("attended").value = "yes";
   setCreditChip("unsure");
   $("notes").value = "";
   $("amountPaid").value = "";
@@ -1889,6 +1931,7 @@ function upsertMatchFromForm() {
     matchDate: $("matchDate").value,
     appliedStatus: "na",
     ticketAction: $("ticketAction").value,
+    attended: $("attended").value,
     creditCredit: $("creditCredit").value,
     notes: $("notes").value.trim(),
     fixtureKey: ($("fixtureKey") ? $("fixtureKey").value.trim() : ""),
@@ -1942,6 +1985,7 @@ function editMatch(id) {
   $("venue").value = m.venue || "H";
   $("competition").value = m.competition || "PL";
     $("ticketAction").value = m.ticketAction || "used";
+  $("attended").value = m.attended || "yes";
   setCreditChip(m.creditCredit || "unsure");
   $("notes").value = m.notes || "";
   $("amountPaid").value = (m.amountPaid ?? "");
@@ -1995,7 +2039,7 @@ function exportCSV() {
 
   const header = [
     "season","opponent","venue","competition","matchDate",
-    "appliedStatus","ticketAction","creditCredit","amountPaid","notes","createdAt","updatedAt"
+    "appliedStatus","ticketAction","attended","creditCredit","amountPaid","notes","createdAt","updatedAt"
   ];
 
   const lines = [header.join(",")];
@@ -2008,6 +2052,7 @@ function exportCSV() {
       m.matchDate,
       m.appliedStatus,
       m.ticketAction,
+      m.attended,
       m.creditCredit,
       m.amountPaid,
       m.notes,
