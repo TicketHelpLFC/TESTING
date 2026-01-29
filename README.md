@@ -1,6 +1,6 @@
-# TicketHelpLFC Credit Tracker (PWA)
+# LFC Tools Credit Tracker (PWA)
 
-This repo hosts a **single-file** PWA build of the TicketHelpLFC Credit Tracker.
+This repo hosts a **single-file** PWA build of the LFC Tools Credit Tracker.
 
 ## Files
 - `index.html` – the entire app (HTML/CSS/JS + embedded fixtures)
@@ -9,7 +9,7 @@ This repo hosts a **single-file** PWA build of the TicketHelpLFC Credit Tracker.
 - `icon.svg` – app icon
 
 ## Live URL
-https://tickethelplfc.github.io/CreditTracker/
+https://lfctools.github.io/CreditTracker2.0/
 
 ## Update process (mobile-friendly)
 1. Download the latest ZIP from ChatGPT
@@ -28,7 +28,7 @@ https://tickethelplfc.github.io/CreditTracker/
 ## Cache note
 After major updates, if you don’t see changes:
 - Remove the installed app
-- Clear site data for `tickethelplfc.github.io`
+- Clear site data for `lfctools.github.io`
 - Reopen and reinstall
 
 ## Account management

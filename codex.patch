@@ -1,0 +1,447 @@
+diff --git a/index.html b/index.html
+index 10d6f925e7c6d743ada3fd8c9e914b8aff788150..f2470d30753a8ab2f09b8d11afe26f93e2d322db 100644
+--- a/index.html
++++ b/index.html
+@@ -1,236 +1,263 @@
+ <!doctype html>
+ <html lang="en">
+ <head>
+   <meta charset="utf-8" />
+   <meta name="viewport" content="width=device-width,initial-scale=1" />
+   <meta name="theme-color" content="#0b0b0b" />
+   <meta name="apple-mobile-web-app-capable" content="yes" />
+   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+ 
+   <link rel="manifest" href="./manifest.json">
+   <link rel="icon" href="icons/icon-192.png">
+   <link rel="apple-touch-icon" href="icons/icon-192.png">
+ 
+   <title>LFC Tools – Credit Tracker</title>
+   <link rel="stylesheet" href="styles.css" />
+ <style>
+ :root{
+-  --bg:#0b0b0b;
+-  --card:#141414;
+-  --muted:#9aa0a6;
+-  --text:#f2f2f2;
+-  --border:#242424;
+-  --accent:#e31b23;
++  --bg:#0b0c0f;
++  --card:#151821;
++  --card-strong:#1a1f2b;
++  --muted:#98a2b3;
++  --text:#f5f7fb;
++  --border:#242a36;
++  --accent:#ff3141;
+   --good:#2ecc71;
+   --bad:#ff4d4d;
+-  --chip:#1b1b1b;
++  --chip:#1d2230;
++  --shadow: 0 18px 40px rgba(0,0,0,.35);
++  --glow: 0 0 0 1px rgba(255,255,255,.04), 0 10px 30px rgba(0,0,0,.35);
+ }
+ 
+ *{box-sizing:border-box}
+ body{
+   margin:0;
+-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+-  background:var(--bg);
++  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
++  background:
++    radial-gradient(1200px 500px at 15% -10%, rgba(255,49,65,.15), transparent 60%),
++    radial-gradient(900px 400px at 95% 0%, rgba(46,204,113,.12), transparent 65%),
++    var(--bg);
+   color:var(--text);
++  letter-spacing: 0.1px;
+ }
+ 
+ .topbar{
+   position:sticky; top:0;
+   display:flex; align-items:center; justify-content:space-between;
+   padding:12px 14px;
+   border-bottom:1px solid var(--border);
+-  background:rgba(11,11,11,.92);
++  background:rgba(11,12,16,.78);
+   backdrop-filter: blur(10px);
+   z-index:10;
+ }
+ 
+ .brand{display:flex; gap:10px; align-items:center}
+ .logo{font-size:22px}
+ .title{font-weight:800; letter-spacing:.2px}
+ .subtitle{color:var(--muted); font-size:12px; margin-top:2px}
+ 
+ .container{max-width:980px; margin:0 auto; padding:14px}
+ 
+ .card{
+-  background:var(--card);
+-  border:1px solid var(--border);
+-  border-radius:14px;
++  background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , var(--card);
++  border:1px solid rgba(255,255,255,.06);
++  border-radius:18px;
+   padding:14px;
+   margin-bottom:12px;
++  box-shadow: var(--glow);
+ }
+ 
+ .row{display:flex; align-items:center}
+ .space-between{justify-content:space-between}
+ .gap{gap:10px}
+ .wrap{flex-wrap:wrap}
+ .grow{flex:1}
+ 
+ .label{font-weight:700; margin-bottom:6px}
+ .hint{color:var(--muted); font-size:12px; line-height:1.35}
+ 
+ .tabs{
+   display:flex; gap:8px;
+   margin:10px 0 14px;
+ }
+ .tab{
+   flex:1;
+-  border-radius:12px;
+-  border:1px solid var(--border);
+-  background:transparent;
++  border-radius:14px;
++  border:1px solid rgba(255,255,255,.08);
++  background:rgba(255,255,255,.02);
+   color:var(--text);
+   padding:10px 10px;
+   font-weight:700;
++  transition: all .2s ease;
+ }
+-.tab.active{border-color:rgba(227,27,35,.6); background:rgba(227,27,35,.12)}
++.tab.active{border-color:rgba(255,49,65,.6); background:rgba(255,49,65,.14); box-shadow: 0 10px 18px rgba(255,49,65,.12)}
++.tab:hover{transform: translateY(-1px)}
+ 
+ .grid3{display:grid; grid-template-columns:repeat(3, 1fr); gap:10px}
+ .grid2{display:grid; grid-template-columns:repeat(2, 1fr); gap:10px}
+ 
+ @media (max-width:720px){
+   .grid3{grid-template-columns:1fr}
+   .grid2{grid-template-columns:1fr}
+ }
+ 
+ .statTitle{color:var(--muted); font-size:12px; margin-bottom:6px}
+ .statValue{font-size:34px; font-weight:900}
+ 
+ .input,.select,.textarea{
+   width:100%;
+   padding:10px 10px;
+-  border-radius:12px;
+-  border:1px solid var(--border);
+-  background:#0f0f0f;
++  border-radius:14px;
++  border:1px solid rgba(255,255,255,.08);
++  background:rgba(12,14,20,.75);
+   color:var(--text);
++  transition: border-color .2s ease, box-shadow .2s ease;
++}
++.input:focus,.select:focus,.textarea:focus{
++  outline:none;
++  border-color: rgba(255,49,65,.55);
++  box-shadow: 0 0 0 3px rgba(255,49,65,.15);
+ }
+ 
+ .textarea{resize:vertical}
+ 
+ .fieldLabel{color:var(--muted); font-size:12px; margin:6px 0}
+ 
+ .btn{
+-  border:1px solid var(--border);
+-  background:#101010;
++  border:1px solid rgba(255,255,255,.1);
++  background:rgba(18,20,26,.8);
+   color:var(--text);
+   padding:10px 12px;
+-  border-radius:12px;
++  border-radius:14px;
+   font-weight:800;
+   cursor:pointer;
++  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+ }
+ .btn.primary{
+-  border-color: rgba(46,204,113,.5);
+-  background: rgba(46,204,113,.12);
++  border-color: rgba(46,204,113,.45);
++  background: linear-gradient(180deg, rgba(46,204,113,.18), rgba(46,204,113,.08));
+ }
+ .btn.danger{
+-  border-color: rgba(255,77,77,.5);
+-  background: rgba(255,77,77,.12);
++  border-color: rgba(255,77,77,.45);
++  background: linear-gradient(180deg, rgba(255,77,77,.18), rgba(255,77,77,.08));
+ }
+ .btn.ghost{background:transparent}
+ .fileBtn{display:inline-flex; align-items:center; gap:6px}
++.btn:hover{transform: translateY(-1px); box-shadow: 0 12px 24px rgba(0,0,0,.3)}
+ 
+ .list{display:flex; flex-direction:column; gap:10px; margin-top:10px}
+ .item{
+-  border:1px solid var(--border);
+-  border-radius:14px;
++  border:1px solid rgba(255,255,255,.06);
++  border-radius:16px;
+   padding:12px;
+-  background:#0f0f0f;
++  background:rgba(12,14,20,.7);
++  box-shadow: 0 10px 18px rgba(0,0,0,.25);
+ }
+ 
+ .item.fixtureTracked{
+   outline:2px solid #f1c40f;
+   outline-offset:0;
+ }
+ .itemTop{display:flex; justify-content:space-between; gap:10px; align-items:flex-start}
+ .itemTitle{font-weight:900}
+ .itemMeta{color:var(--muted); font-size:12px; margin-top:4px}
+ .itemBadges{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+ .badge{
+   padding:6px 10px;
+   border-radius:999px;
+   font-size:12px;
+-  border:1px solid var(--border);
+-  background: var(--chip);
++  border:1px solid rgba(255,255,255,.08);
++  background: rgba(255,255,255,.03);
+ }
+ .badge.good{border-color: rgba(46,204,113,.5)}
+ .badge.bad{border-color: rgba(255,77,77,.5)}
+ .badge.neutral{border-color: rgba(154,160,166,.45)}
+ .badge.red{border-color: rgba(227,27,35,.55)}
+ 
+ .chips{display:flex; gap:10px; flex-wrap:wrap; margin-top:6px}
+ .chip{
+-  border:1px solid var(--border);
+-  background: var(--chip);
++  border:1px solid rgba(255,255,255,.1);
++  background: rgba(255,255,255,.03);
+   color: var(--text);
+   padding:8px 10px;
+   border-radius:999px;
+   font-weight:800;
+   cursor:pointer;
++  transition: all .2s ease;
+ }
+-.chip.active{border-color: rgba(227,27,35,.55); background: rgba(227,27,35,.12)}
++.chip.active{border-color: rgba(255,49,65,.55); background: rgba(255,49,65,.16)}
++.chip:hover{transform: translateY(-1px)}
+ 
+ .hidden{display:none !important}
+ .empty{color:var(--muted); padding:10px 0}
+ 
+ .sep{border:0; height:1px; background:var(--border); margin:14px 0}
+ 
+ .toggleRow{margin:10px 0}
+ .toggle span{margin-left:8px}
+ 
+ 
+ .breakdownTable{width:100%; border-collapse:separate; border-spacing:0 8px;}
+ .breakdownTable th{color:var(--muted); font-size:12px; text-align:left; font-weight:800; padding:0 8px 6px;}
+-.breakdownTable td{background:#0f0f0f; border:1px solid var(--border); padding:10px 8px;}
++.breakdownTable td{background:rgba(12,14,20,.7); border:1px solid rgba(255,255,255,.06); padding:10px 8px;}
+ .breakdownTable td:first-child{border-top-left-radius:12px; border-bottom-left-radius:12px;}
+ .breakdownTable td:last-child{border-top-right-radius:12px; border-bottom-right-radius:12px; text-align:right; font-weight:900;}
+ .breakdownPill{display:inline-block; padding:4px 8px; border-radius:999px; border:1px solid var(--border); background:var(--chip); font-size:12px; font-weight:800;}
+ .breakdownPill.good{border-color: rgba(46,204,113,.5);}
+ .breakdownPill.bad{border-color: rgba(255,77,77,.5);}
+ 
+ 
+ 
+ .grid5{display:grid; grid-template-columns:repeat(5, 1fr); gap:10px}
+ @media (max-width:980px){
+   .grid5{grid-template-columns:repeat(2, 1fr)}
+ }
+ @media (max-width:720px){
+   .grid5{grid-template-columns:1fr}
+ }
+ 
+ .stat.small{padding:12px}
+ .statValue.small{font-size:26px}
+ 
+ 
+ .breakdownTable{width:100%; border-collapse:collapse; margin-top:10px}
+ .breakdownTable th,.breakdownTable td{padding:10px; border-bottom:1px solid var(--border); text-align:left}
+ .breakdownPill{display:inline-block; padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:var(--chip); font-weight:800; font-size:12px}
+ .breakdownPill.good{border-color: rgba(46,204,113,.5); background: rgba(46,204,113,.12)}
+ .breakdownPill.neutral{border-color: rgba(154,160,166,.45); background: rgba(154,160,166,.10)}
+ 
+ 
+ .modal.hidden{display:none !important}
+ 
+-.brandLogo{width:34px;height:34px;border-radius:10px;display:block}
++.brandLogo{
++  width:34px;
++  height:34px;
++  border-radius:12px;
++  display:block;
++  box-shadow: 0 8px 18px rgba(0,0,0,.35);
++}
+ 
+ 
+ 
+ /* Account bar layout (mobile-first) */
+ .acctBar{ padding:14px; }
+ .acctBarFields{
+   display:flex;
+   flex-direction:column;
+   gap:14px;
+ }
+ .acctBarPrimary{ margin-top:14px; }
+ .btn.full{ width:100%; }
+ 
+ .acctBarActions{
+   display:flex;
+   gap:10px;
+   margin-top:12px;
+   flex-wrap:wrap;
+ }
+ .btn.sm{
+   padding:8px 10px;
+   font-size:13px;
+   border-radius:12px;
+ }
+ .btn.ghost.sm{ padding:8px 10px; }
+@@ -381,50 +408,79 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
+   font-weight:900;
+   font-size:12px;
+   display:inline-flex;
+   align-items:center;
+   justify-content:center;
+   min-width:34px;
+ }
+ 
+ /* Only colour the H/A pill */
+ .pill.ha-home{
+   background: rgba(227,27,35,.90);
+   color:#fff;
+   border-color: rgba(227,27,35,.55);
+ }
+ 
+ .pill.ha-away{
+   background: rgba(20,184,166,.90);
+   color:#042f2e;
+   border-color: rgba(20,184,166,.55);
+ }
+ 
+ /* Ensure title wraps nicely without pushing credit */
+ .fixtureTitle{
+   word-break:break-word;
+ }
++
++.backupCard{
++  padding:10px;
++}
++.backupCard .label{
++  font-size:13px;
++}
++.backupCard .hint{
++  font-size:11px;
++}
++.backupCard .btn{
++  padding:8px 10px;
++  font-size:13px;
++  border-radius:12px;
++  white-space:nowrap;
++}
++.backupCard .icon{
++  width:16px;
++  height:16px;
++  display:inline-flex;
++  align-items:center;
++  justify-content:center;
++  font-size:14px;
++}
++.backupCard .row{
++  flex-wrap:nowrap;
++  overflow-x:auto;
++  gap:8px;
++}
+ </style>
+ </head>
+ <body>
+   <header class="topbar">
+     <div class="brand">
+       <img class="brandLogo" src="icon.svg" alt="TicketHelpLFC" />
+       <div>
+         <div class="title">LFC Tools</div>
+         <div class="subtitle">Credit Tracker</div>
+       </div>
+     </div>
+     <div class="headerActions">
+       <button id="btnSupport" class="btn ghost">💬 Support</button>
+       <button id="btnInstall" class="btn ghost" hidden>⬇️ Install</button>
+     </div>
+   </header>
+ 
+   <main class="container">
+     <!-- Season bar -->
+     <section class="card acctBar">
+       <div class="acctBarFields">
+         <div class="acctField">
+           <div class="label">👤 Account</div>
+           <select id="accountSelect" class="select"></select>
+         </div>
+@@ -477,57 +533,57 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
+         <div class="fieldLabel" style="margin-top:10px;">AutoCup (HOME only — Away credits still tracked)</div>
+ <div class="hint" style="margin-top:10px;">Enter names below. AutoCup is saved per account *and per season*.</div>
+         <div id="setupNames" class="list" style="margin-top:10px;"></div>
+ 
+         <div class="row gap wrap" style="margin-top:14px;">
+           <button id="btnSetupCreate" class="btn primary">🟢 Save Account </button>
+         </div>
+       </section>
+     </section>
+ 
+     <!-- Dashboard -->
+     <section id="viewDash" class="view">
+ 
+       <!-- Per-competition credits first -->
+       <section class="card">
+         <div class="row space-between">
+           <div>
+             <div class="label">🏆 Credits by Competition</div>
+             <div class="hint">Home (H) + Away (A) tracked separately. Cup comps show “AutoCup” if enabled for this account.</div>
+           </div>
+         </div>
+         <div id="compBreakdown" class="breakdown"></div>
+       </section>
+ 
+ 
+-<section class="card">
++<section class="card backupCard">
+   <div class="label">📦 Backups</div>
+   <div class="row gap wrap">
+-    <button id="btnExportJSON" class="btn">📤 Export JSON</button>
+-    <button id="btnExportCSV" class="btn">📤 Export CSV</button>
++    <button id="btnExportJSON" class="btn"><span class="icon">📤</span> Export JSON</button>
++    <button id="btnExportCSV" class="btn"><span class="icon">📤</span> Export CSV</button>
+     <label class="btn fileBtn">
+-      📥 Import JSON
++      <span class="icon">📥</span> Import JSON
+       <input id="importFile" type="file" accept="application/json" hidden />
+     </label>
+   </div>
+   <div class="hint">“JSON” is best for restoring exactly. “CSV” is for spreadsheets.</div>
+ </section>
+ </section>
+ 
+     <!-- Matches -->
+     <section id="viewMatches" class="view hidden">
+       <section class="card">
+         <div class="row wrap gap">
+           <input id="searchInput" class="input grow" placeholder="Search opponent / notes…" />
+           <select id="matchSort" class="select">
+             <option value="matchDate" selected>Sort: Match date</option>
+             <option value="dateAdded">Sort: Date added</option>
+           </select>
+           <select id="filterVenue" class="select">
+             <option value="">Venue: All</option>
+             <option value="H">Home (H)</option>
+             <option value="A">Away (A)</option>
+           </select>
+           <select id="filterComp" class="select">
+             <option value="">Comp: All</option>
+             <option value="PL">PL</option>
+             <option value="UCL">UCL</option>

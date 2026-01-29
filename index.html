@@ -11,52 +11,89 @@
   <link rel="icon" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
 
-  <title>TicketHelpLFC – Credit Tracker</title>
+  <title>LFC Tools – Credit Tracker</title>
   <link rel="stylesheet" href="styles.css" />
 <style>
 :root{
-  --bg:#0b0b0b;
-  --card:#141414;
-  --muted:#9aa0a6;
-  --text:#f2f2f2;
-  --border:#242424;
+  --bg:#0a0a0a;
+  --card:#121212;
+  --card-strong:#1a1a1a;
+  --muted:#9a9a9a;
+  --text:#f5f5f7;
+  --border:#222222;
   --accent:#e31b23;
+  --accent-soft: rgba(227,27,35,.18);
   --good:#2ecc71;
   --bad:#ff4d4d;
+  --info:#3b82f6;
   --chip:#1b1b1b;
+  --shadow: 0 18px 40px rgba(0,0,0,.45);
+  --glow: 0 0 0 1px rgba(255,255,255,.035), 0 12px 34px rgba(0,0,0,.45);
 }
 
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background:var(--bg);
+  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--bg);
   color:var(--text);
+  letter-spacing: 0.1px;
 }
 
 .topbar{
   position:sticky; top:0;
-  display:flex; align-items:center; justify-content:space-between;
+  display:grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items:center;
   padding:12px 14px;
   border-bottom:1px solid var(--border);
-  background:rgba(11,11,11,.92);
-  backdrop-filter: blur(10px);
+  background:rgba(8,8,10,.85);
+  backdrop-filter: blur(12px);
   z-index:10;
+  transition: transform .25s ease, opacity .25s ease;
+}
+.topbar.is-hidden{
+  transform: translateY(-100%);
+  opacity:0;
+  pointer-events:none;
 }
 
-.brand{display:flex; gap:10px; align-items:center}
+.topbarLeft{display:flex; align-items:center; gap:10px}
+.topbarTitle{font-weight:800; letter-spacing:.2px; text-align:center}
+.headerActions{ display:flex; gap:8px; align-items:center; justify-content:flex-end; }
+.iconBtn{
+  border:0;
+  background:transparent;
+  color:var(--text);
+  font-size:20px;
+  padding:6px;
+  border-radius:12px;
+  cursor:pointer;
+}
+.iconImg{
+  width:20px;
+  height:20px;
+  display:block;
+}
+.iconBtn:hover{ background: rgba(255,255,255,.06); }
+
 .logo{font-size:22px}
 .title{font-weight:800; letter-spacing:.2px}
 .subtitle{color:var(--muted); font-size:12px; margin-top:2px}
 
-.container{max-width:980px; margin:0 auto; padding:14px}
+.container{
+  max-width:980px;
+  margin:0 auto;
+  padding:14px 14px calc(72px + env(safe-area-inset-bottom, 0px));
+}
 
 .card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:14px;
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01)) , var(--card);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:18px;
   padding:14px;
   margin-bottom:12px;
+  box-shadow: var(--glow);
 }
 
 .row{display:flex; align-items:center}
@@ -66,22 +103,87 @@ body{
 .grow{flex:1}
 
 .label{font-weight:700; margin-bottom:6px}
+.label.withIcon{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.labelIcon{
+  width:16px;
+  height:16px;
+  display:block;
+}
+.btnIcon{
+  width:16px;
+  height:16px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-right:6px;
+}
+.btnIcon img{
+  width:16px;
+  height:16px;
+  display:block;
+}
 .hint{color:var(--muted); font-size:12px; line-height:1.35}
 
-.tabs{
-  display:flex; gap:8px;
-  margin:10px 0 14px;
+.bottomNav{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  display:flex;
+  gap:8px;
+  justify-content:space-around;
+  border-top:1px solid var(--border);
+  background:rgba(8,8,10,.92);
+  padding:8px 12px calc(env(safe-area-inset-bottom, 0px) + 10px);
+  z-index:11;
+  backdrop-filter: blur(12px);
 }
 .tab{
   flex:1;
-  border-radius:12px;
-  border:1px solid var(--border);
+  border-radius:14px;
+  border:0;
   background:transparent;
-  color:var(--text);
-  padding:10px 10px;
+  color:var(--muted);
+  padding:8px 0;
   font-weight:700;
+  font-size:22px;
+  transition: color .2s ease, transform .2s ease;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
 }
-.tab.active{border-color:rgba(227,27,35,.6); background:rgba(227,27,35,.12)}
+.tabIcon{
+  width:22px;
+  height:22px;
+  display:block;
+}
+.tab.active{color:var(--text)}
+.tab.active::after{
+  content:"";
+  position:absolute;
+  bottom:4px;
+  width:6px;
+  height:6px;
+  border-radius:999px;
+  background:var(--text);
+}
+.tab:hover{transform: translateY(-1px)}
+
+.sr-only{
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  border:0;
+}
 
 .grid3{display:grid; grid-template-columns:repeat(3, 1fr); gap:10px}
 .grid2{display:grid; grid-template-columns:repeat(2, 1fr); gap:10px}
@@ -97,47 +199,66 @@ body{
 .input,.select,.textarea{
   width:100%;
   padding:10px 10px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  background:#0f0f0f;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(15,15,15,.8);
   color:var(--text);
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.input:focus,.select:focus,.textarea:focus{
+  outline:none;
+  border-color: rgba(227,27,35,.6);
+  box-shadow: 0 0 0 3px rgba(227,27,35,.18);
 }
 
 .textarea{resize:vertical}
 
 .fieldLabel{color:var(--muted); font-size:12px; margin:6px 0}
+.fieldLabel.withIcon{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
 
 .btn{
-  border:1px solid var(--border);
-  background:#101010;
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(18,20,26,.8);
   color:var(--text);
   padding:10px 12px;
-  border-radius:12px;
+  border-radius:14px;
   font-weight:800;
   cursor:pointer;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
 }
 .btn.primary{
-  border-color: rgba(46,204,113,.5);
-  background: rgba(46,204,113,.12);
+  border-color: rgba(227,27,35,.55);
+  background: linear-gradient(180deg, rgba(227,27,35,.35), rgba(227,27,35,.12));
+}
+.btn.success{
+  border-color: rgba(46,204,113,.6);
+  background: linear-gradient(180deg, rgba(46,204,113,.32), rgba(46,204,113,.12));
 }
 .btn.danger{
-  border-color: rgba(255,77,77,.5);
-  background: rgba(255,77,77,.12);
+  border-color: rgba(255,77,77,.45);
+  background: linear-gradient(180deg, rgba(255,77,77,.18), rgba(255,77,77,.08));
 }
 .btn.ghost{background:transparent}
 .fileBtn{display:inline-flex; align-items:center; gap:6px}
+.btn:hover{transform: translateY(-1px); box-shadow: 0 12px 24px rgba(0,0,0,.3)}
 
 .list{display:flex; flex-direction:column; gap:10px; margin-top:10px}
 .item{
-  border:1px solid var(--border);
-  border-radius:14px;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:16px;
   padding:12px;
-  background:#0f0f0f;
+  background:rgba(16,16,16,.82);
+  box-shadow: 0 10px 18px rgba(0,0,0,.25);
 }
 
 .item.fixtureTracked{
-  outline:2px solid #f1c40f;
-  outline-offset:0;
+  border-color: rgba(241,196,15,.45);
+  background: rgba(241,196,15,.04);
+  box-shadow: 0 10px 18px rgba(0,0,0,.25), 0 0 0 1px rgba(241,196,15,.18);
 }
 .itemTop{display:flex; justify-content:space-between; gap:10px; align-items:flex-start}
 .itemTitle{font-weight:900}
@@ -147,25 +268,35 @@ body{
   padding:6px 10px;
   border-radius:999px;
   font-size:12px;
-  border:1px solid var(--border);
-  background: var(--chip);
+  border:1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
 }
 .badge.good{border-color: rgba(46,204,113,.5)}
 .badge.bad{border-color: rgba(255,77,77,.5)}
 .badge.neutral{border-color: rgba(154,160,166,.45)}
 .badge.red{border-color: rgba(227,27,35,.55)}
+.badge.comp-pl{border-color: rgba(155,89,182,.7); color: #d9c3f4;}
+.badge.comp-ucl{border-color: rgba(52,152,219,.7); color: #b9dcf6;}
+.badge.comp-lc{border-color: rgba(46,204,113,.7); color: #c9f2de;}
+.badge.comp-fac{border-color: rgba(227,27,35,.7); color: #ffc2c5;}
+.badge.comp-other{border-color: rgba(154,160,166,.45); color: var(--text);}
 
 .chips{display:flex; gap:10px; flex-wrap:wrap; margin-top:6px}
 .chip{
-  border:1px solid var(--border);
-  background: var(--chip);
+  border:1px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.03);
   color: var(--text);
   padding:8px 10px;
   border-radius:999px;
   font-weight:800;
   cursor:pointer;
+  transition: all .2s ease;
 }
-.chip.active{border-color: rgba(227,27,35,.55); background: rgba(227,27,35,.12)}
+.chip.active{border-color: rgba(255,255,255,.2)}
+.chip.active[data-credit="yes"]{border-color: rgba(46,204,113,.6); background: rgba(46,204,113,.2)}
+.chip.active[data-credit="no"]{border-color: rgba(255,77,77,.6); background: rgba(255,77,77,.2)}
+.chip.active[data-credit="unsure"]{border-color: rgba(59,130,246,.6); background: rgba(59,130,246,.2)}
+.chip:hover{transform: translateY(-1px)}
 
 .hidden{display:none !important}
 .empty{color:var(--muted); padding:10px 0}
@@ -178,7 +309,7 @@ body{
 
 .breakdownTable{width:100%; border-collapse:separate; border-spacing:0 8px;}
 .breakdownTable th{color:var(--muted); font-size:12px; text-align:left; font-weight:800; padding:0 8px 6px;}
-.breakdownTable td{background:#0f0f0f; border:1px solid var(--border); padding:10px 8px;}
+.breakdownTable td{background:rgba(16,16,16,.82); border:1px solid rgba(255,255,255,.06); padding:10px 8px;}
 .breakdownTable td:first-child{border-top-left-radius:12px; border-bottom-left-radius:12px;}
 .breakdownTable td:last-child{border-top-right-radius:12px; border-bottom-right-radius:12px; text-align:right; font-weight:900;}
 .breakdownPill{display:inline-block; padding:4px 8px; border-radius:999px; border:1px solid var(--border); background:var(--chip); font-size:12px; font-weight:800;}
@@ -204,29 +335,42 @@ body{
 .breakdownPill{display:inline-block; padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:var(--chip); font-weight:800; font-size:12px}
 .breakdownPill.good{border-color: rgba(46,204,113,.5); background: rgba(46,204,113,.12)}
 .breakdownPill.neutral{border-color: rgba(154,160,166,.45); background: rgba(154,160,166,.10)}
+.breakdownPill.comp-pl{border-color: rgba(155,89,182,.7); color: #d9c3f4; background: rgba(155,89,182,.12)}
+.breakdownPill.comp-ucl{border-color: rgba(52,152,219,.7); color: #b9dcf6; background: rgba(52,152,219,.12)}
+.breakdownPill.comp-lc{border-color: rgba(46,204,113,.7); color: #c9f2de; background: rgba(46,204,113,.12)}
+.breakdownPill.comp-fac{border-color: rgba(227,27,35,.7); color: #ffc2c5; background: rgba(227,27,35,.12)}
+.breakdownPill.comp-other{border-color: rgba(154,160,166,.45); color: var(--text); background: rgba(154,160,166,.10)}
 
 
 .modal.hidden{display:none !important}
 
-.brandLogo{width:34px;height:34px;border-radius:10px;display:block}
+.brandLogo{
+  width:34px;
+  height:34px;
+  border-radius:12px;
+  display:block;
+  box-shadow: 0 8px 18px rgba(0,0,0,.35);
+}
 
 
 
 /* Account bar layout (mobile-first) */
 .acctBar{ padding:14px; }
 .acctBarFields{
-  display:flex;
-  flex-direction:column;
-  gap:14px;
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap:12px;
 }
-.acctBarPrimary{ margin-top:14px; }
 .btn.full{ width:100%; }
 
 .acctBarActions{
-  display:flex;
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap:10px;
-  margin-top:12px;
-  flex-wrap:wrap;
+  margin-top:14px;
+}
+.acctBarActions .btn{
+  width:100%;
 }
 .btn.sm{
   padding:8px 10px;
@@ -236,10 +380,6 @@ body{
 .btn.ghost.sm{ padding:8px 10px; }
 
 @media (min-width: 720px){
-  .acctBarFields{
-    flex-direction:row;
-    gap:12px;
-  }
   .acctField{ flex:1; }
 }
 
@@ -292,8 +432,6 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
   font-size: 12px;
   text-align:center;
 }
-
-.headerActions{ display:flex; gap:10px; align-items:center; }
 
 .modalHeader{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
 .modalTitle{ font-weight:800; font-size:18px; }
@@ -372,25 +510,166 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
   flex-shrink:0;
   white-space:nowrap;
 }
+/* Right-side H/A pill */
+.pill{
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background: var(--chip);
+  font-weight:900;
+  font-size:12px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:34px;
+}
+.fixtureLabels{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.pill.comp-pill{
+  font-weight:700;
+  font-size:11px;
+  padding:5px 8px;
+  min-width:auto;
+}
+.pill.comp-pill.comp-pl{border-color: rgba(155,89,182,.7); color: #d9c3f4; background: rgba(155,89,182,.12)}
+.pill.comp-pill.comp-ucl{border-color: rgba(52,152,219,.7); color: #b9dcf6; background: rgba(52,152,219,.12)}
+.pill.comp-pill.comp-lc{border-color: rgba(46,204,113,.7); color: #c9f2de; background: rgba(46,204,113,.12)}
+.pill.comp-pill.comp-fac{border-color: rgba(227,27,35,.7); color: #ffc2c5; background: rgba(227,27,35,.12)}
+.pill.comp-pill.comp-other{border-color: rgba(154,160,166,.45); color: var(--text); background: rgba(154,160,166,.10)}
+
+/* Only colour the H/A pill */
+.pill.ha-home{
+  background: rgba(227,27,35,.18);
+  color:#ffb3b8;
+  border-color: rgba(227,27,35,.55);
+}
+
+.pill.ha-away{
+  background: rgba(20,184,166,.16);
+  color:#87f1e5;
+  border-color: rgba(20,184,166,.55);
+}
 
 /* Ensure title wraps nicely without pushing credit */
 .fixtureTitle{
   word-break:break-word;
 }
+
+.backupCard{
+  padding:10px;
+}
+.backupCard .label{
+  font-size:13px;
+}
+.backupCard .hint{
+  font-size:11px;
+  margin-top:10px;
+}
+.backupCard .btn{
+  padding:5px 6px;
+  font-size:11px;
+  border-radius:10px;
+  white-space:nowrap;
+
+}
+.backupCard .icon{
+  width:14px;
+  height:14px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+.backupCard .icon img{
+  width:14px;
+  height:14px;
+  display:block;
+}
+
+.backupCard .row{
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  gap:8px;
+}
+.backupActions{
+  display:flex;
+  flex-wrap:nowrap;
+  gap:6px;
+}
+.backupActions .btn,
+.backupActions .fileBtn{
+  width:100%;
+  justify-content:center;
+  min-width:0;
+}
+.backupActions .btn{
+  display:flex;
+  align-items:center;
+}
+.dashHeader{
+  margin-bottom:10px;
+}
+.filtersGrid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:10px;
+}
+.infoPage{
+  font-size:15px;
+  line-height:1.6;
+}
+.infoPage h1{
+  font-size:20px;
+  font-weight:800;
+  margin:0 0 14px;
+}
+.infoPage h2{
+  font-size:16px;
+  font-weight:700;
+  margin:18px 0 0;
+}
+.infoPage ul{
+  margin:8px 0 0 20px;
+  padding:0;
+  list-style:disc;
+}
+.infoPage p{
+  margin-top:14px;
+  font-size:13px;
+  color:var(--muted);
+}
+.inlineFields{
+  display:flex;
+  gap:10px;
+  flex-wrap:nowrap;
+  align-items:flex-start;
+}
+.inlineFields > div{
+  flex:1;
+  min-width:0;
+}
+  .inlineFields .input,
+.inlineFields .select{
+  height:44px;
+}
 </style>
 </head>
 <body>
   <header class="topbar">
-    <div class="brand">
+    <div class="topbarLeft">
       <img class="brandLogo" src="icon.svg" alt="TicketHelpLFC" />
-      <div>
-        <div class="title">TicketHelpLFC</div>
-        <div class="subtitle">Credit Tracker</div>
-      </div>
     </div>
+    <div class="topbarTitle">Credit Tracker</div>
     <div class="headerActions">
-      <button id="btnSupport" class="btn ghost">💬 Support</button>
-      <button id="btnInstall" class="btn ghost" hidden>⬇️ Install</button>
+      <button id="btnInfo" class="iconBtn" aria-label="Info" title="Info">
+        <img class="iconImg" src="icons/assets/info.svg" alt="" aria-hidden="true" />
+      </button>
+      <button id="btnSupport" class="iconBtn" aria-label="Support" title="Support">
+        <img class="iconImg" src="icons/assets/support.svg" alt="" aria-hidden="true" />
+      </button>
+      <button id="btnInstall" class="iconBtn" hidden>Install</button>
     </div>
   </header>
 
@@ -399,48 +678,51 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
     <section class="card acctBar">
       <div class="acctBarFields">
         <div class="acctField">
-          <div class="label">👤 Account</div>
+          <div class="label withIcon">
+            <img class="labelIcon" src="icons/assets/account.svg" alt="" aria-hidden="true" />
+            Account
+          </div>
           <select id="accountSelect" class="select"></select>
         </div>
 
         <div class="acctField">
-          <div class="label">📅 Season</div>
+          <div class="label withIcon">
+            <img class="labelIcon" src="icons/assets/season.svg" alt="" aria-hidden="true" />
+            Season
+          </div>
           <select id="seasonSelect" class="select" data-role="season"></select>
         </div>
       </div>
 
-      <div class="acctBarPrimary">
-        <button id="btnAddAccount" class="btn full">➕ Add account to track</button>
+      <div id="acctActions" class="acctBarActions">
+        <button id="btnAddAccount" class="btn sm">
+          Add Account
+        </button>
+        <button type="button" id="btnEditAccount" class="btn sm">Edit</button>
+        <button type="button" id="btnDeleteAccount" class="btn danger sm">Delete</button>
       </div>
-
-      <div class="acctBarActions">
-        <button type="button" id="btnEditAccount" class="btn sm">✏️ Edit</button>
-        <button type="button" id="btnDeleteAccount" class="btn danger sm">🗑️ Delete</button>
-</div>
     </section>
-
-    <!-- Views -->
-    <nav class="tabs">
-      <button class="tab active" data-view="dash">🏠 Dashboard</button>
-      <button class="tab" data-view="matches">📋 Matches</button>
-      <button class="tab" data-view="fixtures">📅 Fixtures</button>
-      <button class="tab" data-view="add">➕ Add</button>
-    </nav>
 
 
     <!-- Setup (no popup) -->
     <section id="viewSetup" class="view hidden">
       <section class="card">
-        <div class="label">🔴 TicketHelpLFC – Setup</div>
-        <div class="hint">Set up the accounts you want to track. No logins. Data stays on your device.</div>
+        <div class="label">Add account details below</div>
+        <div class="hint">Set up the accounts you want to track. Include AutoCup and season, then click save.</div>
       </section>
 
       <section class="card">
-        <div class="label">👥 Accounts</div>
-        <div class="grid2">
+        <div class="label withIcon">
+          <img class="labelIcon" src="icons/assets/account.svg" alt="" aria-hidden="true" />
+          Accounts
+        </div>
+         <div class="inlineFields">
           <div>
-            <div class="fieldLabel">How many accounts?</div>
-            <input id="setupCount" class="input" type="number" min="1" max="10" value="1" />
+            <div class="fieldLabel">Add mode</div>
+            <select id="setupMode" class="select">
+              <option value="new">New account</option>
+              <option value="existing">Existing account</option>
+            </select>
           </div>
           <div>
             <div class="fieldLabel">Season</div>
@@ -448,38 +730,77 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
           </div>
         </div>
 
-        <div class="fieldLabel" style="margin-top:10px;">AutoCup (HOME only — Away credits still tracked)</div>
-<div class="hint" style="margin-top:10px;">Enter names below. AutoCup is saved per account *and per season*.</div>
-        <div id="setupNames" class="list" style="margin-top:10px;"></div>
+        <div id="setupNewAccountFields">
+          <div class="inlineFields" style="margin-top:10px;">
+            <div>
+              <div class="fieldLabel">How many accounts?</div>
+              <input id="setupCount" class="input" type="number" min="1" max="10" value="1" />
+            </div>
+          </div>
+         
+          <div class="hint" style="margin-top:10px;">Enter names below. AutoCup is saved per account *and per season*.</div>
+          <div id="setupNames" class="list" style="margin-top:10px;"></div>
+        </div>
+
+        <div id="setupExistingAccountFields" class="hidden" style="margin-top:10px;">
+          <div class="fieldLabel">Choose existing account</div>
+          <select id="setupExistingAccount" class="select"></select>
+
+        
+          <div class="row wrap gap">
+            <label class="toggle">
+              <input type="checkbox" id="setupExistingLC" />
+              <span>League Cup</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="setupExistingFAC" />
+              <span>FA Cup</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="setupExistingUCL" />
+              <span>Champions League</span>
+            </label>
+          </div>
+          <div class="hint" style="margin-top:8px;">This adds a new season for the selected account.</div>
+        </div>
 
         <div class="row gap wrap" style="margin-top:14px;">
-          <button id="btnSetupCreate" class="btn primary">🟢 Save setup</button>
+          <button id="btnSetupCreate" class="btn primary">Save Account</button>
         </div>
       </section>
     </section>
 
     <!-- Dashboard -->
     <section id="viewDash" class="view">
+      <div class="dashHeader">
+        <div class="label withIcon">
+          <img class="labelIcon" src="icons/assets/dashboard.svg" alt="" aria-hidden="true" />
+          Dashboard
+        </div>
+      </div>
 
       <!-- Per-competition credits first -->
       <section class="card">
         <div class="row space-between">
           <div>
-            <div class="label">🏆 Credits by Competition</div>
-            <div class="hint">Home (H) + Away (A) tracked separately. Cup comps show “AutoCup” if enabled for this account.</div>
+            <div class="label">Credits by Competition</div>
+            <div class="hint">Home (H) & Away (A) tracked separately</div>
           </div>
         </div>
         <div id="compBreakdown" class="breakdown"></div>
       </section>
 
 
-<section class="card">
-  <div class="label">📦 Backups</div>
-  <div class="row gap wrap">
-    <button id="btnExportJSON" class="btn">📤 Export JSON</button>
-    <button id="btnExportCSV" class="btn">📤 Export CSV</button>
+<section class="card backupCard">
+  <div class="label withIcon">
+    <img class="labelIcon" src="icons/assets/backup.svg" alt="" aria-hidden="true" />
+    Backups
+  </div>
+  <div class="backupActions">
+    <button id="btnExportJSON" class="btn"><span class="icon"><img src="icons/assets/export.svg" alt="" aria-hidden="true" /></span> Export JSON</button>
+    <button id="btnExportCSV" class="btn"><span class="icon"><img src="icons/assets/export.svg" alt="" aria-hidden="true" /></span> Export CSV</button>
     <label class="btn fileBtn">
-      📥 Import JSON
+      <span class="icon"><img src="icons/assets/import.svg" alt="" aria-hidden="true" /></span> Import JSON
       <input id="importFile" type="file" accept="application/json" hidden />
     </label>
   </div>
@@ -490,8 +811,21 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
     <!-- Matches -->
     <section id="viewMatches" class="view hidden">
       <section class="card">
-        <div class="row wrap gap">
+        <div class="row space-between">
+          <div>
+            <div class="label withIcon">
+              <img class="labelIcon" src="icons/assets/matches.svg" alt="" aria-hidden="true" />
+              Matches
+            </div>
+            <div class="hint">Search, sort, and filter all saved matches.</div>
+          </div>
+        </div>
+
+        <div class="row wrap gap" style="margin-top:12px;">
           <input id="searchInput" class="input grow" placeholder="Search opponent / notes…" />
+        </div>
+
+        <div class="filtersGrid" style="margin-top:12px;">
           <select id="matchSort" class="select">
             <option value="matchDate" selected>Sort: Match date</option>
             <option value="dateAdded">Sort: Date added</option>
@@ -511,16 +845,16 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
           </select>
           <select id="filterCredit" class="select">
             <option value="">Credit: All</option>
-            <option value="yes">🟢 Yes</option>
-            <option value="no">🔴 No</option>
-            <option value="unsure">ℹ️ Unsure</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="unsure">Unsure</option>
           </select>
         </div>
       </section>
       <section class="card">
         <div id="matchesList" class="list"></div>
         <div id="matchesEmpty" class="empty hidden">
-          🎟️ No matches yet — tap <strong>➕ Add</strong> to start tracking.
+          No matches yet — tap <strong>Add</strong> to start tracking.
         </div>
       </section>
     </section>
@@ -529,8 +863,11 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
     <section id="viewAdd" class="view hidden">
       <section class="card">
         <div class="row space-between">
-          <div class="label">➕ Add / Edit match</div>
-          <button id="btnClearForm" class="btn ghost">🧹 Clear</button>
+          <div class="label withIcon">
+            <img class="labelIcon" src="icons/assets/add.svg" alt="" aria-hidden="true" />
+            Add / Edit match
+          </div>
+          <button id="btnClearForm" class="btn ghost">Clear</button>
         </div>
 
         <form id="matchForm" class="form">
@@ -588,9 +925,9 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
             <div class="chips" role="group" aria-label="Credit outcome">
 <input type="hidden" id="creditCredit" value="unsure">
 
-              <button type="button" class="chip" data-credit="yes">🟢 Credit</button>
-              <button type="button" class="chip" data-credit="no">🔴 No credit</button>
-              <button type="button" class="chip active" data-credit="unsure">ℹ️ Unsure</button>
+              <button type="button" class="chip" data-credit="yes">Credit</button>
+              <button type="button" class="chip" data-credit="no">No credit</button>
+              <button type="button" class="chip active" data-credit="unsure">Unsure</button>
             </div>
             <input type="hidden" id="creditCredit" value="unsure" />
           </div>
@@ -602,17 +939,20 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
           </div>
 
           <div>
-            <div class="fieldLabel">Notes (optional)</div>
+            <div class="fieldLabel withIcon">
+              <img class="labelIcon" src="icons/assets/note.svg" alt="" aria-hidden="true" />
+              Notes (optional)
+            </div>
             <textarea id="notes" class="textarea" rows="3" placeholder="Anything worth remembering…"></textarea>
           </div>
 
           <div class="row space-between">
-            <button type="submit" class="btn primary">🟢 Save match</button>
-            <button type="button" id="btnDelete" class="btn danger" hidden>❌ Delete</button>
+            <button type="submit" class="btn success">Save match</button>
+            <button type="button" id="btnDelete" class="btn danger" hidden>Delete</button>
           </div>
 
           <div class="hint">
-            🔒 Stored on your device. Not affiliated with Liverpool FC.
+            Stored on your device. Not affiliated with Liverpool FC.
           </div>
         </form>
       </section>
@@ -626,7 +966,10 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
       <section class="card">
         <div class="row space-between">
           <div>
-            <div class="label">📅 Fixtures</div>
+            <div class="label withIcon">
+              <img class="labelIcon" src="icons/assets/fixtures.svg" alt="" aria-hidden="true" />
+              Fixtures
+            </div>
             <div class="hint">Tap a fixture to pre-fill the Add screen.</div>
           </div>
         </div>
@@ -642,14 +985,21 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
           </div>
           <div>
             <div class="fieldLabel">Filter</div>
-            <select id="fixtureComp" class="select">
-              <option value="" selected>All competitions</option>
-              <option value="PL">PL</option>
-              <option value="UCL">UCL</option>
-              <option value="FAC">FA Cup</option>
-              <option value="LC">League Cup</option>
-              <option value="OTHER">Other</option>
-            </select>
+            <div class="row gap wrap">
+              <select id="fixtureComp" class="select grow">
+                <option value="" selected>All competitions</option>
+                <option value="PL">PL</option>
+                <option value="UCL">UCL</option>
+                <option value="FAC">FA Cup</option>
+                <option value="LC">League Cup</option>
+                <option value="OTHER">Other</option>
+              </select>
+              <select id="fixtureHA" class="select grow">
+                <option value="" selected>All Venues</option>
+                <option value="H">Home</option>
+                <option value="A">Away</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -658,44 +1008,99 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
         <div id="fixturesEmpty" class="hint hidden" style="margin-top:12px;">No fixtures found.</div>
 
 <div class="row gap wrap" style="margin-top:14px;">
-  <button id="btnReloadFixtures" class="btn ghost sm">🔄 Refresh</button>
-  <label class="btn ghost fileBtn sm">📥 Import ICS
+  <button id="btnReloadFixtures" class="btn ghost sm">Refresh</button>
+  <label class="btn ghost fileBtn sm">
+    <span class="btnIcon"><img src="icons/assets/import.svg" alt="" aria-hidden="true" /></span>
+    Import ICS
     <input id="importFixturesFile" type="file" accept=".ics,text/calendar" hidden />
   </label>
-  <button id="btnClearFixtures" class="btn ghost sm">🧹 Clear imported</button>
+  <button id="btnClearFixtures" class="btn ghost sm">Clear imported</button>
 </div>
       
       </section>
+    </section>
+
+    <!-- Info -->
+    <section id="infoPage" class="view hidden infoPage">
+      <h1>How to Use the Credit Tracker</h1>
+
+      <h2>Adding an Account</h2>
+      <ul>
+        <li>Tap the <strong>Add Account</strong> button on the dashboard screen.</li>
+        <li>Enter your account name(e.g., Main, Dad, Partner, Friend).</li>
+        <li>Choose the season and autocup details (Season, Cup, AutoCup etc.).</li>
+        <li>Save to start tracking fixtures for that account.</li>
+      </ul>
+
+      <h2>Exporting Your Data</h2>
+      <ul>
+        <li>Go to <strong>Dashboard</strong> → <strong>Scroll down to Backup & Export</strong>.</li>
+        <li>Tap <strong>Export</strong> to download a .json file containing your accounts, credits and saved fixtures.</li>
+        <li>Keep this file safe – you’ll need it if you change phone or reinstall the app.</li>
+      </ul>
+
+      <h2>Importing Data</h2>
+      <ul>
+      <li>Go to <strong>Dashboard</strong> → <strong>Scroll down to Backup & Export</strong>.</li>
+        <li>Select <strong>Import</strong> and choose a previously exported .json file.</li>
+        <li>Your accounts and fixtures will be restored instantly.</li>
+      </ul>
+
+      <h2>Using the Matches Screen</h2>
+      <ul>
+        <li>View every match you have added across your accounts.</li>
+        <li>Search by opponent or notes using the search bar.</li>
+        <li>Sort by <strong>Match Date</strong> or <strong>Date Added</strong>.</li>
+        <li>Filter by venue (H/A), competition (PL/UCL/FAC/LC), or credit type.</li>
+      </ul>
+
+      <h2>Using the Fixtures Tab</h2>
+      <ul>
+        <li>Shows all past & upcoming Liverpool fixtures.</li>
+        <li>Tap any match to add it instantly to one of your accounts.</li>
+        <li>Fixtures automatically update when new dates are announced.</li>
+      </ul>
+
+      <h2>The Add Button</h2>
+      <ul>
+        <li>Tap the <strong>+</strong> button to manually add a match to an account.</li>
+        <li>Select opponent, date, venue, competition and credit type.</li>
+        <li>Ideal for historic matches or adding missing games.</li>
+      </ul>
+
+      <p>Built for Liverpool supporters. Completely free. YNWA.</p>
     </section>
 
 <!-- Support & Feedback -->
 <dialog id="supportModal" class="modal hidden">
   <div class="modalInner">
     <div class="modalHeader">
-      <div class="modalTitle">💬 Support & Feedback</div>
-      <button type="button" class="btn ghost sm" id="btnCloseSupport" aria-label="Close">✖</button>
+      <div class="modalTitle">Support & Feedback</div>
+      <button type="button" class="btn ghost sm" id="btnCloseSupport" aria-label="Close">Close</button>
     </div>
 
     <div class="hr"></div>
 
-    <h3 style="margin:0 0 6px;">☕ Support the tools</h3>
+    <h3 style="margin:0 0 6px;">Support the tools</h3>
     <div class="hint" style="margin-bottom:10px;">
-      If these tools help you, you can chip in to support hosting + ongoing updates.
+      Built to help the community and kept free for everyone.
+      Optional support helps with hosting + new features. Thank you.
     </div>
-    <button type="button" id="btnBmac" class="btn full">Open Buy Me a Coffee</button>
+    <button type="button" id="btnBmac" class="btn full">Support the Tools 🍺</button>
 
     <div class="hr" style="margin-top:16px;"></div>
 
-    <h3 style="margin:0 0 6px;">📝 Send feedback</h3>
+    <h3 style="margin:0 0 6px;">Send feedback</h3>
     <div class="hint" style="margin-bottom:10px;">
       Fill this in and it’ll send straight to me via Google Forms.
     </div>
 
     
 <button id="btnToggleFeedback" class="toggleRow">
-  <span>📝 Give feedback</span>
+  <span>Give feedback</span>
   <span id="feedbackArrow">▸</span>
 </button>
+    
 
 <div id="feedbackPanel" class="feedbackPanel hidden">
 <div class="formEmbedWrap">
@@ -712,75 +1117,81 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
 </div>
   </div>
 </dialog>
+
+<!-- Account settings -->
+<dialog id="accountSettingsModal" class="modal hidden">
+  <div class="modalInner">
+    <div class="modalHeader">
+      <div class="modalTitle">Account Settings</div>
+      <button type="button" class="btn ghost sm" id="btnCloseAccountSettings" aria-label="Close">Close</button>
+    </div>
+    <div class="hr"></div>
+    <div class="fieldLabel">Account name</div>
+    <input id="accountNameInput" class="input" placeholder="Account name" />
+    <div class="row gap wrap" style="margin-top:14px;">
+      <button type="button" class="btn primary" id="btnSaveAccountSettings">Save</button>
+      <button type="button" class="btn ghost" id="btnCancelAccountSettings">Cancel</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="autoCupModal" class="modal hidden">
+  <div class="modalInner">
+    <div class="modalHeader">
+      <div class="modalTitle" id="autoCupTitle">AutoCup</div>
+      <button type="button" class="btn ghost sm" id="btnCloseAutoCup" aria-label="Close">Close</button>
+    </div>
+    <div class="hr"></div>
+    <div class="label" id="autoCupQuestion">AutoCup option</div>
+    <div class="hint" id="autoCupSeason">Season</div>
+    <div class="row gap wrap" style="margin-top:14px;">
+      <button type="button" class="btn primary" id="btnAutoCupYes">Yes</button>
+      <button type="button" class="btn" id="btnAutoCupNo">No</button>
+      <button type="button" class="btn ghost" id="btnAutoCupCancel">Cancel</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="deleteAccountModal" class="modal hidden">
+  <div class="modalInner">
+    <div class="modalHeader">
+      <div class="modalTitle">Delete options</div>
+      <button type="button" class="btn ghost sm" id="btnCloseDeleteAccount" aria-label="Close">Close</button>
+    </div>
+    <div class="hr"></div>
+    <div class="label" id="deleteAccountQuestion">Delete account or season?</div>
+    <div class="hint" id="deleteAccountSeason">Season</div>
+    <div class="row gap wrap" style="margin-top:14px;">
+      <button type="button" class="btn danger" id="btnDeleteAccountConfirm">Account</button>
+      <button type="button" class="btn" id="btnDeleteSeasonConfirm">Season</button>
+      <button type="button" class="btn ghost" id="btnDeleteAccountCancel">Cancel</button>
+    </div>
+  </div>
+</dialog>
 </main>
 
-  <div class="hint" style="text-align:center;margin:20px 0;">Powered by TicketHelpLFC</div>
+  <nav class="bottomNav" aria-label="Primary">
+    <button class="tab active" data-view="dash" aria-label="Dashboard" title="Dashboard">
+      <img class="tabIcon" src="icons/assets/dashboard.svg" alt="" aria-hidden="true" />
+      <span class="sr-only">Dashboard</span>
+    </button>
+    <button class="tab" data-view="matches" aria-label="Matches" title="Matches">
+      <img class="tabIcon" src="icons/assets/matches.svg" alt="" aria-hidden="true" />
+      <span class="sr-only">Matches</span>
+    </button>
+    <button class="tab" data-view="fixtures" aria-label="Fixtures" title="Fixtures">
+      <img class="tabIcon" src="icons/assets/fixtures.svg" alt="" aria-hidden="true" />
+      <span class="sr-only">Fixtures</span>
+    </button>
+    <button class="tab" data-view="add" aria-label="Add" title="Add">
+      <img class="tabIcon" src="icons/assets/add.svg" alt="" aria-hidden="true" />
+      <span class="sr-only">Add</span>
+    </button>
+  </nav>
 
-<script type="application/json" id="fixturesData">[]</script>
-<script>
-(async () => {
-  const el = document.getElementById("fixturesData");
-  if (!el) return;
+  <div class="hint" style="text-align:center;margin:20px 0;">Powered by LFC Tools</div>
 
-  async function fetchSeasonFixtures(seasonId) {
-    const url = `./data/lfc-fixtures-${seasonId}.json`; // GitHub Pages: /data/...
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) throw new Error(`Failed to load ${url}: ${res.status}`);
-    return res.json();
-  }
-
-  function toAppFixture(f, seasonLabel) {
-    const comp = (["PL","UCL","FAC","LC","OTHER"].includes(f.competition)) ? f.competition : "OTHER";
-    return {
-      id: f.id,
-      season: seasonLabel || "",
-      date: f.date,
-      time: f.time,
-      datetime_utc: f.datetime_utc,
-      competition: comp,
-      opponent: f.opponent,
-      venue: f.venue,
-      location: f.location || ""
-    };
-  }
-
-  async function injectForSeason(seasonId) {
-    const json = await fetchSeasonFixtures(seasonId);
-    const seasonLabel = json.seasonLabel || "";
-    const mapped = (json.fixtures || []).map(f => toAppFixture(f, seasonLabel));
-    el.textContent = JSON.stringify(mapped);
-
-    try {
-      // nudge the app to re-render fixtures if already initialised
-      window.fixturesCache = null;
-      if (typeof window.renderFixtures === "function") window.renderFixtures();
-    } catch (e) {}
-  }
-
-  function bindSeasonReload() {
-    const seasonSel = document.getElementById("seasonSelect");
-    if (!seasonSel) return;
-
-    injectForSeason(seasonSel.value).catch(err => {
-      console.error("❌ Season fixtures load failed", err);
-      el.textContent = "[]";
-    });
-
-    seasonSel.addEventListener("change", () => {
-      injectForSeason(seasonSel.value).catch(err => {
-        console.error("❌ Season fixtures load failed", err);
-        el.textContent = "[]";
-      });
-    });
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", bindSeasonReload);
-  } else {
-    bindSeasonReload();
-  }
-})();
-</script>
+<script type="application/json" id="fixturesData">[{"id":"2025-08-10-other-crystalpalace-a-1500","season":"25/26","date":"2025-08-10","time":"15:00","datetime_utc":"2025-08-10T15:00:00Z","competition":"OTHER","opponent":"Crystal Palace","venue":"A","location":""},{"id":"2025-08-15-pl-bournemouth-h-2000","season":"25/26","date":"2025-08-15","time":"20:00","datetime_utc":"2025-08-15T20:00:00Z","competition":"PL","opponent":"Bournemouth","venue":"H","location":""},{"id":"2025-08-25-pl-newcastleunited-a-2000","season":"25/26","date":"2025-08-25","time":"20:00","datetime_utc":"2025-08-25T20:00:00Z","competition":"PL","opponent":"Newcastle United","venue":"A","location":""},{"id":"2025-08-31-pl-arsenal-h-1630","season":"25/26","date":"2025-08-31","time":"16:30","datetime_utc":"2025-08-31T16:30:00Z","competition":"PL","opponent":"Arsenal","venue":"H","location":""},{"id":"2025-09-14-pl-burnley-a-1400","season":"25/26","date":"2025-09-14","time":"14:00","datetime_utc":"2025-09-14T14:00:00Z","competition":"PL","opponent":"Burnley","venue":"A","location":""},{"id":"2025-09-17-ucl-atleticomadrid-h-2000","season":"25/26","date":"2025-09-17","time":"20:00","datetime_utc":"2025-09-17T20:00:00Z","competition":"UCL","opponent":"Atletico Madrid","venue":"H","location":""},{"id":"2025-09-20-pl-everton-h-1230","season":"25/26","date":"2025-09-20","time":"12:30","datetime_utc":"2025-09-20T12:30:00Z","competition":"PL","opponent":"Everton","venue":"H","location":""},{"id":"2025-09-23-lc-southampton-h-2000","season":"25/26","date":"2025-09-23","time":"20:00","datetime_utc":"2025-09-23T20:00:00Z","competition":"LC","opponent":"Southampton","venue":"H","location":""},{"id":"2025-09-27-pl-crystalpalace-a-1500","season":"25/26","date":"2025-09-27","time":"15:00","datetime_utc":"2025-09-27T15:00:00Z","competition":"PL","opponent":"Crystal Palace","venue":"A","location":""},{"id":"2025-09-30-ucl-galatasaray-a-2000","season":"25/26","date":"2025-09-30","time":"20:00","datetime_utc":"2025-09-30T20:00:00Z","competition":"UCL","opponent":"Galatasaray","venue":"A","location":""},{"id":"2025-10-04-pl-chelsea-a-1730","season":"25/26","date":"2025-10-04","time":"17:30","datetime_utc":"2025-10-04T17:30:00Z","competition":"PL","opponent":"Chelsea","venue":"A","location":""},{"id":"2025-10-19-pl-manchesterunited-h-1630","season":"25/26","date":"2025-10-19","time":"16:30","datetime_utc":"2025-10-19T16:30:00Z","competition":"PL","opponent":"Manchester United","venue":"H","location":""},{"id":"2025-10-22-ucl-eintrachtfrankfurt-a-2000","season":"25/26","date":"2025-10-22","time":"20:00","datetime_utc":"2025-10-22T20:00:00Z","competition":"UCL","opponent":"Eintracht Frankfurt","venue":"A","location":""},{"id":"2025-10-25-pl-brentford-a-2000","season":"25/26","date":"2025-10-25","time":"20:00","datetime_utc":"2025-10-25T20:00:00Z","competition":"PL","opponent":"Brentford","venue":"A","location":""},{"id":"2025-10-29-lc-crystalpalace-h-1945","season":"25/26","date":"2025-10-29","time":"19:45","datetime_utc":"2025-10-29T19:45:00Z","competition":"LC","opponent":"Crystal Palace","venue":"H","location":""},{"id":"2025-11-01-pl-astonvilla-h-2000","season":"25/26","date":"2025-11-01","time":"20:00","datetime_utc":"2025-11-01T20:00:00Z","competition":"PL","opponent":"Aston Villa","venue":"H","location":""},{"id":"2025-11-04-ucl-realmadrid-h-2000","season":"25/26","date":"2025-11-04","time":"20:00","datetime_utc":"2025-11-04T20:00:00Z","competition":"UCL","opponent":"Real Madrid","venue":"H","location":""},{"id":"2025-11-09-pl-manchestercity-a-1630","season":"25/26","date":"2025-11-09","time":"16:30","datetime_utc":"2025-11-09T16:30:00Z","competition":"PL","opponent":"Manchester City","venue":"A","location":""},{"id":"2025-11-22-pl-nottinghamforest-h-1500","season":"25/26","date":"2025-11-22","time":"15:00","datetime_utc":"2025-11-22T15:00:00Z","competition":"PL","opponent":"Nottingham Forest","venue":"H","location":""},{"id":"2025-11-26-ucl-psveindhoven-h-2000","season":"25/26","date":"2025-11-26","time":"20:00","datetime_utc":"2025-11-26T20:00:00Z","competition":"UCL","opponent":"PSV Eindhoven","venue":"H","location":""},{"id":"2025-11-30-pl-westhamunited-a-1405","season":"25/26","date":"2025-11-30","time":"14:05","datetime_utc":"2025-11-30T14:05:00Z","competition":"PL","opponent":"West Ham United","venue":"A","location":""},{"id":"2025-12-03-pl-sunderland-h-2015","season":"25/26","date":"2025-12-03","time":"20:15","datetime_utc":"2025-12-03T20:15:00Z","competition":"PL","opponent":"Sunderland","venue":"H","location":""},{"id":"2025-12-06-pl-leedsunited-a-1730","season":"25/26","date":"2025-12-06","time":"17:30","datetime_utc":"2025-12-06T17:30:00Z","competition":"PL","opponent":"Leeds United","venue":"A","location":""},{"id":"2025-12-09-ucl-intermilan-a-2000","season":"25/26","date":"2025-12-09","time":"20:00","datetime_utc":"2025-12-09T20:00:00Z","competition":"UCL","opponent":"Inter Milan","venue":"A","location":""},{"id":"2025-12-13-pl-brighton-h-1500","season":"25/26","date":"2025-12-13","time":"15:00","datetime_utc":"2025-12-13T15:00:00Z","competition":"PL","opponent":"Brighton","venue":"H","location":""},{"id":"2025-12-20-pl-tottenhamhotspur-a-1730","season":"25/26","date":"2025-12-20","time":"17:30","datetime_utc":"2025-12-20T17:30:00Z","competition":"PL","opponent":"Tottenham Hotspur","venue":"A","location":""},{"id":"2025-12-27-pl-wolves-h-1500","season":"25/26","date":"2025-12-27","time":"15:00","datetime_utc":"2025-12-27T15:00:00Z","competition":"PL","opponent":"Wolves","venue":"H","location":""},{"id":"2026-01-01-pl-leedsunited-h-1730","season":"25/26","date":"2026-01-01","time":"17:30","datetime_utc":"2026-01-01T17:30:00Z","competition":"PL","opponent":"Leeds United","venue":"H","location":""},{"id":"2026-01-04-pl-fulham-a-1500","season":"25/26","date":"2026-01-04","time":"15:00","datetime_utc":"2026-01-04T15:00:00Z","competition":"PL","opponent":"Fulham","venue":"A","location":""},{"id":"2026-01-08-pl-arsenal-a-2000","season":"25/26","date":"2026-01-08","time":"20:00","datetime_utc":"2026-01-08T20:00:00Z","competition":"PL","opponent":"Arsenal","venue":"A","location":""},{"id":"2026-01-12-fa-barnsley-h-1945","season":"25/26","date":"2026-01-12","time":"19:45","datetime_utc":"2026-01-12T19:45:00Z","competition":"FAC","opponent":"Barnsley","venue":"H","location":""},{"id":"2026-01-17-pl-burnley-h-1500","season":"25/26","date":"2026-01-17","time":"15:00","datetime_utc":"2026-01-17T15:00:00Z","competition":"PL","opponent":"Burnley","venue":"H","location":""},{"id":"2026-01-21-ucl-marseille-a-2000","season":"25/26","date":"2026-01-21","time":"20:00","datetime_utc":"2026-01-21T20:00:00Z","competition":"UCL","opponent":"Marseille","venue":"A","location":""},{"id":"2026-01-24-pl-bournemouth-a-1730","season":"25/26","date":"2026-01-24","time":"17:30","datetime_utc":"2026-01-24T17:30:00Z","competition":"PL","opponent":"Bournemouth","venue":"A","location":""},{"id":"2026-01-28-ucl-qarabagfk-h-2000","season":"25/26","date":"2026-01-28","time":"20:00","datetime_utc":"2026-01-28T20:00:00Z","competition":"UCL","opponent":"Qarabag FK","venue":"H","location":""},{"id":"2026-01-31-pl-newcastleunited-h-2000","season":"25/26","date":"2026-01-31","time":"20:00","datetime_utc":"2026-01-31T20:00:00Z","competition":"PL","opponent":"Newcastle United","venue":"H","location":""},{"id":"2026-02-08-pl-manchestercity-h-1630","season":"25/26","date":"2026-02-08","time":"16:30","datetime_utc":"2026-02-08T16:30:00Z","competition":"PL","opponent":"Manchester City","venue":"H","location":""},{"id":"2026-02-11-pl-sunderland-a-2015","season":"25/26","date":"2026-02-11","time":"20:15","datetime_utc":"2026-02-11T20:15:00Z","competition":"PL","opponent":"Sunderland","venue":"A","location":""},{"id":"2026-02-14-fa-brighton-h-2000","season":"25/26","date":"2026-02-14","time":"20:00","datetime_utc":"2026-02-14T20:00:00Z","competition":"FAC","opponent":"Brighton","venue":"H","location":""},{"id":"2026-02-21-pl-nottinghamforest-a-1500","season":"25/26","date":"2026-02-21","time":"15:00","datetime_utc":"2026-02-21T15:00:00Z","competition":"PL","opponent":"Nottingham Forest","venue":"A","location":""},{"id":"2026-02-28-pl-westhamunited-h-1500","season":"25/26","date":"2026-02-28","time":"15:00","datetime_utc":"2026-02-28T15:00:00Z","competition":"PL","opponent":"West Ham United","venue":"H","location":""},{"id":"2026-03-04-pl-wolves-a-2000","season":"25/26","date":"2026-03-04","time":"20:00","datetime_utc":"2026-03-04T20:00:00Z","competition":"PL","opponent":"Wolves","venue":"A","location":""},{"id":"2026-03-14-pl-tottenhamhotspur-h-1500","season":"25/26","date":"2026-03-14","time":"15:00","datetime_utc":"2026-03-14T15:00:00Z","competition":"PL","opponent":"Tottenham Hotspur","venue":"H","location":""},{"id":"2026-03-21-pl-brighton-a-1500","season":"25/26","date":"2026-03-21","time":"15:00","datetime_utc":"2026-03-21T15:00:00Z","competition":"PL","opponent":"Brighton","venue":"A","location":""},{"id":"2026-04-11-pl-fulham-h-1500","season":"25/26","date":"2026-04-11","time":"15:00","datetime_utc":"2026-04-11T15:00:00Z","competition":"PL","opponent":"Fulham","venue":"H","location":""},{"id":"2026-04-18-pl-everton-a-1500","season":"25/26","date":"2026-04-18","time":"15:00","datetime_utc":"2026-04-18T15:00:00Z","competition":"PL","opponent":"Everton","venue":"A","location":""},{"id":"2026-04-25-pl-crystalpalace-h-1500","season":"25/26","date":"2026-04-25","time":"15:00","datetime_utc":"2026-04-25T15:00:00Z","competition":"PL","opponent":"Crystal Palace","venue":"H","location":""},{"id":"2026-05-02-pl-manchesterunited-a-1500","season":"25/26","date":"2026-05-02","time":"15:00","datetime_utc":"2026-05-02T15:00:00Z","competition":"PL","opponent":"Manchester United","venue":"A","location":""},{"id":"2026-05-09-pl-chelsea-h-1500","season":"25/26","date":"2026-05-09","time":"15:00","datetime_utc":"2026-05-09T15:00:00Z","competition":"PL","opponent":"Chelsea","venue":"H","location":""},{"id":"2026-05-17-pl-astonvilla-a-1500","season":"25/26","date":"2026-05-17","time":"15:00","datetime_utc":"2026-05-17T15:00:00Z","competition":"PL","opponent":"Aston Villa","venue":"A","location":""},{"id":"2026-05-24-pl-brentford-h-1600","season":"25/26","date":"2026-05-24","time":"16:00","datetime_utc":"2026-05-24T16:00:00Z","competition":"PL","opponent":"Brentford","venue":"H","location":""}]</script>
 
 <script>
 /* Inlined app script (single-file build) */
@@ -856,6 +1267,63 @@ function seasonLabelFromId(id) {
   const a = parts[0].slice(-2);
   const b = parts[1].slice(-2);
   return `${a}/${b}`;
+}
+
+function getUsedSeasonIds(accountId) {
+  const used = new Set();
+  const accId = accountId || null;
+  for (const m of (state.data.matches || [])) {
+    if (!m || !m.seasonId) continue;
+    if (!accId || m.accountId === accId) used.add(m.seasonId);
+  }
+  for (const acc of (state.data.accounts || [])) {
+    if (accId && acc && acc.id !== accId) continue;
+    const map = acc && acc.autoCupBySeason;
+    if (map) {
+      Object.keys(map).forEach(id => {
+        if (id) used.add(id);
+      });
+    }
+  }
+  return used;
+}
+
+function getAccountSeasonOptions(accountId) {
+  if (!accountId) return [];
+  const seasons = Array.isArray(state.data.seasons) ? state.data.seasons : [];
+  const used = getUsedSeasonIds(accountId);
+  const out = [];
+  const seen = new Set();
+  for (const s of seasons) {
+    if (s && used.has(s.id)) {
+      out.push(s);
+      seen.add(s.id);
+    }
+  }
+  for (const id of used) {
+    if (!seen.has(id)) {
+      out.push({ id, label: seasonLabelFromId(id) });
+      seen.add(id);
+    }
+  }
+  return out;
+}
+
+function ensureSeasonExists(id, label) {
+  if (!id) return;
+  if (!Array.isArray(state.data.seasons)) state.data.seasons = [];
+  const existing = state.data.seasons.find(s => s.id === id);
+  if (existing) {
+    if (!existing.label && label) existing.label = label;
+    if (!("userCreated" in existing)) existing.userCreated = true;
+    return;
+  }
+  state.data.seasons.push({
+    id,
+    label: label || seasonLabelFromId(id),
+    createdAt: new Date().toISOString(),
+    userCreated: true
+  });
 }
 
 function generateSeasons(rangeBack = 3, rangeForward = 6) {
@@ -1058,22 +1526,37 @@ function formatMatchTitle(m) {
   return `Liverpool vs ${m.opponent} (${m.venue})`;
 }
 
-function formatMeta(m) {
+function formatDisplayDate(ymd) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ymd || "");
+  if (!match) return ymd || "—";
+  return `${match[3]}-${match[2]}-${match[1]}`;
+}
+
+function competitionLabel(comp) {
   const compMap = { PL: "PL", UCL: "UCL", FAC: "FA Cup", LC: "League Cup", OTHER: "Other" };
-  const comp = compMap[m.competition] || m.competition;
-  const date = m.matchDate || "—";
+  return compMap[comp] || comp || "Other";
+}
+
+function competitionBadgeClass(comp) {
+  const map = { PL: "comp-pl", UCL: "comp-ucl", LC: "comp-lc", FAC: "comp-fac", OTHER: "comp-other" };
+  return map[comp] || "comp-other";
+}
+
+function formatMeta(m) {
+  const comp = competitionLabel(m.competition);
+  const date = formatDisplayDate(m.matchDate || "");
   return `${date} • ${comp}`;
 }
 
 function badgeForCredit(m) {
-  if (m.creditCredit === "yes") return { text: "🟢 Credit", cls: "good" };
-  if (m.creditCredit === "no") return { text: "🔴 No credit", cls: "bad" };
-  return { text: "ℹ️ Unsure", cls: "neutral" };
+  if (m.creditCredit === "yes") return { text: "Credit", cls: "good" };
+  if (m.creditCredit === "no") return { text: "No credit", cls: "bad" };
+  return { text: "Unsure", cls: "neutral" };
 }
 
 function badgeForOutcome(m) {
   const map = { applied: "Applied", successful: "Successful", unsuccessful: "Unsuccessful", na: "Didn’t apply" };
-  return { text: `📄 ${map[m.appliedStatus] || "—"}`, cls: "neutral" };
+  return { text: `${map[m.appliedStatus] || "—"}`, cls: "neutral" };
 }
 
 function badgeForAction(m) {
@@ -1086,17 +1569,23 @@ function badgeForAction(m) {
     hosp_nocredit: "Hospitality (no credit)",
     scan_nocredit: "Scan in (no credit)"
   };
-  return { text: `🎟️ ${map[m.ticketAction] || "—"}`, cls: "neutral" };
+  return { text: `${map[m.ticketAction] || "—"}`, cls: "neutral" };
 }
 
 function setView(viewName) {
   const tabs = document.querySelectorAll(".tab");
   tabs.forEach(t => t.classList.toggle("active", t.dataset.view === viewName));
 
+  const acctActions = $("acctActions");
+  if (acctActions) {
+    acctActions.classList.toggle("hidden", viewName !== "dash");
+  }
+
   $("viewSetup").classList.toggle("hidden", viewName !== "setup");
   $("viewDash").classList.toggle("hidden", viewName !== "dash");
   $("viewMatches").classList.toggle("hidden", viewName !== "matches");
   $("viewAdd").classList.toggle("hidden", viewName !== "add");
+  $("infoPage").classList.toggle("hidden", viewName !== "info");
   if (viewName === "fixtures") { setTimeout(() => { bindFixturesControls(); renderFixtures(); }, 0); }
   if (viewName === "setup") { setTimeout(() => { try{ populateAllSeasonSelects(); }catch(e){} }, 0); }
   $("viewFixtures").classList.toggle("hidden", viewName !== "fixtures");
@@ -1107,24 +1596,36 @@ function setView(viewName) {
 function renderSeasonSelect() {
   const sel = $("seasonSelect");
   sel.innerHTML = "";
-  for (const s of state.data.seasons) {
+  const seasons = getAccountSeasonOptions(activeAccountId());
+  if (seasons.length === 0) {
     const opt = document.createElement("option");
-    opt.value = s.id;
-    opt.textContent = s.label;
+    opt.value = "";
+    opt.textContent = "No seasons yet";
     sel.appendChild(opt);
+    sel.value = "";
+    sel.disabled = true;
+  } else {
+    const desired = activeSeasonId();
+    const hasDesired = seasons.some(s => s.id === desired);
+    if (desired && !hasDesired) {
+      setActiveSeason(seasons[0].id);
+      return;
+    }
+    for (const s of seasons) {
+      const opt = document.createElement("option");
+      opt.value = s.id;
+      opt.textContent = s.label;
+      sel.appendChild(opt);
+    }
+    sel.value = desired || seasons[0].id;
+    sel.disabled = false;
   }
-  sel.value = activeSeasonId();
 
   // mirror into modals if present
   const onboardSeason = $("onboardSeason");
   if (onboardSeason) {
     onboardSeason.innerHTML = sel.innerHTML;
     onboardSeason.value = sel.value;
-  }
-  const setupSeason = $("setupSeason");
-  if (setupSeason) {
-    setupSeason.innerHTML = sel.innerHTML;
-    setupSeason.value = sel.value;
   }
 }
 
@@ -1153,7 +1654,7 @@ function renderDashboard() {
     setText("statSpend", formatGBP(0));
     setText("statAvgSpend", formatGBP(0));
     const mount = $("compBreakdown");
-    if (mount) mount.innerHTML = '<div class="empty">👤 Add an account to start tracking.</div>';
+    if (mount) mount.innerHTML = '<div class="empty">Add an account to start tracking.</div>';
     const root = $("recentList");
     if (root) root.innerHTML = '<div class="empty">No activity yet.</div>';
     return;
@@ -1172,6 +1673,7 @@ function renderDashboard() {
   const autoCup = getAutoCupForSeason(acc, activeSeasonId());
   const breakdown = computeBreakdownByCompetition(activeSeasonId());
   const labels = { PL: "Premier League", UCL: "UCL", FAC: "FA Cup", LC: "League Cup", OTHER: "Other" };
+  const compClasses = { PL: "comp-pl", UCL: "comp-ucl", LC: "comp-lc", FAC: "comp-fac", OTHER: "comp-other" };
   const table = document.createElement("table");
   table.className = "breakdownTable";
   table.innerHTML = `
@@ -1187,15 +1689,16 @@ function renderDashboard() {
     const row = document.createElement("tr");
     const comp = document.createElement("td");
     comp.textContent = labels[key] || key;
+    const compClass = compClasses[key] || "comp-other";
     const h = document.createElement("td");
     const homeAuto = (key === "LC" && autoCup.LC) || (key === "FAC" && autoCup.FAC) || (key === "UCL" && autoCup.UCL);
     if (homeAuto) {
       h.innerHTML = `<span class="breakdownPill neutral">AutoCup</span>`;
     } else {
-      h.innerHTML = `<span class="breakdownPill good">H: ${breakdown[key].H}</span>`;
+      h.innerHTML = `<span class="breakdownPill ${compClass}">H: ${breakdown[key].H}</span>`;
     }
     const a = document.createElement("td");
-    a.innerHTML = `<span class="breakdownPill good">A: ${breakdown[key].A}</span>`;
+    a.innerHTML = `<span class="breakdownPill ${compClass}">A: ${breakdown[key].A}</span>`;
     row.appendChild(comp);
     row.appendChild(h);
     row.appendChild(a);
@@ -1219,7 +1722,7 @@ function renderDashboard() {
 if (matches.length === 0) {
     const div = document.createElement("div");
     div.className = "empty";
-    div.textContent = "🎟️ No matches yet — tap ➕ Add match to start tracking.";
+    div.textContent = "No matches yet — tap Add match to start tracking.";
     root.appendChild(div);
     return;
   }
@@ -1249,12 +1752,18 @@ function matchCard(m) {
   left.appendChild(title);
   left.appendChild(meta);
 
+  const ha = (m.venue === "A") ? "A" : "H";
+  const haPill = document.createElement("div");
+  haPill.className = `pill ${ha === "H" ? "ha-home" : "ha-away"}`;
+  haPill.textContent = ha;
+
   const credit = badgeForCredit(m);
   const creditBadge = document.createElement("div");
   creditBadge.className = `badge ${credit.cls}`;
   creditBadge.textContent = credit.text;
 
   top.appendChild(left);
+  top.appendChild(haPill);
 
   const badges = document.createElement("div");
   badges.className = "itemBadges";
@@ -1262,12 +1771,12 @@ function matchCard(m) {
   if (typeof m.amountPaid === "number" && Number.isFinite(m.amountPaid)) {
     const cost = document.createElement("div");
     cost.className = "badge neutral";
-    cost.textContent = `💷 ${formatGBP(m.amountPaid)}`;
+    cost.textContent = `${formatGBP(m.amountPaid)}`;
     badges.appendChild(cost);
   }
   const comp = document.createElement("div");
-  comp.className = "badge red";
-  comp.textContent = `🏷️ ${m.competition}`;
+  comp.className = `badge ${competitionBadgeClass(m.competition)}`;
+  comp.textContent = competitionLabel(m.competition);
 
   badges.appendChild(creditBadge);
   badges.appendChild(comp);
@@ -1279,7 +1788,7 @@ function matchCard(m) {
     const notes = document.createElement("div");
     notes.className = "itemMeta";
     notes.style.marginTop = "8px";
-    notes.textContent = `🗒️ ${m.notes.trim()}`;
+    notes.textContent = `Notes: ${m.notes.trim()}`;
     div.appendChild(notes);
   }
 
@@ -1520,7 +2029,7 @@ function importJSONFile(file) {
       renderAll();
       alert("Import complete ✅");
     } catch {
-      alert("Import failed ❌ (Invalid JSON backup)");
+      alert("Import failed (Invalid JSON backup)");
     }
   };
   reader.readAsText(file);
@@ -1546,7 +2055,7 @@ function addSeason() {
     alert("That season already exists.");
     return;
   }
-  state.data.seasons.push({ id, label, createdAt: new Date().toISOString() });
+  ensureSeasonExists(id, label);
   state.data.activeSeasonId = id;
   save();
   renderAll();
@@ -1620,7 +2129,7 @@ function bindEvents() {
     }
   });
 
-  onEl("btnReloadFixtures","click", ()=>{ fixturesCache=null; renderFixtures(); });
+  onEl("btnReloadFixtures","click", reloadFixturesHard);
   onEl("fixtureShow","change", renderFixtures);
   onEl("fixtureComp","change", renderFixtures);
 
@@ -1697,11 +2206,48 @@ onEl("btnSettings","click", openSettings);
 
   // Setup screen
   onEl("setupCount","input", renderSetupNames);
+  onEl("setupMode","change", () => {
+    updateSetupModeUI();
+    renderSetupNames();
+  });
   onEl("btnSetupCreate","click", () => { try { saveSetup(); } catch(e){ alert("Setup error: " + (e && e.message ? e.message : e)); console.error(e); } });
 
 onEl("btnSupport","click", openSupport);
 onEl("btnCloseSupport","click", closeSupport);
-onEl("btnBmac","click", ()=> window.open("https://buymeacoffee.com/TicketHelpLFC", "_blank", "noopener"));
+onEl("btnBmac","click", ()=> window.open("https://buymeacoffee.com/lfctools", "_blank", "noopener"));
+onEl("btnInfo","click", () => setView("info"));
+}
+
+function bindTopbarAutoHide() {
+  const topbar = document.querySelector(".topbar");
+  if (!topbar) return;
+  let lastY = window.scrollY || 0;
+  let ticking = false;
+  const downThreshold = 10;
+  const upThreshold = 6;
+
+  const update = () => {
+    const currentY = window.scrollY || 0;
+    const delta = currentY - lastY;
+
+    if (currentY <= 0) {
+      topbar.classList.remove("is-hidden");
+    } else if (delta > downThreshold) {
+      topbar.classList.add("is-hidden");
+    } else if (delta < -upThreshold) {
+      topbar.classList.remove("is-hidden");
+    }
+
+    lastY = currentY;
+    ticking = false;
+  };
+
+  window.addEventListener("scroll", () => {
+    if (!ticking) {
+      window.requestAnimationFrame(update);
+      ticking = true;
+    }
+  }, { passive: true });
 }
 
 function init() {
@@ -1710,14 +2256,17 @@ function init() {
   load();
   setupPWA();
   bindEvents();
+  bindTopbarAutoHide();
   try { bindFixturesControls(); } catch(e) {}
   clearForm();
   renderAll();
+  updateSetupModeUI();
   setView("dash");
 
   if (!state.data.accounts || state.data.accounts.length === 0) {
     setView("setup");
     renderSetupNames();
+    updateSetupModeUI();
   
 }
 }
@@ -1731,7 +2280,12 @@ function renderSetupNames() {
 
   const count = Math.max(1, Math.min(10, parseInt($("setupCount")?.value || "1", 10)));
 
-    wrap.innerHTML = "";
+  wrap.innerHTML = "";
+  if (getSetupMode() === "existing") {
+    try { populateAllSeasonSelects(); } catch(e) {}
+    return;
+  }
+
   for (let i = 1; i <= count; i++) {
     const row = document.createElement("div");
     row.className = "item";
@@ -1765,24 +2319,88 @@ function renderSetupNames() {
 
 }
 
+function getSetupMode() {
+  return $("setupMode")?.value || "new";
+}
+
+function populateExistingAccountSelect() {
+  const sel = $("setupExistingAccount");
+  if (!sel) return;
+  sel.innerHTML = "";
+  for (const a of (state.data.accounts || [])) {
+    const opt = document.createElement("option");
+    opt.value = a.id;
+    opt.textContent = a.name;
+    sel.appendChild(opt);
+  }
+  sel.value = activeAccountId() || sel.options[0]?.value || "";
+}
+
+function updateSetupModeUI() {
+  const modeSelect = $("setupMode");
+  const newFields = $("setupNewAccountFields");
+  const existingFields = $("setupExistingAccountFields");
+  if (!modeSelect || !newFields || !existingFields) return;
+  const hasAccounts = (state.data.accounts || []).length > 0;
+  const existingOption = modeSelect.querySelector('option[value="existing"]');
+  if (existingOption) existingOption.disabled = !hasAccounts;
+  if (!hasAccounts && modeSelect.value === "existing") modeSelect.value = "new";
+
+  const isExisting = modeSelect.value === "existing";
+  newFields.classList.toggle("hidden", isExisting);
+  existingFields.classList.toggle("hidden", !isExisting);
+  if (isExisting) populateExistingAccountSelect();
+}
+
 
 function openSetupForNewAccount() {
   // Convenience: go to setup screen but keep existing accounts
   state.isAddingSingle = true;
   setView("setup");
   $("setupCount").value = "1";
+  if ($("setupMode")) $("setupMode").value = "new";
 
   // Ensure the setup season dropdown is populated with real season IDs
   try { populateSeasonSelect($("setupSeason")); } catch(e) {}
   if ($("setupSeason")) $("setupSeason").value = activeSeasonId();
 
+  updateSetupModeUI();
   renderSetupNames();
 }
 
 function saveSetup() {
   const count = Math.max(1, Math.min(10, parseInt($("setupCount")?.value || "1", 10)));
-  const season = $("setupSeason")?.value || activeSeasonId();
+  const setupSeason = $("setupSeason");
+  const season = setupSeason?.value || activeSeasonId();
+  const seasonLabel = setupSeason?.selectedOptions?.[0]?.textContent || seasonLabelFromId(season);
+  ensureSeasonExists(season, seasonLabel);
   setActiveSeason(season);
+
+  if (getSetupMode() === "existing") {
+    const accId = $("setupExistingAccount")?.value;
+    const acc = state.data.accounts.find(a => a.id === accId);
+    if (!acc) {
+      alert("Select an existing account to add a season.");
+      return;
+    }
+    const autoCup = {
+      LC: !!$("setupExistingLC")?.checked,
+      FAC: !!$("setupExistingFAC")?.checked,
+      UCL: !!$("setupExistingUCL")?.checked
+    };
+    setAutoCupForSeason(acc, season, autoCup);
+    acc.autoCup = {
+      LC: !!autoCup.LC,
+      FAC: !!autoCup.FAC,
+      UCL: !!autoCup.UCL
+    };
+    setActiveAccount(acc.id);
+    save();
+    renderAll();
+    setView("dash");
+    try { showToast(`Season added to ${acc.name}`); } catch(e) { alert(`Season added to ${acc.name}`); }
+    return;
+  }
 
   const createdIds = [];
 
@@ -1852,13 +2470,166 @@ function createAccount(name, autoCup={LC:false, FAC:false, UCL:false}, seasonId=
 
 var fixturesCache = null;
 
+// Published Google Sheet (CSV)
+const FIXTURES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRqcy7d0MakWNfXkcDa60y4opsxQifUfzw38man6J0-U-2BvQKbUIJPnpPMFaxQMlYBV2-psPNram_E/pub?gid=716063176&single=true&output=csv";
 
+// Cache CSV results in localStorage (so fixtures still load if you're offline)
+const FIXTURES_CACHE_KEY = "thlfc_fixtures_csv_cache_v1";
+const FIXTURES_CACHE_TS_KEY = "thlfc_fixtures_csv_cache_ts_v1";
+const FIXTURES_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
 
+function loadCachedCSVFixtures() {
+  try {
+    const ts = Number(localStorage.getItem(FIXTURES_CACHE_TS_KEY) || "0");
+    const raw = localStorage.getItem(FIXTURES_CACHE_KEY);
+    if (!raw) return null;
+    const fixtures = JSON.parse(raw);
+    if (!Array.isArray(fixtures)) return null;
+    return { ts, fixtures };
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveCachedCSVFixtures(fixtures) {
+  try {
+    localStorage.setItem(FIXTURES_CACHE_KEY, JSON.stringify(fixtures || []));
+    localStorage.setItem(FIXTURES_CACHE_TS_KEY, String(Date.now()));
+  } catch (e) {}
+}
+
+// Simple CSV parser that supports quoted fields + commas
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let cur = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < (text || "").length; i++) {
+    const ch = text[i];
+    const next = text[i + 1];
+
+    if (inQuotes) {
+      if (ch === '"' && next === '"') {
+        cur += '"';
+        i++;
+      } else if (ch === '"') {
+        inQuotes = false;
+      } else {
+        cur += ch;
+      }
+      continue;
+    }
+
+    if (ch === '"') {
+      inQuotes = true;
+      continue;
+    }
+
+    if (ch === ",") {
+      row.push(cur);
+      cur = "";
+      continue;
+    }
+
+    if (ch === "\n") {
+      row.push(cur);
+      rows.push(row);
+      row = [];
+      cur = "";
+      continue;
+    }
+
+    if (ch === "\r") continue;
+
+    cur += ch;
+  }
+
+  // last cell
+  row.push(cur);
+  rows.push(row);
+
+  // drop fully empty trailing rows
+  while (rows.length && rows[rows.length - 1].every(v => String(v || "").trim() === "")) rows.pop();
+  return rows;
+}
+
+function toFixtureObject(headers, cells) {
+  const obj = {};
+  headers.forEach((h, idx) => { obj[h] = (cells[idx] ?? "").trim(); });
+
+  const date = obj.date || "";
+  const time = obj.time || "00:00";
+  const competition = obj.competition || "OTHER";
+  const opponent = obj.opponent || "";
+  const venue = (obj.venue || "H").toUpperCase() === "A" ? "A" : "H";
+
+  // Ensure ID exists (needed for de-duping + tracked highlighting)
+  const safeOpp = opponent.replace(/\s+/g, "").toLowerCase();
+  const id = (obj.id && obj.id.trim()) ? obj.id.trim() :
+    `${date}-${competition.toLowerCase()}-${safeOpp}-${venue.toLowerCase()}-${String(time).replace(":","")}`;
+
+  // Ensure datetime_utc exists (some parts of the app use date only, but keep it consistent)
+  const dtUtc = (obj.datetime_utc && obj.datetime_utc.trim()) ? obj.datetime_utc.trim() :
+    (date ? `${date}T${time}:00Z` : "");
+
+  return {
+    id,
+    season: obj.season || "",
+    date,
+    time,
+    datetime_utc: dtUtc,
+    competition,
+    opponent,
+    venue,
+    location: obj.location || ""
+  };
+}
+
+async function fetchFixturesFromCSV() {
+  const res = await fetch(FIXTURES_CSV_URL, { cache: "no-store" });
+  if (!res.ok) throw new Error(`CSV HTTP ${res.status}`);
+  const text = await res.text();
+  const rows = parseCSV(text);
+  if (!rows.length) return [];
+  const headers = rows[0].map(h => String(h || "").trim());
+  const dataRows = rows.slice(1);
+
+  const fixtures = [];
+  for (const r of dataRows) {
+    if (!r || r.every(v => String(v || "").trim() === "")) continue;
+    fixtures.push(toFixtureObject(headers, r));
+  }
+
+  // De-dupe by id (keep last)
+  const map = new Map();
+  fixtures.forEach(f => { if (f && f.id) map.set(String(f.id), f); });
+  return Array.from(map.values());
+}
 
 async function loadFixturesData() {
   if (fixturesCache) return fixturesCache;
 
-  // Primary: embedded JSON in index.html (offline + SW-safe)
+  // 1) CSV cache (fast + offline-friendly)
+  const cached = loadCachedCSVFixtures();
+  if (cached && (Date.now() - cached.ts) < FIXTURES_TTL_MS && cached.fixtures.length) {
+    fixturesCache = cached.fixtures;
+    return fixturesCache;
+  }
+
+  // 2) Live CSV (Google Sheet)
+  try {
+    const fixtures = await fetchFixturesFromCSV();
+    if (Array.isArray(fixtures) && fixtures.length) {
+      fixturesCache = fixtures;
+      saveCachedCSVFixtures(fixturesCache);
+      return fixturesCache;
+    }
+  } catch (e) {
+    // swallow + fall through to embedded/imported
+  }
+
+  // 3) Embedded JSON in index.html (offline + SW-safe)
   try {
     const el = document.getElementById("fixturesData");
     if (el && el.textContent) {
@@ -1868,7 +2639,7 @@ async function loadFixturesData() {
     }
   } catch(e) {}
 
-  // Fallback: imported fixtures from localStorage
+  // 4) Imported fixtures from localStorage
   try {
     const imported = getImportedFixtures();
     if (Array.isArray(imported) && imported.length) {
@@ -1883,13 +2654,15 @@ async function loadFixturesData() {
 
 function formatFixtureDate(f) {
   // Use date only (app stores matchDate only). Time may be 00:00 in feed.
-  return f.date || (f.datetime_utc ? (f.datetime_utc.slice(0,10)) : "");
+  const raw = f.date || (f.datetime_utc ? (f.datetime_utc.slice(0,10)) : "");
+  return formatDisplayDate(raw);
 }
 
 function fixtureRow(f) {
   const when = formatFixtureDate(f);
   const ha = (f.venue === "H") ? "H" : "A";
   const comp = f.competition || "OTHER";
+  const compClass = competitionBadgeClass(comp);
   const opp = f.opponent || "—";
   const time = (f.time && f.time !== "00:00") ? ` • ${f.time}` : "";
   const el = document.createElement("div");
@@ -1898,9 +2671,12 @@ function fixtureRow(f) {
     <div class="row space-between">
       <div>
         <div class="itemTitle">${opp}</div>
-        <div class="hint">${when}${time} • ${comp} • ${ha}</div>
+        <div class="hint">${when}${time}</div>
       </div>
-      <div class="pill">${ha}</div>
+     <div class="fixtureLabels">
+        <div class="pill comp-pill ${compClass}">${comp}</div>
+        <div class="pill ${ha === "H" ? "ha-home" : "ha-away"}">${ha}</div>
+      </div>
     </div>
   `;
   el.addEventListener("click", () => prefillFromFixture(f));
@@ -1921,8 +2697,10 @@ async function renderFixtures() {
 
     const showSel = document.getElementById("fixtureShow");
     const compSel = document.getElementById("fixtureComp");
+    const haSel = document.getElementById("fixtureHA");
     const show = showSel ? showSel.value : "upcoming";
     const compFilter = compSel ? compSel.value : "";
+    const haFilter = haSel ? haSel.value : "";
 
     const data = (await loadFixturesData()).slice();
     if (countEl) countEl.textContent = `Loaded ${data.length} fixtures…`;
@@ -1932,6 +2710,7 @@ async function renderFixtures() {
 
     let filtered = data.filter(f => {
       if (compFilter && f.competition !== compFilter) return false;
+      if (haFilter && (f.venue || "H") !== haFilter) return false;
       const raw = (f.date || (f.datetime_utc||""));
       const d = parseYMD((raw || "").slice(0,10));
       if (!d) return false;
@@ -1962,8 +2741,10 @@ const _trackedKeys = new Set(_matches.map(m => `${(m.matchDate||"")}|${(m.compet
 
     listEl.innerHTML = filtered.map(f => {
       const when = (f.date || (f.datetime_utc||"").slice(0,10));
+      const whenDisplay = formatDisplayDate(when);
       const ha = (f.venue === "A") ? "A" : "H";
       const comp = f.competition || "OTHER";
+      const compClass = competitionBadgeClass(comp);
       const opp = f.opponent || "—";
       const time = (f.time && f.time !== "00:00") ? ` • ${f.time}` : "";
       const fid = (f.id || "").replace(/"/g,'');
@@ -1974,9 +2755,12 @@ const _trackedKeys = new Set(_matches.map(m => `${(m.matchDate||"")}|${(m.compet
           <div class="row space-between">
             <div>
               <div class="itemTitle">${opp}</div>
-              <div class="hint">${when}${time} • ${comp} • ${ha}</div>
+              <div class="hint">${whenDisplay}${time}</div>
             </div>
-            <div class="pill">${ha}</div>
+           <div class="fixtureLabels">
+              <div class="pill comp-pill ${compClass}">${comp}</div>
+              <div class="pill ${ha === "H" ? "ha-home" : "ha-away"}">${ha}</div>
+            </div>
           </div>
         </div>
       `;
@@ -2054,10 +2838,12 @@ function showToast(msg){
 (function(){
   const fs = document.getElementById("fixtureShow");
   const fc = document.getElementById("fixtureComp");
+  const fh = document.getElementById("fixtureHA");
   const fr = document.getElementById("btnReloadFixtures");
   if (fs) fs.addEventListener("change", renderFixtures);
   if (fc) fc.addEventListener("change", renderFixtures);
-  if (fr) fr.addEventListener("click", ()=>{ fixturesCache=null; renderFixtures(); });
+  if (fh) fh.addEventListener("change", renderFixtures);
+  if (fr) fr.addEventListener("click", reloadFixturesHard);
   const clr = document.getElementById("btnClearFixtures");
   if (clr) clr.addEventListener("click", ()=>{ setImportedFixtures([]); fixturesCache=null; try{showToast("Cleared imported fixtures");}catch(e){} renderFixtures(); });
 })();
@@ -2148,13 +2934,38 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.getRegistration().then(reg => { if (reg) reg.update(); });
 }
 
+async function reloadFixturesHard(){
+  try{
+    // Clear in-memory + local cached CSV so we definitely fetch the latest sheet
+    fixturesCache = null;
+    try{
+      localStorage.removeItem(FIXTURES_CACHE_KEY);
+      localStorage.removeItem(FIXTURES_CACHE_TS_KEY);
+    }catch(_){}
+
+    // Fetch live CSV immediately (and re-cache it)
+    const live = await fetchFixturesFromCSV();
+    if (Array.isArray(live) && live.length){
+      fixturesCache = live;
+      saveCachedCSVFixtures(live);
+    }
+
+    await renderFixtures();
+  }catch(e){
+    console.error("Failed to refresh fixtures", e);
+    alert("Failed to refresh fixtures. Check your connection and try again.");
+  }
+}
+
 function bindFixturesControls(){
   const fs = document.getElementById("fixtureShow");
   const fc = document.getElementById("fixtureComp");
+  const fh = document.getElementById("fixtureHA");
   const fr = document.getElementById("btnReloadFixtures");
   if (fs) fs.onchange = () => renderFixtures();
   if (fc) fc.onchange = () => renderFixtures();
-  if (fr) fr.onclick = () => { fixturesCache = null; renderFixtures(); };
+  if (fh) fh.onchange = () => renderFixtures();
+  if (fr) fr.onclick = reloadFixturesHard;
 }
 
 function seasonLabel(startYY){
@@ -2193,22 +3004,169 @@ if (typeof init === "function") {
 }
 
 
-function editActiveAccount(){
+function openAccountSettingsModal(acc){
+  return new Promise(resolve => {
+    const dlg = $("accountSettingsModal");
+    const input = $("accountNameInput");
+    const btnSave = $("btnSaveAccountSettings");
+    const btnCancel = $("btnCancelAccountSettings");
+    const btnClose = $("btnCloseAccountSettings");
+    if (!dlg || !input || !btnSave || !btnCancel || !btnClose) {
+      resolve({ name: (acc && acc.name) || "" });
+      return;
+    }
+
+    input.value = acc && acc.name ? acc.name : "";
+
+    const cleanup = (result) => {
+      btnSave.removeEventListener("click", onSave);
+      btnCancel.removeEventListener("click", onCancel);
+      btnClose.removeEventListener("click", onCancel);
+      dlg.removeEventListener("cancel", onCancel);
+      try { dlg.close(); } catch(e) {}
+      dlg.classList.add("hidden");
+      resolve(result);
+    };
+
+    const onSave = () => cleanup({ name: (input.value || "").trim() });
+    const onCancel = () => cleanup(null);
+
+    btnSave.addEventListener("click", onSave);
+    btnCancel.addEventListener("click", onCancel);
+    btnClose.addEventListener("click", onCancel);
+    dlg.addEventListener("cancel", onCancel);
+
+    dlg.classList.remove("hidden");
+    if (dlg.showModal) dlg.showModal();
+    else dlg.setAttribute("open","");
+    setTimeout(() => input.focus(), 0);
+  });
+}
+
+function openDeleteAccountModal({ accountName, seasonTxt }) {
+  return new Promise(resolve => {
+    const dlg = $("deleteAccountModal");
+    const question = $("deleteAccountQuestion");
+    const seasonLabel = $("deleteAccountSeason");
+    const accountBtn = $("btnDeleteAccountConfirm");
+    const seasonBtn = $("btnDeleteSeasonConfirm");
+    const cancelBtn = $("btnDeleteAccountCancel");
+    const closeBtn = $("btnCloseDeleteAccount");
+    if (!dlg || !question || !seasonLabel || !accountBtn || !seasonBtn || !cancelBtn || !closeBtn) {
+      resolve("cancel");
+      return;
+    }
+
+    question.textContent = `Delete "${accountName}" or just this season?`;
+    seasonLabel.textContent = `Season ${seasonTxt}`;
+
+    const cleanup = (result) => {
+      accountBtn.removeEventListener("click", onAccount);
+      seasonBtn.removeEventListener("click", onSeason);
+      cancelBtn.removeEventListener("click", onCancel);
+      closeBtn.removeEventListener("click", onCancel);
+      dlg.removeEventListener("cancel", onCancel);
+      try { dlg.close(); } catch(e) {}
+      dlg.classList.add("hidden");
+      resolve(result);
+    };
+
+    const onAccount = () => cleanup("account");
+    const onSeason = () => cleanup("season");
+    const onCancel = () => cleanup("cancel");
+
+    accountBtn.addEventListener("click", onAccount);
+    seasonBtn.addEventListener("click", onSeason);
+    cancelBtn.addEventListener("click", onCancel);
+    closeBtn.addEventListener("click", onCancel);
+    dlg.addEventListener("cancel", onCancel);
+
+    dlg.classList.remove("hidden");
+    if (dlg.showModal) dlg.showModal();
+    else dlg.setAttribute("open","");
+    setTimeout(() => seasonBtn.focus(), 0);
+  });
+}
+
+function openAutoCupPrompt(opts){
+  const { seasonTxt, competitionLabel } = opts || {};
+  return new Promise(resolve => {
+    const dlg = $("autoCupModal");
+    const title = $("autoCupTitle");
+    const question = $("autoCupQuestion");
+    const season = $("autoCupSeason");
+    const yesBtn = $("btnAutoCupYes");
+    const noBtn = $("btnAutoCupNo");
+    const cancelBtn = $("btnAutoCupCancel");
+    const closeBtn = $("btnCloseAutoCup");
+    if (!dlg || !title || !question || !season || !yesBtn || !noBtn || !cancelBtn || !closeBtn) {
+      resolve("cancel");
+      return;
+    }
+
+    title.textContent = "Account Settings";
+    question.textContent = `AutoCup (HOME) — ${competitionLabel}?`;
+    season.textContent = `Season ${seasonTxt}`;
+
+    const cleanup = (result) => {
+      yesBtn.removeEventListener("click", onYes);
+      noBtn.removeEventListener("click", onNo);
+      cancelBtn.removeEventListener("click", onCancel);
+      closeBtn.removeEventListener("click", onCancel);
+      dlg.removeEventListener("cancel", onCancel);
+      try { dlg.close(); } catch(e) {}
+      dlg.classList.add("hidden");
+      resolve(result);
+    };
+
+    const onYes = () => cleanup("yes");
+    const onNo = () => cleanup("no");
+    const onCancel = () => cleanup("cancel");
+
+    yesBtn.addEventListener("click", onYes);
+    noBtn.addEventListener("click", onNo);
+    cancelBtn.addEventListener("click", onCancel);
+    closeBtn.addEventListener("click", onCancel);
+    dlg.addEventListener("cancel", onCancel);
+
+    dlg.classList.remove("hidden");
+    if (dlg.showModal) dlg.showModal();
+    else dlg.setAttribute("open","");
+    setTimeout(() => yesBtn.focus(), 0);
+  });
+}
+
+function seasonLabelFromId(seasonId){
+  const match = String(seasonId || "").match(/^(\d{4})/);
+  if (!match) return String(seasonId || "");
+  const startYear = Number(match[1]);
+  if (!Number.isFinite(startYear)) return String(seasonId || "");
+  return seasonLabel(startYear % 100);
+}
+
+async function editActiveAccount(){
   const accId = activeAccountId();
   const acc = state.data.accounts.find(a=>a.id===accId);
   if(!acc){ alert("No account selected"); return; }
-  const newName = prompt("Account name:", acc.name || "");
-  if(newName === null) return;
-  acc.name = (newName || "").trim() || acc.name;
+  const accountResult = await openAccountSettingsModal(acc);
+  if(!accountResult) return;
+  const originalName = acc.name;
+  acc.name = accountResult.name || acc.name;
 
-  // Autocup toggles (per account)
-  const ac = getAutoCupForSeason(acc, activeSeasonId());
-  const seasonTxt = seasonLabel(activeSeasonId());
-  const lc = confirm(`AutoCup (HOME) — League Cup?\nSeason: ${seasonTxt}\n\nOK = Yes, Cancel = No`);
-  const fac = confirm(`AutoCup (HOME) — FA Cup?\nSeason: ${seasonTxt}\n\nOK = Yes, Cancel = No`);
-  const ucl = confirm(`AutoCup (HOME) — Champions League?\nSeason: ${seasonTxt}\n\nOK = Yes, Cancel = No`);
-  setAutoCupForSeason(acc, activeSeasonId(), {LC:lc, FAC:fac, UCL:ucl});
-  acc.autoCup = {LC:lc, FAC:fac, UCL:ucl};
+  const seasonTxt = seasonLabelFromId(activeSeasonId());
+  const lc = await openAutoCupPrompt({ seasonTxt, competitionLabel: "League Cup" });
+  if (lc === "cancel") { acc.name = originalName; return; }
+  const fac = await openAutoCupPrompt({ seasonTxt, competitionLabel: "FA Cup" });
+  if (fac === "cancel") { acc.name = originalName; return; }
+  const ucl = await openAutoCupPrompt({ seasonTxt, competitionLabel: "Champions League" });
+  if (ucl === "cancel") { acc.name = originalName; return; }
+
+  const lcYes = lc === "yes";
+  const facYes = fac === "yes";
+  const uclYes = ucl === "yes";
+
+  setAutoCupForSeason(acc, activeSeasonId(), {LC:lcYes, FAC:facYes, UCL:uclYes});
+  acc.autoCup = {LC:lcYes, FAC:facYes, UCL:uclYes};
 
   save();
   renderAccountSelect();
@@ -2216,10 +3174,33 @@ function editActiveAccount(){
   showToast("Account updated");
 }
 
-function deleteActiveAccount(){
+async function deleteActiveAccount(){
   const accId = activeAccountId();
   const acc = state.data.accounts.find(a=>a.id===accId);
   if(!acc){ alert("No account selected"); return; }
+  const seasonId = activeSeasonId();
+  const seasonTxt = seasonLabelFromId(seasonId);
+  const choice = await openDeleteAccountModal({ accountName: acc.name, seasonTxt });
+  if(choice === "season") {
+    const ok = confirm(`Delete season ${seasonTxt} for "${acc.name}"?\nThis will remove tracked matches for this season only.`);
+    if(!ok) return;
+    state.data.matches = state.data.matches.filter(m => !(m.accountId === accId && m.seasonId === seasonId));
+    if (acc.autoCupBySeason && acc.autoCupBySeason[seasonId]) {
+      delete acc.autoCupBySeason[seasonId];
+    }
+    acc.autoCup = { LC:false, FAC:false, UCL:false };
+    const options = getAccountSeasonOptions(accId);
+    if (state.data.activeSeasonId === seasonId) {
+      state.data.activeSeasonId = options.find(s => s.id !== seasonId)?.id || options[0]?.id || "";
+    }
+    save();
+    renderAll();
+    showToast("Season deleted");
+    return;
+  }
+
+  if (choice !== "account") return;
+
   if(state.data.accounts.length <= 1){
     alert("You must have at least 1 account.");
     return;
@@ -2268,8 +3249,5 @@ onEl("btnToggleFeedback","click", ()=>{
   arrow.textContent = open ? "▾" : "▸";
 });
 </script>
-
-
-  <footer class="buildFooter">Build 2026-01-19 • fixtures-small</footer>
 </body>
 </html>
