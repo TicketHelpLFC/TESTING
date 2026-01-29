@@ -258,16 +258,14 @@ body{
 
 .matchItem{
   position:relative;
-  padding-bottom:52px;
 }
 
 .itemCornerTags{
-  position:absolute;
-  right:12px;
-  bottom:12px;
+  margin-left:auto;
   display:flex;
   align-items:center;
   gap:6px;
+  flex-shrink:0;
 }
 
 .item.fixtureTracked{
@@ -637,9 +635,21 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
   margin-bottom:10px;
 }
 .filtersGrid{
-  display:grid;
-  grid-template-columns:repeat(2, minmax(0, 1fr));
+  display:flex;
+  flex-direction:column;
   gap:10px;
+}
+.filtersRow{
+  display:flex;
+  gap:10px;
+}
+.filtersRow.twoCol > *{
+  flex:1;
+  min-width:0;
+}
+.filtersRow.threeCol > *{
+  flex:1;
+  min-width:0;
 }
 .infoPage{
   font-size:15px;
@@ -851,29 +861,38 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
         </div>
 
         <div class="filtersGrid" style="margin-top:12px;">
-          <select id="matchSort" class="select">
-            <option value="matchDate" selected>Sort: Match date</option>
-            <option value="dateAdded">Sort: Date added</option>
-          </select>
-          <select id="filterVenue" class="select">
-            <option value="">Venue: All</option>
-            <option value="H">Home (H)</option>
-            <option value="A">Away (A)</option>
-          </select>
-          <select id="filterComp" class="select">
-            <option value="">Comp: All</option>
-            <option value="PL">PL</option>
-            <option value="UCL">UCL</option>
-            <option value="FAC">FA Cup</option>
-            <option value="LC">League Cup</option>
-            <option value="OTHER">Other</option>
-          </select>
-          <select id="filterCredit" class="select">
-            <option value="">Credit: All</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-            <option value="unsure">Unsure</option>
-          </select>
+          <div class="filtersRow twoCol">
+            <select id="matchSort" class="select">
+              <option value="matchDate" selected>Sort: Match date</option>
+              <option value="dateAdded">Sort: Date added</option>
+            </select>
+            <select id="filterVenue" class="select">
+              <option value="">Venue: All</option>
+              <option value="H">Home (H)</option>
+              <option value="A">Away (A)</option>
+            </select>
+          </div>
+          <div class="filtersRow threeCol">
+            <select id="filterComp" class="select">
+              <option value="">Comp: All</option>
+              <option value="PL">PL</option>
+              <option value="UCL">UCL</option>
+              <option value="FAC">FA Cup</option>
+              <option value="LC">League Cup</option>
+              <option value="OTHER">Other</option>
+            </select>
+            <select id="filterCredit" class="select">
+              <option value="">Credit: All</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+              <option value="unsure">Unsure</option>
+            </select>
+            <select id="filterAttended" class="select">
+              <option value="">Attended: All</option>
+              <option value="yes">Attended</option>
+              <option value="no">Not attended</option>
+            </select>
+          </div>
         </div>
       </section>
       <section class="card">
@@ -1785,12 +1804,25 @@ function matchCard(m) {
   left.appendChild(title);
   left.appendChild(meta);
 
+  const cornerTags = document.createElement("div");
+  cornerTags.className = "itemCornerTags";
+  const compTag = document.createElement("div");
+  compTag.className = `pill comp-pill ${competitionBadgeClass(m.competition)}`;
+  compTag.textContent = competitionLabel(m.competition);
+  const ha = (m.venue === "A") ? "A" : "H";
+  const haPill = document.createElement("div");
+  haPill.className = `pill ${ha === "H" ? "ha-home" : "ha-away"}`;
+  haPill.textContent = ha;
+  cornerTags.appendChild(compTag);
+  cornerTags.appendChild(haPill);
+
   const credit = badgeForCredit(m);
   const creditBadge = document.createElement("div");
   creditBadge.className = `badge ${credit.cls}`;
   creditBadge.textContent = credit.text;
 
   top.appendChild(left);
+  top.appendChild(cornerTags);
 
   const badges = document.createElement("div");
   badges.className = "itemBadges";
@@ -1812,19 +1844,6 @@ function matchCard(m) {
 
   div.appendChild(top);
   div.appendChild(badges);
-
-  const cornerTags = document.createElement("div");
-  cornerTags.className = "itemCornerTags";
-  const compTag = document.createElement("div");
-  compTag.className = `pill comp-pill ${competitionBadgeClass(m.competition)}`;
-  compTag.textContent = competitionLabel(m.competition);
-  const ha = (m.venue === "A") ? "A" : "H";
-  const haPill = document.createElement("div");
-  haPill.className = `pill ${ha === "H" ? "ha-home" : "ha-away"}`;
-  haPill.textContent = ha;
-  cornerTags.appendChild(compTag);
-  cornerTags.appendChild(haPill);
-  div.appendChild(cornerTags);
 
   if (m.notes && m.notes.trim()) {
     const notes = document.createElement("div");
@@ -1850,12 +1869,14 @@ function renderMatches() {
   const v = $("filterVenue").value;
   const c = $("filterComp").value;
   const cr = $("filterCredit").value;
+  const attended = $("filterAttended") ? $("filterAttended").value : "";
 
   const matches = getSeasonMatches(activeSeasonId())
     .filter(m => {
       if (v && m.venue !== v) return false;
       if (c && m.competition !== c) return false;
       if (cr && m.creditCredit !== cr) return false;
+      if (attended && m.attended !== attended) return false;
       if (q) {
         const hay = `${m.opponent} ${m.notes || ""}`.toLowerCase();
         if (!hay.includes(q)) return false;
@@ -2227,7 +2248,7 @@ const ce=document.getElementById("fixturesCount"); if(ce) ce.textContent = `Impo
 
   $("btnDelete").addEventListener("click", deleteCurrentMatch);
 
-  ["searchInput","filterVenue","filterComp","filterCredit"].forEach(id => {
+  ["searchInput","filterVenue","filterComp","filterCredit","filterAttended"].forEach(id => {
     $(id).addEventListener("input", renderMatches);
     $(id).addEventListener("change", renderMatches);
   });
