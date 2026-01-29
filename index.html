@@ -2982,7 +2982,13 @@ function populateSeasonSelect(sel){
   sel.innerHTML = "";
 
   const seasons = Array.isArray(state.data.seasons) ? state.data.seasons : generateSeasons().seasons;
+  const minAccountSeasonStartYear = 2025;
+  const isAccountSetupSeason = sel.id === "setupSeason";
   for (const s of seasons) {
+    if (isAccountSetupSeason) {
+      const startYear = parseInt(String(s.id || "").split("-")[0], 10);
+      if (!Number.isFinite(startYear) || startYear < minAccountSeasonStartYear) continue;
+    }
     const opt = document.createElement("option");
     opt.value = s.id;
     opt.textContent = s.label;
