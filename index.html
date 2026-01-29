@@ -319,6 +319,23 @@ body{
 .chip.active[data-credit="yes"]{border-color: rgba(46,204,113,.6); background: rgba(46,204,113,.2)}
 .chip.active[data-credit="no"]{border-color: rgba(255,77,77,.6); background: rgba(255,77,77,.2)}
 .chip.active[data-credit="unsure"]{border-color: rgba(59,130,246,.6); background: rgba(59,130,246,.2)}
+.chip.active[data-attended="yes"]{border-color: rgba(46,204,113,.6); background: rgba(46,204,113,.2)}
+.chip.active[data-attended="no"]{border-color: rgba(255,77,77,.6); background: rgba(255,77,77,.2)}
+.chip.comp-chip{font-weight:800}
+.chip.comp-chip[data-comp="PL"]{border-color: rgba(155,89,182,.7); color: #d9c3f4}
+.chip.comp-chip[data-comp="UCL"]{border-color: rgba(52,152,219,.7); color: #b9dcf6}
+.chip.comp-chip[data-comp="LC"]{border-color: rgba(46,204,113,.7); color: #c9f2de}
+.chip.comp-chip[data-comp="FAC"]{border-color: rgba(227,27,35,.7); color: #ffc2c5}
+.chip.comp-chip[data-comp="OTHER"]{border-color: rgba(154,160,166,.45); color: var(--text)}
+.chip.comp-chip.active[data-comp="PL"]{background: rgba(155,89,182,.18)}
+.chip.comp-chip.active[data-comp="UCL"]{background: rgba(52,152,219,.18)}
+.chip.comp-chip.active[data-comp="LC"]{background: rgba(46,204,113,.18)}
+.chip.comp-chip.active[data-comp="FAC"]{background: rgba(227,27,35,.18)}
+.chip.comp-chip.active[data-comp="OTHER"]{background: rgba(154,160,166,.12)}
+.chip.ha-chip[data-ha="H"]{border-color: rgba(227,27,35,.55); color:#ffb3b8}
+.chip.ha-chip[data-ha="A"]{border-color: rgba(20,184,166,.55); color:#87f1e5}
+.chip.ha-chip.active[data-ha="H"]{background: rgba(227,27,35,.18)}
+.chip.ha-chip.active[data-ha="A"]{background: rgba(20,184,166,.18)}
 .chip:hover{transform: translateY(-1px)}
 
 .hidden{display:none !important}
@@ -929,59 +946,45 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
 
             <div>
               <div class="fieldLabel">Home/Away</div>
-              <select id="venue" class="select" required>
-                <option value="H">Home (H)</option>
-                <option value="A">Away (A)</option>
-              </select>
+              <div class="chips" role="group" aria-label="Home or Away">
+                <input type="hidden" id="venue" value="H" />
+                <button type="button" class="chip ha-chip" data-ha="H">Home (H)</button>
+                <button type="button" class="chip ha-chip" data-ha="A">Away (A)</button>
+              </div>
             </div>
 
             <div>
               <div class="fieldLabel">Competition</div>
-              <select id="competition" class="select" required>
-                <option value="PL">PL</option>
-                <option value="UCL">UCL</option>
-                <option value="FAC">FA Cup</option>
-                <option value="LC">League Cup</option>
-                <option value="OTHER">Other</option>
-              </select>
+              <div class="chips" role="group" aria-label="Competition">
+                <input type="hidden" id="competition" value="PL" />
+                <button type="button" class="chip comp-chip comp-pl" data-comp="PL">PL</button>
+                <button type="button" class="chip comp-chip comp-ucl" data-comp="UCL">UCL</button>
+                <button type="button" class="chip comp-chip comp-fac" data-comp="FAC">FA Cup</button>
+                <button type="button" class="chip comp-chip comp-lc" data-comp="LC">League Cup</button>
+                <button type="button" class="chip comp-chip comp-other" data-comp="OTHER">Other</button>
+              </div>
             </div>
           </div>
 
-          <div class="grid2">
-            
-            <div>
-              <div class="fieldLabel">Ticket</div>
-              <select id="ticketAction" class="select">
-                <option value="credit">Credit</option>
-                <option value="season_return">Season Ticket Return</option>
-                <option value="fwd_me_credit">Forwarded to me (with credit)</option>
-                <option value="fwd_me_nocredit">Forwarded to me (no credit)</option>
-                <option value="hosp_credit">Hospitality (credit)</option>
-                <option value="hosp_nocredit">Hospitality (no credit)</option>
-                <option value="scan_nocredit">Scan in (no credit)</option>
-              </select>
-            </div>
-
-            <div>
-              <div class="fieldLabel">Attended</div>
-              <select id="attended" class="select">
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-              </select>
-            </div>
-
-          </div>
+          <input type="hidden" id="ticketAction" value="credit" />
 
           <div>
             <div class="fieldLabel">Credit outcome</div>
             <div class="chips" role="group" aria-label="Credit outcome">
-<input type="hidden" id="creditCredit" value="unsure">
-
+              <input type="hidden" id="creditCredit" value="unsure" />
               <button type="button" class="chip" data-credit="yes">Credit</button>
               <button type="button" class="chip" data-credit="no">No credit</button>
               <button type="button" class="chip active" data-credit="unsure">Unsure</button>
             </div>
-            <input type="hidden" id="creditCredit" value="unsure" />
+          </div>
+
+          <div>
+            <div class="fieldLabel">Attended</div>
+            <div class="chips" role="group" aria-label="Attended">
+              <input type="hidden" id="attended" value="yes" />
+              <button type="button" class="chip" data-attended="yes">Attended</button>
+              <button type="button" class="chip" data-attended="no">Not attended</button>
+            </div>
           </div>
 
           <div>
@@ -1906,10 +1909,10 @@ function clearForm() {
   if ($("fixtureKey")) $("fixtureKey").value = "";
   $("opponent").value = "";
   $("matchDate").value = todayISODate();
-  $("venue").value = "H";
-  $("competition").value = "PL";
-    $("ticketAction").value = "credit";
-  $("attended").value = "yes";
+  setVenueChip("H");
+  setCompetitionChip("PL");
+  $("ticketAction").value = "credit";
+  setAttendedChip("yes");
   setCreditChip("unsure");
   $("notes").value = "";
   $("amountPaid").value = "";
@@ -1919,8 +1922,32 @@ function clearForm() {
 function setCreditChip(val) {
   const cc = $("creditCredit");
   if (cc) cc.value = val;
-  document.querySelectorAll(".chip").forEach(ch => {
+  document.querySelectorAll("[data-credit]").forEach(ch => {
     ch.classList.toggle("active", ch.dataset.credit === val);
+  });
+}
+
+function setCompetitionChip(val) {
+  const comp = $("competition");
+  if (comp) comp.value = val;
+  document.querySelectorAll("[data-comp]").forEach(ch => {
+    ch.classList.toggle("active", ch.dataset.comp === val);
+  });
+}
+
+function setVenueChip(val) {
+  const venue = $("venue");
+  if (venue) venue.value = val;
+  document.querySelectorAll("[data-ha]").forEach(ch => {
+    ch.classList.toggle("active", ch.dataset.ha === val);
+  });
+}
+
+function setAttendedChip(val) {
+  const attended = $("attended");
+  if (attended) attended.value = val;
+  document.querySelectorAll("[data-attended]").forEach(ch => {
+    ch.classList.toggle("active", ch.dataset.attended === val);
   });
 }
 
@@ -2003,10 +2030,10 @@ function editMatch(id) {
   $("matchId").value = m.id;
   $("opponent").value = m.opponent || "";
   $("matchDate").value = m.matchDate || todayISODate();
-  $("venue").value = m.venue || "H";
-  $("competition").value = m.competition || "PL";
-    $("ticketAction").value = m.ticketAction || "used";
-  $("attended").value = m.attended || "yes";
+  setVenueChip(m.venue || "H");
+  setCompetitionChip(m.competition || "PL");
+  $("ticketAction").value = m.ticketAction || "used";
+  setAttendedChip(m.attended || "yes");
   setCreditChip(m.creditCredit || "unsure");
   $("notes").value = m.notes || "";
   $("amountPaid").value = (m.amountPaid ?? "");
@@ -2184,18 +2211,6 @@ function bindEvents() {
   
   $("btnClearForm").addEventListener("click", clearForm);
 
-  document.querySelectorAll(".chip").forEach(ch => {
-    ch.addEventListener("click", () => setCreditChip(ch.dataset.credit));
-  });
-
-  $("ticketAction").addEventListener("change", (e) => {
-    const cc = $("creditCredit");
-    const current = cc ? cc.value : "unsure";
-    if (current === "unsure") {
-      setCreditChip(defaultCreditFromAction(e.target.value));
-    }
-  });
-
   onEl("btnReloadFixtures","click", reloadFixturesHard);
   onEl("fixtureShow","change", renderFixtures);
   onEl("fixtureComp","change", renderFixtures);
@@ -2205,6 +2220,27 @@ function bindEvents() {
     btn.addEventListener("click", () => {
       const val = btn.getAttribute("data-credit");
       setCreditChip(val);
+    });
+  });
+
+  document.querySelectorAll("[data-comp]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const val = btn.getAttribute("data-comp");
+      setCompetitionChip(val);
+    });
+  });
+
+  document.querySelectorAll("[data-ha]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const val = btn.getAttribute("data-ha");
+      setVenueChip(val);
+    });
+  });
+
+  document.querySelectorAll("[data-attended]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const val = btn.getAttribute("data-attended");
+      setAttendedChip(val);
     });
   });
 
@@ -2859,13 +2895,13 @@ function prefillFromFixture(f) {
   clearForm();
   if ($("fixtureKey")) $("fixtureKey").value = (f.id || `${f.date||""}|${f.competition||""}|${f.venue||""}|${f.opponent||""}`);
   $("opponent").value = f.opponent || "";
-  $("venue").value = (f.venue === "A") ? "A" : "H";
+  setVenueChip((f.venue === "A") ? "A" : "H");
   // Map competitions to app options
   const comp = f.competition || "OTHER";
   if (["PL","UCL","FAC","LC","OTHER"].includes(comp)) {
-    $("competition").value = comp;
+    setCompetitionChip(comp);
   } else {
-    $("competition").value = "OTHER";
+    setCompetitionChip("OTHER");
   }
   $("matchDate").value = f.date || (f.datetime_utc ? f.datetime_utc.slice(0,10) : "");
   $("ticketAction").value = "credit";
