@@ -215,6 +215,7 @@ body{
 .textarea{resize:vertical}
 
 .fieldLabel{color:var(--muted); font-size:12px; margin:6px 0}
+#viewAdd .fieldLabel{font-weight:700}
 .fieldLabel.withIcon{
   display:flex;
   align-items:center;
@@ -336,6 +337,12 @@ body{
 .chip.ha-chip[data-ha="A"]{border-color: rgba(20,184,166,.55); color:#87f1e5}
 .chip.ha-chip.active[data-ha="H"]{background: rgba(227,27,35,.18)}
 .chip.ha-chip.active[data-ha="A"]{background: rgba(20,184,166,.18)}
+#viewAdd .chip.comp-chip:not(.active),
+#viewAdd .chip.ha-chip:not(.active){
+  border-color: rgba(255,255,255,.12);
+  color: var(--muted);
+  background: rgba(255,255,255,.02);
+}
 .chip:hover{transform: translateY(-1px)}
 
 .hidden{display:none !important}
@@ -1578,7 +1585,7 @@ function eligibilityText(totals) {
 }
 
 function formatMatchTitle(m) {
-  return `Liverpool vs ${m.opponent} (${m.venue})`;
+  return `Liverpool vs ${m.opponent}`;
 }
 
 function formatDisplayDate(ymd) {
@@ -1598,9 +1605,8 @@ function competitionBadgeClass(comp) {
 }
 
 function formatMeta(m) {
-  const comp = competitionLabel(m.competition);
   const date = formatDisplayDate(m.matchDate || "");
-  return `${date} • ${comp}`;
+  return `${date}`;
 }
 
 function badgeForCredit(m) {
@@ -1809,14 +1815,10 @@ function matchCard(m) {
 
   const cornerTags = document.createElement("div");
   cornerTags.className = "itemCornerTags";
-  const compTag = document.createElement("div");
-  compTag.className = `pill comp-pill ${competitionBadgeClass(m.competition)}`;
-  compTag.textContent = competitionLabel(m.competition);
   const ha = (m.venue === "A") ? "A" : "H";
   const haPill = document.createElement("div");
   haPill.className = `pill ${ha === "H" ? "ha-home" : "ha-away"}`;
   haPill.textContent = ha;
-  cornerTags.appendChild(compTag);
   cornerTags.appendChild(haPill);
 
   const credit = badgeForCredit(m);
