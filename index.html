@@ -1816,9 +1816,15 @@ function matchCard(m) {
   const cornerTags = document.createElement("div");
   cornerTags.className = "itemCornerTags";
   const ha = (m.venue === "A") ? "A" : "H";
+  const comp = competitionLabel(m.competition || "OTHER");
+  const compClass = competitionBadgeClass(m.competition);
+  const compPill = document.createElement("div");
+  compPill.className = `pill comp-pill ${compClass}`;
+  compPill.textContent = comp;
   const haPill = document.createElement("div");
   haPill.className = `pill ${ha === "H" ? "ha-home" : "ha-away"}`;
   haPill.textContent = ha;
+  cornerTags.appendChild(compPill);
   cornerTags.appendChild(haPill);
 
   const credit = badgeForCredit(m);
