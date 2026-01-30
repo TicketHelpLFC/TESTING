@@ -467,11 +467,8 @@ body{
   margin-top:14px;
 }
 .acctBarActions.persistent{
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-top:10px;
-}
-.acctBarActions.persistent .btn{
-  grid-column:2;
 }
 .acctBarActions .btn{
   width:100%;
@@ -834,6 +831,9 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
         <button type="button" id="btnDeleteAccount" class="btn danger sm">Delete</button>
       </div>
       <div class="acctBarActions persistent">
+        <button type="button" id="btnImportBackup" class="btn success sm">
+          Import from Backup
+        </button>
         <button type="button" id="btnBackupData" class="btn danger sm attention">
           Backup Data
         </button>
