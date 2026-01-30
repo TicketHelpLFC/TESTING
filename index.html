@@ -2566,6 +2566,12 @@ const ce=document.getElementById("fixturesCount"); if(ce) ce.textContent = `Impo
   $("btnExportCSV").addEventListener("click", exportCSV);
   onEl("btnExportJSON2","click", exportJSON);
 onEl("btnExportCSV2","click", exportCSV);
+  onEl("btnImportBackup","click", () => {
+    const importInput = $("importFile");
+    if (importInput) {
+      importInput.click();
+    }
+  });
   onEl("btnBackupNudgeNow","click", exportJSON);
   onEl("btnBackupNudgeLater","click", () => {
     localStorage.setItem(BACKUP_NUDGE_DISMISSED_KEY, new Date().toISOString());
