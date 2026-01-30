@@ -1207,14 +1207,12 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
 <dialog id="fixturesSeasonRefreshModal" class="modal hidden">
   <div class="modalInner">
     <div class="modalHeader">
-      <div class="modalTitle">Account Settings</div>
-      <button type="button" class="btn ghost sm" id="btnCloseFixturesSeasonRefresh" aria-label="Close">Close</button>
+      <div class="modalTitle">Fixtures update</div>
     </div>
     <div class="hr"></div>
-    <div class="label" id="fixturesSeasonRefreshQuestion">Do you want to refresh fixture list for selected season?</div>
+    <div class="label" id="fixturesSeasonRefreshQuestion">Fixtures will now update</div>
     <div class="row gap wrap" style="margin-top:14px;">
-      <button type="button" class="btn primary" id="btnFixturesSeasonRefreshYes">Yes</button>
-      <button type="button" class="btn ghost" id="btnFixturesSeasonRefreshCancel">Cancel</button>
+      <button type="button" class="btn primary" id="btnFixturesSeasonRefreshOk">OK</button>
     </div>
   </div>
 </dialog>
@@ -2820,7 +2818,7 @@ function fixtureRow(f) {
   return el;
 }
 
-async function renderFixtures() {
+async function renderFixtures(options = {}) {
   try {
     const listEl = document.getElementById("fixturesList");
     const emptyEl = document.getElementById("fixturesEmpty");
@@ -2835,10 +2833,6 @@ async function renderFixtures() {
     const showSel = document.getElementById("fixtureShow");
     const compSel = document.getElementById("fixtureComp");
     const haSel = document.getElementById("fixtureHA");
-        if (showSel && seasonLabelFromId(activeSeasonId()) === "24/25" && showSel.value === "upcoming") {
-      showSel.value = "past";
-    }
-    const show = showSel ? showSel.value : "upcoming";
     const compFilter = compSel ? compSel.value : "";
     const haFilter = haSel ? haSel.value : "";
 
@@ -2848,6 +2842,22 @@ async function renderFixtures() {
     const today = new Date();
     today.setUTCHours(0,0,0,0);
     const seasonFilterLabel = seasonLabelFromId(activeSeasonId());
+    const preferUpcoming = options && options.preferUpcoming;
+    if (showSel) {
+      const hasUpcoming = data.some(f => {
+        if (seasonFilterLabel && fixtureSeasonLabel(f) !== seasonFilterLabel) return false;
+        const raw = (f.date || (f.datetime_utc || ""));
+        const d = parseYMD((raw || "").slice(0,10));
+        return d && d >= today;
+      });
+      if (preferUpcoming && hasUpcoming) {
+        showSel.value = "upcoming";
+      }
+      if (showSel.value === "upcoming" && !hasUpcoming) {
+        showSel.value = "past";
+      }
+    }
+    const show = showSel ? showSel.value : "upcoming";
 
     let filtered = data.filter(f => {
       if (seasonFilterLabel && fixtureSeasonLabel(f) !== seasonFilterLabel) return false;
@@ -3099,7 +3109,7 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.getRegistration().then(reg => { if (reg) reg.update(); });
 }
 
-async function reloadFixturesHard(){
+async function reloadFixturesHard(options = {}){
   try{
     // Clear in-memory + local cached CSV so we definitely fetch the latest sheet
     fixturesCache = null;
@@ -3115,7 +3125,7 @@ async function reloadFixturesHard(){
       saveCachedCSVFixtures(live);
     }
 
-    await renderFixtures();
+    await renderFixtures({ preferUpcoming: options.preferUpcoming });
   }catch(e){
     console.error("Failed to refresh fixtures", e);
     alert("Failed to refresh fixtures. Check your connection and try again.");
@@ -3311,38 +3321,31 @@ function openFixturesSeasonRefreshModal(){
   return new Promise(resolve => {
     const dlg = $("fixturesSeasonRefreshModal");
     const question = $("fixturesSeasonRefreshQuestion");
-    const yesBtn = $("btnFixturesSeasonRefreshYes");
-    const cancelBtn = $("btnFixturesSeasonRefreshCancel");
-    const closeBtn = $("btnCloseFixturesSeasonRefresh");
-    if (!dlg || !question || !yesBtn || !cancelBtn || !closeBtn) {
-      resolve("cancel");
+    const okBtn = $("btnFixturesSeasonRefreshOk");
+    if (!dlg || !question || !okBtn) {
+      resolve("ok");
       return;
     }
 
-    question.textContent = "Do you want to refresh fixture list for selected season?";
+    question.textContent = "Fixtures will now update";
 
     const cleanup = (result) => {
-      yesBtn.removeEventListener("click", onYes);
-      cancelBtn.removeEventListener("click", onCancel);
-      closeBtn.removeEventListener("click", onCancel);
-      dlg.removeEventListener("cancel", onCancel);
+      okBtn.removeEventListener("click", onOk);
+      dlg.removeEventListener("cancel", onOk);
       try { dlg.close(); } catch(e) {}
       dlg.classList.add("hidden");
       resolve(result);
     };
 
-    const onYes = () => cleanup("yes");
-    const onCancel = () => cleanup("cancel");
+    const onOk = () => cleanup("ok");
 
-    yesBtn.addEventListener("click", onYes);
-    cancelBtn.addEventListener("click", onCancel);
-    closeBtn.addEventListener("click", onCancel);
-    dlg.addEventListener("cancel", onCancel);
+    okBtn.addEventListener("click", onOk);
+    dlg.addEventListener("cancel", onOk);
 
     dlg.classList.remove("hidden");
     if (dlg.showModal) dlg.showModal();
     else dlg.setAttribute("open","");
-    setTimeout(() => yesBtn.focus(), 0);
+    setTimeout(() => okBtn.focus(), 0);
   });
 }
 
@@ -3350,8 +3353,8 @@ async function handleSeasonChange(seasonId){
   setActiveSeason(seasonId);
   if (state.currentView !== "fixtures") return;
   const choice = await openFixturesSeasonRefreshModal();
-  if (choice !== "yes") return;
-  await reloadFixturesHard();
+  if (choice !== "ok") return;
+  await reloadFixturesHard({ preferUpcoming: true });
 }
 
 function seasonLabelFromId(seasonId){
