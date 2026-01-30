@@ -1204,6 +1204,21 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
   </div>
 </dialog>
 
+<dialog id="fixturesSeasonRefreshModal" class="modal hidden">
+  <div class="modalInner">
+    <div class="modalHeader">
+      <div class="modalTitle">Account Settings</div>
+      <button type="button" class="btn ghost sm" id="btnCloseFixturesSeasonRefresh" aria-label="Close">Close</button>
+    </div>
+    <div class="hr"></div>
+    <div class="label" id="fixturesSeasonRefreshQuestion">Do you want to refresh fixture list for selected season?</div>
+    <div class="row gap wrap" style="margin-top:14px;">
+      <button type="button" class="btn primary" id="btnFixturesSeasonRefreshYes">Yes</button>
+      <button type="button" class="btn ghost" id="btnFixturesSeasonRefreshCancel">Cancel</button>
+    </div>
+  </div>
+</dialog>
+
 <dialog id="autoCupModal" class="modal hidden">
   <div class="modalInner">
     <div class="modalHeader">
@@ -1285,7 +1300,8 @@ function setText(id, value){ const el = $(id); if(el) el.textContent = value; }
 const state = {
   data: null,
   deferredPrompt: null,
-  lastAddSource: "manual"
+  lastAddSource: "manual",
+  currentView: "dash"
 };
 
 function uid() {
@@ -1643,6 +1659,7 @@ function badgeForAction(m) {
 }
 
 function setView(viewName) {
+  state.currentView = viewName;
   const tabs = document.querySelectorAll(".tab");
   tabs.forEach(t => t.classList.toggle("active", t.dataset.view === viewName));
 
@@ -2219,7 +2236,7 @@ function bindEvents() {
 });
 
   onEl("accountSelect","change",(e)=> setActiveAccount(e.target.value));
-  onEl("seasonSelect","change",(e)=> setActiveSeason(e.target.value));
+  onEl("seasonSelect","change",(e)=> handleSeasonChange(e.target.value));
   onEl("btnAddAccount","click", openSetupForNewAccount);
   onEl("btnEditAccount","click", editActiveAccount);
   onEl("btnDeleteAccount","click", deleteActiveAccount);
@@ -3288,6 +3305,53 @@ function openAutoCupPrompt(opts){
     else dlg.setAttribute("open","");
     setTimeout(() => yesBtn.focus(), 0);
   });
+}
+
+function openFixturesSeasonRefreshModal(){
+  return new Promise(resolve => {
+    const dlg = $("fixturesSeasonRefreshModal");
+    const question = $("fixturesSeasonRefreshQuestion");
+    const yesBtn = $("btnFixturesSeasonRefreshYes");
+    const cancelBtn = $("btnFixturesSeasonRefreshCancel");
+    const closeBtn = $("btnCloseFixturesSeasonRefresh");
+    if (!dlg || !question || !yesBtn || !cancelBtn || !closeBtn) {
+      resolve("cancel");
+      return;
+    }
+
+    question.textContent = "Do you want to refresh fixture list for selected season?";
+
+    const cleanup = (result) => {
+      yesBtn.removeEventListener("click", onYes);
+      cancelBtn.removeEventListener("click", onCancel);
+      closeBtn.removeEventListener("click", onCancel);
+      dlg.removeEventListener("cancel", onCancel);
+      try { dlg.close(); } catch(e) {}
+      dlg.classList.add("hidden");
+      resolve(result);
+    };
+
+    const onYes = () => cleanup("yes");
+    const onCancel = () => cleanup("cancel");
+
+    yesBtn.addEventListener("click", onYes);
+    cancelBtn.addEventListener("click", onCancel);
+    closeBtn.addEventListener("click", onCancel);
+    dlg.addEventListener("cancel", onCancel);
+
+    dlg.classList.remove("hidden");
+    if (dlg.showModal) dlg.showModal();
+    else dlg.setAttribute("open","");
+    setTimeout(() => yesBtn.focus(), 0);
+  });
+}
+
+async function handleSeasonChange(seasonId){
+  setActiveSeason(seasonId);
+  if (state.currentView !== "fixtures") return;
+  const choice = await openFixturesSeasonRefreshModal();
+  if (choice !== "yes") return;
+  await reloadFixturesHard();
 }
 
 function seasonLabelFromId(seasonId){
