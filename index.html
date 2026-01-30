@@ -362,14 +362,45 @@ body{
 .toggle span{margin-left:8px}
 
 
-.breakdownTable{width:100%; border-collapse:separate; border-spacing:0 8px;}
-.breakdownTable th{color:var(--muted); font-size:12px; text-align:left; font-weight:800; padding:0 8px 6px;}
-.breakdownTable td{background:rgba(16,16,16,.82); border:1px solid rgba(255,255,255,.06); padding:10px 8px;}
-.breakdownTable td:first-child{border-top-left-radius:12px; border-bottom-left-radius:12px;}
-.breakdownTable td:last-child{border-top-right-radius:12px; border-bottom-right-radius:12px; text-align:right; font-weight:900;}
-.breakdownPill{display:inline-block; padding:4px 8px; border-radius:999px; border:1px solid var(--border); background:var(--chip); font-size:12px; font-weight:800;}
-.breakdownPill.good{border-color: rgba(46,204,113,.5);}
-.breakdownPill.bad{border-color: rgba(255,77,77,.5);}
+.breakdownTable{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0 8px;
+  margin-top:10px;
+}
+.breakdownTable th{
+  color:var(--muted);
+  font-size:12px;
+  text-align:left;
+  font-weight:800;
+  padding:0 8px 6px;
+}
+.breakdownTable td{
+  background:rgba(16,16,16,.82);
+  border:1px solid rgba(255,255,255,.06);
+  padding:10px 8px;
+}
+.breakdownTable td:first-child{
+  border-top-left-radius:12px;
+  border-bottom-left-radius:12px;
+}
+.breakdownTable td:last-child{
+  border-top-right-radius:12px;
+  border-bottom-right-radius:12px;
+  text-align:right;
+  font-weight:900;
+}
+.breakdownPill{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--chip);
+  font-weight:800;
+  font-size:12px;
+}
+.breakdownPill.good{border-color: rgba(46,204,113,.5); background: rgba(46,204,113,.12)}
+.breakdownPill.bad{border-color: rgba(255,77,77,.5); background: rgba(255,77,77,.12)}
 
 
 
@@ -385,10 +416,6 @@ body{
 .statValue.small{font-size:26px}
 
 
-.breakdownTable{width:100%; border-collapse:collapse; margin-top:10px}
-.breakdownTable th,.breakdownTable td{padding:10px; border-bottom:1px solid var(--border); text-align:left}
-.breakdownPill{display:inline-block; padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:var(--chip); font-weight:800; font-size:12px}
-.breakdownPill.good{border-color: rgba(46,204,113,.5); background: rgba(46,204,113,.12)}
 .breakdownPill.neutral{border-color: rgba(154,160,166,.45); background: rgba(154,160,166,.10)}
 .breakdownPill.comp-pl{border-color: rgba(155,89,182,.7); color: #d9c3f4; background: rgba(155,89,182,.12)}
 .breakdownPill.comp-ucl{border-color: rgba(52,152,219,.7); color: #b9dcf6; background: rgba(52,152,219,.12)}
