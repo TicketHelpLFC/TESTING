@@ -705,6 +705,19 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
   display:flex;
   align-items:center;
 }
+.backupNudge{
+  margin-bottom:10px;
+}
+.backupNudge .label{
+  font-size:12px;
+  margin-bottom:4px;
+}
+.backupNudge .hint{
+  font-size:11px;
+}
+.backupNudgeActions{
+  margin-top:8px;
+}
 .dashHeader{
   margin-bottom:10px;
 }
@@ -914,6 +927,14 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
   <div class="label withIcon">
     <img class="labelIcon" src="icons/assets/backup.svg" alt="" aria-hidden="true" />
     Backups
+  </div>
+  <div id="backupNudge" class="item backupNudge hidden" role="status" aria-live="polite">
+    <div class="label">Backup reminder</div>
+    <div id="backupNudgeMessage" class="hint"></div>
+    <div class="row gap wrap backupNudgeActions">
+      <button id="btnBackupNudgeNow" class="btn primary sm">Backup now</button>
+      <button id="btnBackupNudgeLater" class="btn ghost sm">Later</button>
+    </div>
   </div>
   <div class="backupActions">
     <button id="btnExportJSON" class="btn"><span class="icon"><img src="icons/assets/export.svg" alt="" aria-hidden="true" /></span> Export JSON</button>
@@ -1342,6 +1363,10 @@ function safeSetValue(id, val){
 /* TicketHelpLFC Credit Tracker – PWA Starter (Local-only) */
 
 const STORAGE_KEY = "thlfc_credit_tracker_v1";
+const FIRST_SEEN_KEY = "thlfc_firstSeenAt";
+const LAST_BACKUP_KEY = "thlfc_lastBackupAt";
+const BACKUP_NUDGE_DISMISSED_KEY = "thlfc_backupNudgeDismissedAt";
+const HAS_USER_DATA_KEY = "thlfc_hasUserData";
 
 const $ = (id) => document.getElementById(id);
 
@@ -1356,6 +1381,79 @@ const state = {
 
 function uid() {
   return crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + "_" + Math.random().toString(16).slice(2);
+}
+
+function ensureFirstSeen() {
+  if (!localStorage.getItem(FIRST_SEEN_KEY)) {
+    localStorage.setItem(FIRST_SEEN_KEY, new Date().toISOString());
+  }
+}
+
+function setHasUserData() {
+  if (localStorage.getItem(HAS_USER_DATA_KEY) !== "true") {
+    localStorage.setItem(HAS_USER_DATA_KEY, "true");
+  }
+}
+
+function setLastBackupNow() {
+  localStorage.setItem(LAST_BACKUP_KEY, new Date().toISOString());
+  localStorage.removeItem(BACKUP_NUDGE_DISMISSED_KEY);
+}
+
+function shouldPromptBackup({ noBackupAfterHours = 24, staleAfterDays = 7 } = {}) {
+  const now = Date.now();
+  const firstSeen = localStorage.getItem(FIRST_SEEN_KEY);
+  if (!firstSeen) {
+    localStorage.setItem(FIRST_SEEN_KEY, new Date().toISOString());
+    return false;
+  }
+
+  const dismissedAt = localStorage.getItem(BACKUP_NUDGE_DISMISSED_KEY);
+  if (dismissedAt) {
+    const dismissedMs = Date.parse(dismissedAt);
+    if (Number.isFinite(dismissedMs) && now - dismissedMs < 24 * 60 * 60 * 1000) {
+      return false;
+    }
+  }
+
+  const lastBackup = localStorage.getItem(LAST_BACKUP_KEY);
+  if (!lastBackup) {
+    const hasUserData = localStorage.getItem(HAS_USER_DATA_KEY) === "true";
+    const firstSeenMs = Date.parse(firstSeen);
+    const waitMs = noBackupAfterHours * 60 * 60 * 1000;
+    const waitedLongEnough = Number.isFinite(firstSeenMs) && now - firstSeenMs >= waitMs;
+    return hasUserData || waitedLongEnough;
+  }
+
+  const lastBackupMs = Date.parse(lastBackup);
+  if (!Number.isFinite(lastBackupMs)) return false;
+  const staleMs = staleAfterDays * 24 * 60 * 60 * 1000;
+  return now - lastBackupMs >= staleMs;
+}
+
+function backupPromptMessage() {
+  const lastBackup = localStorage.getItem(LAST_BACKUP_KEY);
+  if (!lastBackup) {
+    return "Quick reminder: you haven’t created a backup yet…";
+  }
+  const lastBackupMs = Date.parse(lastBackup);
+  if (!Number.isFinite(lastBackupMs)) {
+    return "Quick reminder: you haven’t created a backup yet…";
+  }
+  const days = Math.max(1, Math.floor((Date.now() - lastBackupMs) / (24 * 60 * 60 * 1000)));
+  return `Quick reminder: your last backup was ${days} day${days === 1 ? "" : "s"} ago…`;
+}
+
+function showBackupNudge() {
+  const nudge = $("backupNudge");
+  const message = $("backupNudgeMessage");
+  if (!nudge || !message) return;
+  if (!shouldPromptBackup()) {
+    nudge.classList.add("hidden");
+    return;
+  }
+  message.textContent = backupPromptMessage();
+  nudge.classList.remove("hidden");
 }
 
 function parseAmount(raw) {
@@ -1741,6 +1839,7 @@ function setView(viewName) {
   if (viewName === "setup") { setTimeout(() => { try{ populateAllSeasonSelects(); }catch(e){} }, 0); }
   $("viewFixtures").classList.toggle("hidden", viewName !== "fixtures");
   if (viewName === "fixtures") { setTimeout(() => { bindFixturesControls(); renderFixtures(); }, 0); }
+  if (viewName === "dash") { showBackupNudge(); }
 }
 
 
@@ -2219,6 +2318,8 @@ function downloadFile(filename, text, mime="application/octet-stream") {
 function exportJSON() {
   const payload = JSON.stringify(state.data, null, 2);
   downloadFile(`thlfc-credits-${activeSeasonId()}-${new Date().toISOString().slice(0,10)}.json`, payload, "application/json");
+  setLastBackupNow();
+  showBackupNudge();
 }
 
 function escapeCSV(s) {
@@ -2258,6 +2359,8 @@ function exportCSV() {
   }
 
   downloadFile(`thlfc-credits-${seasonId}-${new Date().toISOString().slice(0,10)}.csv`, lines.join("\n"), "text/csv");
+  setLastBackupNow();
+  showBackupNudge();
 }
 
 function importJSONFile(file) {
@@ -2269,6 +2372,8 @@ function importJSONFile(file) {
       state.data = parsed;
       save();
       renderAll();
+      setHasUserData();
+      showBackupNudge();
       alert("Import complete ✅");
     } catch {
       alert("Import failed (Invalid JSON backup)");
@@ -2425,6 +2530,8 @@ const ce=document.getElementById("fixturesCount"); if(ce) ce.textContent = `Impo
     e.preventDefault();
     const m = upsertMatchFromForm();
     if (!m) return;
+    setHasUserData();
+    showBackupNudge();
     clearForm();
     renderAll();
     setView(state.lastAddSource === "fixture" ? "fixtures" : "matches");
@@ -2441,6 +2548,11 @@ const ce=document.getElementById("fixturesCount"); if(ce) ce.textContent = `Impo
   $("btnExportCSV").addEventListener("click", exportCSV);
   onEl("btnExportJSON2","click", exportJSON);
 onEl("btnExportCSV2","click", exportCSV);
+  onEl("btnBackupNudgeNow","click", exportJSON);
+  onEl("btnBackupNudgeLater","click", () => {
+    localStorage.setItem(BACKUP_NUDGE_DISMISSED_KEY, new Date().toISOString());
+    showBackupNudge();
+  });
 $("importFile").addEventListener("change", (e) => {
     const f = e.target.files?.[0];
     if (f) importJSONFile(f);
@@ -2505,6 +2617,7 @@ function init() {
   if (window.__THLFC_INITED) return;
   window.__THLFC_INITED = true;
   load();
+  ensureFirstSeen();
   setupPWA();
   bindEvents();
   bindTopbarAutoHide();
@@ -2513,6 +2626,7 @@ function init() {
   renderAll();
   updateSetupModeUI();
   setView("dash");
+  showBackupNudge();
 
   if (!state.data.accounts || state.data.accounts.length === 0) {
     setView("setup");
@@ -3569,6 +3683,7 @@ function openSupport(){
   dlg.classList.remove("hidden");
   if (dlg.showModal) dlg.showModal();
   else dlg.setAttribute("open","");
+  showBackupNudge();
 }
 function closeSupport(){
   const dlg = $("supportModal");
