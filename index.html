@@ -466,6 +466,13 @@ body{
   gap:10px;
   margin-top:14px;
 }
+.acctBarActions.persistent{
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top:10px;
+}
+.acctBarActions.persistent .btn{
+  grid-column:2;
+}
 .acctBarActions .btn{
   width:100%;
 }
@@ -475,6 +482,9 @@ body{
   border-radius:12px;
 }
 .btn.ghost.sm{ padding:8px 10px; }
+.btn.attention{
+  box-shadow: 0 0 0 1px rgba(227,27,35,.5), 0 10px 18px rgba(227,27,35,.2);
+}
 
 @media (min-width: 720px){
   .acctField{ flex:1; }
@@ -823,6 +833,11 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
         <button type="button" id="btnEditAccount" class="btn sm">Edit</button>
         <button type="button" id="btnDeleteAccount" class="btn danger sm">Delete</button>
       </div>
+      <div class="acctBarActions persistent">
+        <button type="button" id="btnBackupData" class="btn danger sm attention">
+          Backup Data
+        </button>
+      </div>
     </section>
 
 
@@ -923,7 +938,7 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
       </section>
 
 
-<section class="card backupCard">
+<section class="card backupCard" id="backupCard">
   <div class="label withIcon">
     <img class="labelIcon" src="icons/assets/backup.svg" alt="" aria-hidden="true" />
     Backups
@@ -2459,6 +2474,15 @@ function bindEvents() {
   onEl("btnAddAccount","click", openSetupForNewAccount);
   onEl("btnEditAccount","click", editActiveAccount);
   onEl("btnDeleteAccount","click", deleteActiveAccount);
+  onEl("btnBackupData","click", () => {
+    setView("dash");
+    requestAnimationFrame(() => {
+      const card = $("backupCard");
+      if (card) {
+        card.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  });
   onEl("matchSort","change", renderMatches);
 
   
