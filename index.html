@@ -2818,6 +2818,9 @@ async function renderFixtures() {
     const showSel = document.getElementById("fixtureShow");
     const compSel = document.getElementById("fixtureComp");
     const haSel = document.getElementById("fixtureHA");
+        if (showSel && seasonLabelFromId(activeSeasonId()) === "24/25" && showSel.value === "upcoming") {
+      showSel.value = "past";
+    }
     const show = showSel ? showSel.value : "upcoming";
     const compFilter = compSel ? compSel.value : "";
     const haFilter = haSel ? haSel.value : "";
