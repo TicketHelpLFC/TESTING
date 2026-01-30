@@ -1125,7 +1125,7 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
 
       <h2>Using the Fixtures Tab</h2>
       <ul>
-        <li>Shows all past & upcoming Liverpool fixtures.</li>
+        <li>Shows past & upcoming Liverpool fixtures for the selected season.</li>
         <li>Tap any match to add it instantly to one of your accounts.</li>
         <li>Fixtures automatically update when new dates are announced.</li>
       </ul>
@@ -2825,8 +2825,10 @@ async function renderFixtures() {
 
     const today = new Date();
     today.setUTCHours(0,0,0,0);
+    const seasonFilterLabel = seasonLabelFromId(activeSeasonId());
 
     let filtered = data.filter(f => {
+      if (seasonFilterLabel && fixtureSeasonLabel(f) !== seasonFilterLabel) return false;
       if (compFilter && f.competition !== compFilter) return false;
       if (haFilter && (f.venue || "H") !== haFilter) return false;
       const raw = (f.date || (f.datetime_utc||""));
@@ -2932,6 +2934,29 @@ function parseYMD(ymd){
   if(!m) return null;
   const y=+m[1], mo=+m[2]-1, d=+m[3];
   return new Date(Date.UTC(y,mo,d));
+}
+
+function seasonIdFromDateString(ymd){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ymd || "");
+  if(!m) return "";
+  const y = Number(m[1]);
+  const month = Number(m[2]);
+  if (!Number.isFinite(y) || !Number.isFinite(month)) return "";
+  const startYear = (month >= 7) ? y : (y - 1);
+  return `${startYear}-${String(startYear + 1).slice(-2)}`;
+}
+
+function fixtureSeasonLabel(f){
+  if (!f) return "";
+  const raw = String(f.season || "").trim();
+  if (raw) {
+    if (raw.includes("/")) return raw;
+    if (raw.includes("-")) return seasonLabelFromId(raw);
+    return raw;
+  }
+  const rawDate = f.date || (f.datetime_utc ? f.datetime_utc.slice(0,10) : "");
+  const seasonId = seasonIdFromDateString(rawDate);
+  return seasonId ? seasonLabelFromId(seasonId) : "";
 }
 
 function showToast(msg){
@@ -3099,7 +3124,7 @@ function populateSeasonSelect(sel){
   sel.innerHTML = "";
 
   const seasons = Array.isArray(state.data.seasons) ? state.data.seasons : generateSeasons().seasons;
-  const minAccountSeasonStartYear = 2025;
+  const minAccountSeasonStartYear = 2024;
   const isAccountSetupSeason = sel.id === "setupSeason";
   for (const s of seasons) {
     if (isAccountSetupSeason) {
