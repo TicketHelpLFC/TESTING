@@ -395,6 +395,16 @@ body{
 .breakdownPill.comp-lc{border-color: rgba(46,204,113,.7); color: #c9f2de; background: rgba(46,204,113,.12)}
 .breakdownPill.comp-fac{border-color: rgba(227,27,35,.7); color: #ffc2c5; background: rgba(227,27,35,.12)}
 .breakdownPill.comp-other{border-color: rgba(154,160,166,.45); color: var(--text); background: rgba(154,160,166,.10)}
+.breakdownPill.autocup{
+  border-color: rgba(246,195,67,.7);
+  color: #f6c343;
+  background: rgba(246,195,67,.16);
+}
+.breakdownPill.attended{
+  border-color: rgba(14,165,233,.7);
+  color: #bae6fd;
+  background: rgba(14,165,233,.14);
+}
 
 
 .modal.hidden{display:none !important}
@@ -1572,14 +1582,19 @@ function computeSpend(seasonId) {
 
 function computeBreakdownByCompetition(seasonId) {
   const matches = getSeasonMatches(seasonId);
-  const comps = ["PL","UCL","FAC","LC","OTHER"];
+  const comps = ["PL","UCL","FAC","LC","ATTENDED"];
   const out = {};
   for (const c of comps) out[c] = { H: 0, A: 0 };
   for (const m of matches) {
-    const c = out[m.competition] ? m.competition : "OTHER";
     if (m.creditCredit === "yes") {
+      const c = out[m.competition] ? m.competition : null;
+      if (!c) continue;
       if (m.venue === "H") out[c].H += 1;
       if (m.venue === "A") out[c].A += 1;
+    }
+    if (m.attended === "yes") {
+      if (m.venue === "H") out.ATTENDED.H += 1;
+      if (m.venue === "A") out.ATTENDED.A += 1;
     }
   }
   return out;
@@ -1757,8 +1772,8 @@ function renderDashboard() {
   const acc = state.data.accounts.find(a => a.id === activeAccountId());
   const autoCup = getAutoCupForSeason(acc, activeSeasonId());
   const breakdown = computeBreakdownByCompetition(activeSeasonId());
-  const labels = { PL: "Premier League", UCL: "UCL", FAC: "FA Cup", LC: "League Cup", OTHER: "Other" };
-  const compClasses = { PL: "comp-pl", UCL: "comp-ucl", LC: "comp-lc", FAC: "comp-fac", OTHER: "comp-other" };
+  const labels = { PL: "Premier League", UCL: "UCL", FAC: "FA Cup", LC: "League Cup", ATTENDED: "Attended" };
+  const compClasses = { PL: "comp-pl", UCL: "comp-ucl", LC: "comp-lc", FAC: "comp-fac", ATTENDED: "attended" };
   const table = document.createElement("table");
   table.className = "breakdownTable";
   table.innerHTML = `
@@ -1778,7 +1793,7 @@ function renderDashboard() {
     const h = document.createElement("td");
     const homeAuto = (key === "LC" && autoCup.LC) || (key === "FAC" && autoCup.FAC) || (key === "UCL" && autoCup.UCL);
     if (homeAuto) {
-      h.innerHTML = `<span class="breakdownPill neutral">AutoCup</span>`;
+      h.innerHTML = `<span class="breakdownPill autocup">AutoCup</span>`;
     } else {
       h.innerHTML = `<span class="breakdownPill ${compClass}">H: ${breakdown[key].H}</span>`;
     }
