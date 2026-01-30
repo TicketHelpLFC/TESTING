@@ -2475,13 +2475,7 @@ function bindEvents() {
   onEl("btnEditAccount","click", editActiveAccount);
   onEl("btnDeleteAccount","click", deleteActiveAccount);
   onEl("btnBackupData","click", () => {
-    setView("dash");
-    requestAnimationFrame(() => {
-      const card = $("backupCard");
-      if (card) {
-        card.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    });
+    exportJSON();
   });
   onEl("matchSort","change", renderMatches);
 
