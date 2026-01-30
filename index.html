@@ -405,6 +405,10 @@ body{
   color: #bae6fd;
   background: rgba(14,165,233,.14);
 }
+.breakdownTotal td{
+  font-weight:800;
+  background: rgba(255,255,255,.04);
+}
 
 
 .modal.hidden{display:none !important}
@@ -865,6 +869,16 @@ dialog.modal input, dialog.modal select, dialog.modal textarea{
           </div>
         </div>
         <div id="compBreakdown" class="breakdown"></div>
+      </section>
+
+      <section class="card">
+        <div class="row space-between">
+          <div>
+            <div class="label">Attendance by Competition</div>
+            <div class="hint">Attended matches split by home/away, with season total</div>
+          </div>
+        </div>
+        <div id="attendanceBreakdown" class="breakdown"></div>
       </section>
 
 
@@ -1582,20 +1596,29 @@ function computeSpend(seasonId) {
 
 function computeBreakdownByCompetition(seasonId) {
   const matches = getSeasonMatches(seasonId);
-  const comps = ["PL","UCL","FAC","LC","ATTENDED"];
+  const comps = ["PL","UCL","FAC","LC","OTHER"];
   const out = {};
   for (const c of comps) out[c] = { H: 0, A: 0 };
   for (const m of matches) {
     if (m.creditCredit === "yes") {
-      const c = out[m.competition] ? m.competition : null;
-      if (!c) continue;
+      const c = out[m.competition] ? m.competition : "OTHER";
       if (m.venue === "H") out[c].H += 1;
       if (m.venue === "A") out[c].A += 1;
     }
-    if (m.attended === "yes") {
-      if (m.venue === "H") out.ATTENDED.H += 1;
-      if (m.venue === "A") out.ATTENDED.A += 1;
-    }
+  }
+  return out;
+}
+
+function computeAttendanceByCompetition(seasonId) {
+  const matches = getSeasonMatches(seasonId);
+  const comps = ["PL","UCL","FAC","LC","OTHER"];
+  const out = {};
+  for (const c of comps) out[c] = { H: 0, A: 0 };
+  for (const m of matches) {
+    if (m.attended !== "yes") continue;
+    const c = out[m.competition] ? m.competition : "OTHER";
+    if (m.venue === "H") out[c].H += 1;
+    if (m.venue === "A") out[c].A += 1;
   }
   return out;
 }
@@ -1755,6 +1778,8 @@ function renderDashboard() {
     setText("statAvgSpend", formatGBP(0));
     const mount = $("compBreakdown");
     if (mount) mount.innerHTML = '<div class="empty">Add an account to start tracking.</div>';
+    const attendanceMount = $("attendanceBreakdown");
+    if (attendanceMount) attendanceMount.innerHTML = '<div class="empty">Add an account to start tracking.</div>';
     const root = $("recentList");
     if (root) root.innerHTML = '<div class="empty">No activity yet.</div>';
     return;
@@ -1772,8 +1797,8 @@ function renderDashboard() {
   const acc = state.data.accounts.find(a => a.id === activeAccountId());
   const autoCup = getAutoCupForSeason(acc, activeSeasonId());
   const breakdown = computeBreakdownByCompetition(activeSeasonId());
-  const labels = { PL: "Premier League", UCL: "UCL", FAC: "FA Cup", LC: "League Cup", ATTENDED: "Attended" };
-  const compClasses = { PL: "comp-pl", UCL: "comp-ucl", LC: "comp-lc", FAC: "comp-fac", ATTENDED: "attended" };
+  const labels = { PL: "Premier League", UCL: "UCL", FAC: "FA Cup", LC: "League Cup", OTHER: "Other" };
+  const compClasses = { PL: "comp-pl", UCL: "comp-ucl", LC: "comp-lc", FAC: "comp-fac", OTHER: "comp-other" };
   const table = document.createElement("table");
   table.className = "breakdownTable";
   table.innerHTML = `
@@ -1808,6 +1833,54 @@ function renderDashboard() {
   const mount = $("compBreakdown");
   mount.innerHTML = "";
   mount.appendChild(table);
+
+  const attendance = computeAttendanceByCompetition(activeSeasonId());
+  const attendanceTable = document.createElement("table");
+  attendanceTable.className = "breakdownTable";
+  attendanceTable.innerHTML = `
+    <thead>
+      <tr>
+        <th>Competition</th>
+        <th>Home</th>
+        <th>Away</th>
+      </tr>
+    </thead>`;
+  const attendanceBody = document.createElement("tbody");
+  let seasonHome = 0;
+  let seasonAway = 0;
+  for (const key of Object.keys(attendance)) {
+    const row = document.createElement("tr");
+    const comp = document.createElement("td");
+    comp.textContent = labels[key] || key;
+    const compClass = compClasses[key] || "comp-other";
+    const h = document.createElement("td");
+    h.innerHTML = `<span class="breakdownPill ${compClass}">H: ${attendance[key].H}</span>`;
+    const a = document.createElement("td");
+    a.innerHTML = `<span class="breakdownPill ${compClass}">A: ${attendance[key].A}</span>`;
+    seasonHome += attendance[key].H;
+    seasonAway += attendance[key].A;
+    row.appendChild(comp);
+    row.appendChild(h);
+    row.appendChild(a);
+    attendanceBody.appendChild(row);
+  }
+  const totalRow = document.createElement("tr");
+  totalRow.className = "breakdownTotal";
+  const totalLabel = document.createElement("td");
+  const seasonTotal = seasonHome + seasonAway;
+  totalLabel.textContent = `Season Attendance (Total: ${seasonTotal})`;
+  const totalHome = document.createElement("td");
+  totalHome.innerHTML = `<span class="breakdownPill attended">H: ${seasonHome}</span>`;
+  const totalAway = document.createElement("td");
+  totalAway.innerHTML = `<span class="breakdownPill attended">A: ${seasonAway}</span>`;
+  totalRow.appendChild(totalLabel);
+  totalRow.appendChild(totalHome);
+  totalRow.appendChild(totalAway);
+  attendanceBody.appendChild(totalRow);
+  attendanceTable.appendChild(attendanceBody);
+  const attendanceMount = $("attendanceBreakdown");
+  attendanceMount.innerHTML = "";
+  attendanceMount.appendChild(attendanceTable);
 
   // Recent list: last 6 updated
   const matches = getSeasonMatches(activeSeasonId())
