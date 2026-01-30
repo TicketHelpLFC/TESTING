@@ -2187,7 +2187,7 @@ function editMatch(id) {
   $("amountPaid").value = (m.amountPaid ?? "");
 
   $("btnDelete").hidden = false;
-  state.lastAddSource = "fixture";
+  state.lastAddSource = state.currentView === "fixtures" ? "fixture" : "matches";
   setView("add");
 }
 
