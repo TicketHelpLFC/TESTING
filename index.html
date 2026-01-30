@@ -1530,10 +1530,8 @@ function setActiveAccount(id) {
   state.data.activeAccountId = id;
   save();
   renderAll();
-   const fixturesView = $("viewFixtures");
-  if (fixturesView && !fixturesView.classList.contains("hidden")) {
-    renderFixtures();
-  }
+  renderFixtures();
+  
 }
 
 function seasonLabel(id) {
