@@ -3561,18 +3561,35 @@ async function reloadSalesHard() {
 }
 
 function guessSalesFields(obj) {
-  // Flexible mapping based on likely column names in your sheet
   const keys = Object.keys(obj);
-  const find = (k) => keys.find(key => key.includes(k));
+  const find = (str) => keys.find(k => k.includes(str.toLowerCase()));
   
-  const match = obj[find('match')] || obj[find('opponent')] || obj[find('event')] || "Event";
-  const date = obj[find('date')] || "";
-  const time = obj[find('time')] || "";
-  const type = obj[find('type')] || obj[find('sale')] || "";
-  const details = obj[find('details')] || obj[find('criteria')] || obj[find('info')] || obj[find('link')] || "";
-  const status = obj[find('status')] || obj[find('result')] || "";
+  const match = obj[find('match')] || obj[find('opponent')] || obj[find('event')] || "";
   
-  return { match, date, time, type, details, status };
+  // Registration
+  const regOpen = obj[find('registration open')] || obj[find('reg open')] || "";
+  const regClose = obj[find('registration close')] || obj[find('reg close')] || "";
+  
+  // Unique Links
+  const uniqueLinks = obj[find('unique link')] || obj[find('link date')] || "";
+  
+  // Local Ballot
+  const localOpen = obj[find('local ballot open')] || obj[find('local open')] || "";
+  const localClose = obj[find('local ballot close')] || obj[find('local close')] || "";
+  const localResults = obj[find('local ballot result')] || obj[find('local result')] || "";
+  
+  // Sale
+  const saleCriteria = obj[find('sale criteria')] || obj[find('criteria')] || "";
+  const saleOpen = obj[find('sale open')] || "";
+  const saleClose = obj[find('sale close')] || "";
+
+  return { 
+    match, 
+    regOpen, regClose, 
+    uniqueLinks, 
+    localOpen, localClose, localResults, 
+    saleCriteria, saleOpen, saleClose 
+  };
 }
 
 async function renderSales() {
@@ -3593,21 +3610,55 @@ async function renderSales() {
 
   data.forEach(row => {
     const item = guessSalesFields(row);
-    if (!item.match && !item.details) return;
+    if (!item.match) return;
 
     const el = document.createElement("div");
     el.className = "item";
-    el.innerHTML = `
-      <div class="row space-between" style="align-items:flex-start">
-        <div style="flex:1">
-          <div class="itemTitle" style="font-size:16px; margin-bottom:4px;">${item.match}</div>
-          <div class="hint" style="color:var(--text); font-weight:500;">${item.date} ${item.time ? '• ' + item.time : ''}</div>
-          ${item.type ? `<div class="badge neutral" style="margin-top:6px; display:inline-block;">${item.type}</div>` : ''}
-          ${item.details ? `<div class="hint" style="margin-top:8px; line-height:1.4;">${item.details}</div>` : ''}
-        </div>
-        ${item.status ? `<div class="badge ${item.status.toLowerCase().includes('open') ? 'good' : 'neutral'}">${item.status}</div>` : ''}
-      </div>
-    `;
+    
+    let html = `<div class="itemTitle" style="font-size:18px; margin-bottom:12px; border-bottom:1px solid var(--separator); padding-bottom:8px;">${item.match}</div>`;
+    
+    // Grid layout for dates
+    html += `<div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">`;
+    
+    if (item.regOpen || item.regClose) {
+        html += `<div style="grid-column: span 2;">
+            <div class="fieldLabel" style="margin-top:0; color:var(--primary);">Registration</div>
+            <div class="hint" style="margin-top:2px; color:var(--text); font-size:14px;">${item.regOpen} ${item.regClose ? '— ' + item.regClose : ''}</div>
+        </div>`;
+    }
+
+    if (item.uniqueLinks) {
+        html += `<div>
+            <div class="fieldLabel" style="margin-top:0;">Unique Links</div>
+            <div class="hint" style="margin-top:2px; color:var(--text); font-size:14px;">${item.uniqueLinks}</div>
+        </div>`;
+    }
+    
+    if (item.localResults) {
+        html += `<div>
+            <div class="fieldLabel" style="margin-top:0;">Local Results</div>
+            <div class="hint" style="margin-top:2px; color:var(--text); font-size:14px;">${item.localResults}</div>
+        </div>`;
+    }
+
+    if (item.localOpen || item.localClose) {
+        html += `<div style="grid-column: span 2;">
+            <div class="fieldLabel" style="margin-top:0;">Local Ballot</div>
+            <div class="hint" style="margin-top:2px; color:var(--text); font-size:14px;">${item.localOpen} ${item.localClose ? '— ' + item.localClose : ''}</div>
+        </div>`;
+    }
+    
+    html += `</div>`; // End grid
+
+    if (item.saleCriteria || item.saleOpen || item.saleClose) {
+        html += `<div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--separator);">
+            <div class="fieldLabel" style="margin-top:0;">Sale Details</div>
+            ${item.saleCriteria ? `<div class="hint" style="margin-top:2px; color:var(--text); margin-bottom:4px; font-size:14px;">${item.saleCriteria}</div>` : ''}
+            ${(item.saleOpen || item.saleClose) ? `<div class="hint" style="color:var(--text-secondary); font-size:13px;">${item.saleOpen} ${item.saleClose ? '— ' + item.saleClose : ''}</div>` : ''}
+        </div>`;
+    }
+
+    el.innerHTML = html;
     list.appendChild(el);
   });
 }
