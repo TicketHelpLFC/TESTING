@@ -576,7 +576,7 @@ dialog.modal::backdrop{
   background: transparent;
   border: none;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   padding: 4px 12px;
   border-radius: 8px;
@@ -616,7 +616,7 @@ dialog.modal::backdrop{
     <div class="topbarLeft">
       <img class="brandLogo" src="icon.svg" alt="TicketHelpLFC" />
     </div>
-    <div class="topbarCenter" style="display:flex; gap:8px; position:absolute; left:50%; transform:translateX(-50%);">
+    <div class="topbarCenter" style="display:flex; gap:8px; position:absolute; left:50%; transform:translate(-50%, -50%);">
       <select id="headerAccountSelect" class="headerSelect"></select>
       <select id="headerSeasonSelect" class="headerSelect"></select>
     </div>
