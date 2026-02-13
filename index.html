@@ -44,6 +44,31 @@
   --glow-card: none;
   --tilt-x: 0deg;
   --tilt-y: 0deg;
+  --card-bg: rgba(24, 24, 27, 0.6);
+  --bar-bg: rgba(9, 9, 11, 0.8);
+  --modal-bg: rgba(24, 24, 27, 0.95);
+  --input-bg: var(--surface-2);
+  --grad-1: rgba(244, 63, 94, 0.15);
+  --grad-2: rgba(139, 92, 246, 0.1);
+}
+
+[data-theme="light"] {
+  --bg: #f2f2f7;
+  --surface: #ffffff;
+  --surface-2: #e4e4e7;
+  --surface-3: #d4d4d8;
+  --separator: #d4d4d8;
+  --text: #18181b;
+  --text-secondary: #52525b;
+  --text-tertiary: #71717a;
+  --border: rgba(0,0,0,0.08);
+  --card-bg: rgba(255, 255, 255, 0.75);
+  --bar-bg: rgba(244, 244, 245, 0.85);
+  --modal-bg: rgba(255, 255, 255, 0.95);
+  --input-bg: #ffffff;
+  --shadow-card: 0 10px 30px -10px rgba(0,0,0,0.08);
+  --grad-1: rgba(244, 63, 94, 0.08);
+  --grad-2: rgba(139, 92, 246, 0.05);
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -64,8 +89,8 @@ body::before {
   top: 0; left: 0; width: 100%; height: 100%;
   background-color: var(--bg);
   background-image: 
-    radial-gradient(circle at 0% 0%, rgba(244, 63, 94, 0.15), transparent 50%),
-    radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.1), transparent 50%);
+    radial-gradient(circle at 0% 0%, var(--grad-1), transparent 50%),
+    radial-gradient(circle at 100% 100%, var(--grad-2), transparent 50%);
   z-index: -1;
   animation: bgPulse 20s ease-in-out infinite alternate;
 }
@@ -79,7 +104,7 @@ body::before {
   position: sticky; top: 0; z-index: 100;
   height: calc(var(--header-height) + env(safe-area-inset-top));
   padding-top: env(safe-area-inset-top);
-  background: rgba(9, 9, 11, 0.8);
+  background: var(--bar-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: saturate(180%) blur(20px);
@@ -103,6 +128,7 @@ body::before {
 }
 .iconBtn:active { opacity: 0.5; }
 .iconImg { width: 22px; height: 22px; filter: invert(38%) sepia(92%) saturate(3944%) hue-rotate(206deg) brightness(100%) contrast(104%); } /* iOS Blue Filter */
+.iconSvg { width: 22px; height: 22px; stroke: currentColor; fill: none; }
 
 /* Container */
 .container{
@@ -121,7 +147,7 @@ body::before {
 
 /* Cards */
 .card{
-  background: rgba(24, 24, 27, 0.6);
+  background: var(--card-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-l);
@@ -146,7 +172,7 @@ body::before {
 /* Inputs */
 .input,.select,.textarea{
   width:100%;
-  background: var(--surface-2);
+  background: var(--input-bg);
   border: 1px solid transparent;
   border-radius: var(--radius-m);
   padding: 14px 16px;
@@ -196,7 +222,7 @@ body::before {
 /* Bottom Nav */
 .bottomNav{
   position: fixed; bottom: 24px; left: 24px; right: 24px;
-  background: rgba(24, 24, 27, 0.85);
+  background: var(--bar-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: saturate(180%) blur(20px);
@@ -310,7 +336,7 @@ body::before {
 dialog.modal{
   border:none;
   padding:0;
-  background: rgba(24, 24, 27, 0.95);
+  background: var(--modal-bg);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
   color: var(--text);
@@ -559,6 +585,7 @@ dialog.modal::backdrop{
   padding: 4px 12px;
   border-radius: 8px;
   cursor: pointer;
+  color: var(--text);
   z-index: 120;
 }
 .topbarCenter:active { background: rgba(255,255,255,0.1); }
@@ -585,6 +612,9 @@ dialog.modal::backdrop{
       <div id="headerSubtitle" class="topbarSubtitle"></div>
     </button>
     <div class="headerActions">
+      <button id="btnThemeToggle" class="iconBtn" aria-label="Toggle Theme" title="Toggle Theme">
+        <svg class="iconSvg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      </button>
       <button id="btnAddManual" class="iconBtn" aria-label="Add Match" title="Add Match">
         <img class="iconImg" src="icons/assets/add.svg" alt="" aria-hidden="true" />
       </button>
@@ -2452,6 +2482,7 @@ onEl("btnAddManual","click", () => {
 
   onEl("btnHeaderSwitch", "click", openAccountSwitcher);
   onEl("btnCloseAccountSwitcher", "click", closeAccountSwitcher);
+  onEl("btnThemeToggle", "click", toggleTheme);
 }
 
 function bindTopbarAutoHide() {
@@ -2506,6 +2537,33 @@ function initGyro() {
   });
 }
 
+function initTheme() {
+  const saved = localStorage.getItem("thlfc_theme");
+  if (saved) {
+    document.documentElement.setAttribute("data-theme", saved);
+  }
+  updateThemeIcon();
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute("data-theme");
+  const next = current === "light" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", next);
+  localStorage.setItem("thlfc_theme", next);
+  updateThemeIcon();
+}
+
+function updateThemeIcon() {
+  const current = document.documentElement.getAttribute("data-theme");
+  const btn = document.getElementById("btnThemeToggle");
+  if (!btn) return;
+  if (current === "light") {
+    btn.innerHTML = `<svg class="iconSvg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+  } else {
+    btn.innerHTML = `<svg class="iconSvg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+  }
+}
+
 function init() {
   if (window.__THLFC_INITED) return;
   window.__THLFC_INITED = true;
@@ -2515,6 +2573,7 @@ function init() {
   bindEvents();
   bindTopbarAutoHide();
   initGyro();
+  initTheme();
   try { bindFixturesControls(); } catch(e) {}
   clearForm();
   renderAll();
