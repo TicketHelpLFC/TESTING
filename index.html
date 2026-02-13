@@ -539,6 +539,32 @@ dialog.modal::backdrop{
 .settingsSection .item {
   display: flex; align-items: center; justify-content: space-between;
 }
+
+/* Header Center Button */
+.topbarCenter {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 20;
+}
+.topbarCenter:active { background: rgba(255,255,255,0.1); }
+.topbarTitleRow { display: flex; align-items: center; gap: 4px; }
+.headerChevron { font-size: 10px; opacity: 0.5; transform: translateY(1px); transition: transform 0.2s; }
+.topbarSubtitle { font-size: 12px; color: var(--text-secondary); font-weight: 500; line-height: 1.1; margin-top: 2px; }
+
+/* Ghost Select */
+.selectGhost { appearance: none; -webkit-appearance: none; background: transparent; border: none; color: var(--blue); font-size: 17px; text-align: right; padding: 0; margin: 0; width: auto; min-width: 100px; direction: rtl; }
+.selectGhost:focus { outline: none; background: transparent; box-shadow: none; }
+.selectGhost option { direction: ltr; color: #000; }
 </style>
 </head>
 <body>
@@ -546,10 +572,13 @@ dialog.modal::backdrop{
     <div class="topbarLeft">
       <img class="brandLogo" src="icon.svg" alt="TicketHelpLFC" />
     </div>
-    <div style="display:flex; flex-direction:column; align-items:center;">
-      <div class="topbarTitle" id="headerTitle" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Credit Tracker</div>
-      <div id="headerSubtitle" style="font-size:12px; color:var(--text-secondary); font-weight:500; line-height:1.1;"></div>
-    </div>
+    <button id="btnHeaderSwitch" class="topbarCenter">
+      <div class="topbarTitleRow">
+        <span class="topbarTitle" id="headerTitle" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Credit Tracker</span>
+        <span class="headerChevron">▼</span>
+      </div>
+      <div id="headerSubtitle" class="topbarSubtitle"></div>
+    </button>
     <div class="headerActions">
       <button id="btnAddManual" class="iconBtn" aria-label="Add Match" title="Add Match">
         <img class="iconImg" src="icons/assets/add.svg" alt="" aria-hidden="true" />
@@ -884,21 +913,26 @@ dialog.modal::backdrop{
       </div>
 
       <section class="card settingsSection">
-        <div class="fieldLabel" style="margin-left:0; margin-top:0;">Account & Season</div>
-        <div class="acctBarFields">
-          <div class="acctField">
-            <div class="fieldLabel">Account</div>
-            <select id="accountSelect" class="select"></select>
+        <div class="fieldLabel" style="margin-left:16px; margin-top:0;">Account & Season</div>
+        <div class="list">
+          <div class="item">
+            <div class="row space-between" style="width:100%">
+              <div class="itemTitle">Account</div>
+              <select id="accountSelect" class="selectGhost"></select>
+            </div>
           </div>
-          <div class="acctField">
-            <div class="fieldLabel">Season</div>
-            <select id="seasonSelect" class="select" data-role="season"></select>
+          <div class="item">
+            <div class="row space-between" style="width:100%">
+              <div class="itemTitle">Season</div>
+              <select id="seasonSelect" class="selectGhost" data-role="season"></select>
+            </div>
           </div>
         </div>
-        <div id="acctActions" class="acctBarActions" style="margin-top:12px;">
-          <button id="btnAddAccount" class="btn sm">Add Account</button>
-          <button type="button" id="btnEditAccount" class="btn sm">Edit</button>
-          <button type="button" id="btnDeleteAccount" class="btn danger sm">Delete</button>
+        
+        <div class="list" style="margin-top:20px;">
+           <button id="btnAddAccount" class="item clickable" style="color:var(--blue); text-align:center; width:100%; justify-content:center;">Add Account</button>
+           <button id="btnEditAccount" class="item clickable" style="color:var(--blue); text-align:center; width:100%; justify-content:center;">Edit Current Account</button>
+           <button id="btnDeleteAccount" class="item clickable" style="color:var(--danger); text-align:center; width:100%; justify-content:center;">Delete Current Account</button>
         </div>
       </section>
 
@@ -1100,6 +1134,17 @@ dialog.modal::backdrop{
       <button type="button" class="btn" id="btnDeleteSeasonConfirm">Season</button>
       <button type="button" class="btn ghost" id="btnDeleteAccountCancel">Cancel</button>
     </div>
+  </div>
+</dialog>
+
+<!-- Account Switcher Modal -->
+<dialog id="accountSwitcherModal" class="modal hidden">
+  <div class="modalInner">
+    <div class="modalHeader">
+      <div class="modalTitle">Switch Account</div>
+      <button type="button" class="btn ghost sm" id="btnCloseAccountSwitcher" aria-label="Close">Close</button>
+    </div>
+    <div class="list" id="accountSwitcherList"></div>
   </div>
 </dialog>
 </main>
@@ -2399,6 +2444,9 @@ onEl("btnAddManual","click", () => {
   clearForm();
   setView("add");
 });
+
+  onEl("btnHeaderSwitch", "click", openAccountSwitcher);
+  onEl("btnCloseAccountSwitcher", "click", closeAccountSwitcher);
 }
 
 function bindTopbarAutoHide() {
@@ -3418,6 +3466,64 @@ function openFixturesSeasonRefreshModal(){
     else dlg.setAttribute("open","");
     setTimeout(() => okBtn.focus(), 0);
   });
+}
+
+function openAccountSwitcher() {
+  const dlg = $("accountSwitcherModal");
+  if (!dlg) return;
+  renderAccountSwitcherList();
+  dlg.classList.remove("hidden");
+  if (dlg.showModal) dlg.showModal();
+  else dlg.setAttribute("open","");
+}
+
+function closeAccountSwitcher() {
+  const dlg = $("accountSwitcherModal");
+  if (!dlg) return;
+  try { dlg.close(); } catch(e) {}
+  dlg.classList.add("hidden");
+}
+
+function renderAccountSwitcherList() {
+  const list = $("accountSwitcherList");
+  if (!list) return;
+  list.innerHTML = "";
+  
+  const currentId = activeAccountId();
+  
+  (state.data.accounts || []).forEach(acc => {
+    const item = document.createElement("button");
+    item.className = "item clickable";
+    item.style.width = "100%";
+    item.style.display = "flex";
+    item.style.justifyContent = "space-between";
+    item.style.alignItems = "center";
+    
+    item.innerHTML = `
+      <div class="itemTitle" style="${acc.id === currentId ? 'color:var(--blue);' : ''}">${acc.name}</div>
+      ${acc.id === currentId ? '<div style="color:var(--blue); font-weight:bold;">✓</div>' : ''}
+    `;
+    
+    item.onclick = () => {
+      setActiveAccount(acc.id);
+      closeAccountSwitcher();
+    };
+    
+    list.appendChild(item);
+  });
+  
+  const manageBtn = document.createElement("button");
+  manageBtn.className = "item clickable";
+  manageBtn.style.width = "100%";
+  manageBtn.style.textAlign = "center";
+  manageBtn.style.color = "var(--blue)";
+  manageBtn.style.justifyContent = "center";
+  manageBtn.innerHTML = `<div class="itemTitle">Manage Accounts</div>`;
+  manageBtn.onclick = () => {
+    closeAccountSwitcher();
+    setView("settings");
+  };
+  list.appendChild(manageBtn);
 }
 
 async function handleSeasonChange(seasonId){
