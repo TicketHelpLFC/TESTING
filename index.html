@@ -444,55 +444,14 @@ dialog.modal::backdrop{
     </div>
     <div class="topbarTitle">Credit Tracker</div>
     <div class="headerActions">
-      <button id="btnInfo" class="iconBtn" aria-label="Info" title="Info">
-        <img class="iconImg" src="icons/assets/info.svg" alt="" aria-hidden="true" />
-      </button>
-      <button id="btnSupport" class="iconBtn" aria-label="Support" title="Support">
-        <img class="iconImg" src="icons/assets/support.svg" alt="" aria-hidden="true" />
+      <button id="btnAddManual" class="iconBtn" aria-label="Add Match" title="Add Match">
+        <img class="iconImg" src="icons/assets/add.svg" alt="" aria-hidden="true" />
       </button>
       <button id="btnInstall" class="iconBtn" hidden>Install</button>
     </div>
   </header>
 
   <main class="container">
-    <!-- Season bar -->
-    <section class="card acctBar">
-      <div class="acctBarFields">
-        <div class="acctField">
-          <div class="label withIcon">
-            <img class="labelIcon" src="icons/assets/account.svg" alt="" aria-hidden="true" />
-            Account
-          </div>
-          <select id="accountSelect" class="select"></select>
-        </div>
-
-        <div class="acctField">
-          <div class="label withIcon">
-            <img class="labelIcon" src="icons/assets/season.svg" alt="" aria-hidden="true" />
-            Season
-          </div>
-          <select id="seasonSelect" class="select" data-role="season"></select>
-        </div>
-      </div>
-
-      <div id="acctActions" class="acctBarActions">
-        <button id="btnAddAccount" class="btn sm">
-          Add Account
-        </button>
-        <button type="button" id="btnEditAccount" class="btn sm">Edit</button>
-        <button type="button" id="btnDeleteAccount" class="btn danger sm">Delete</button>
-      </div>
-      <div class="acctBarActions persistent">
-        <button type="button" id="btnImportBackup" class="btn success sm">
-          Import from Backup
-        </button>
-        <button type="button" id="btnBackupData" class="btn danger sm attention">
-          Backup Data
-        </button>
-      </div>
-    </section>
-
-
     <!-- Setup (no popup) -->
     <section id="viewSetup" class="view hidden">
       <section class="card">
@@ -589,31 +548,11 @@ dialog.modal::backdrop{
         <div id="attendanceBreakdown" class="breakdown"></div>
       </section>
 
-
-<section class="card backupCard" id="backupCard">
-  <div class="label withIcon">
-    <img class="labelIcon" src="icons/assets/backup.svg" alt="" aria-hidden="true" />
-    Backups
-  </div>
-  <div id="backupNudge" class="item backupNudge hidden" role="status" aria-live="polite">
-    <div class="label">Backup reminder</div>
-    <div id="backupNudgeMessage" class="hint"></div>
-    <div class="row gap wrap backupNudgeActions">
-      <button id="btnBackupNudgeNow" class="btn primary sm">Backup now</button>
-      <button id="btnBackupNudgeLater" class="btn ghost sm">Later</button>
-    </div>
-  </div>
-  <div class="backupActions">
-    <button id="btnExportJSON" class="btn"><span class="icon"><img src="icons/assets/export.svg" alt="" aria-hidden="true" /></span> Export JSON</button>
-    <button id="btnExportCSV" class="btn"><span class="icon"><img src="icons/assets/export.svg" alt="" aria-hidden="true" /></span> Export CSV</button>
-    <label class="btn fileBtn">
-      <span class="icon"><img src="icons/assets/import.svg" alt="" aria-hidden="true" /></span> Import JSON
-      <input id="importFile" type="file" accept="application/json" hidden />
-    </label>
-  </div>
-  <div class="hint">“JSON” is best for restoring exactly. “CSV” is for spreadsheets.</div>
-</section>
-</section>
+      <section class="card">
+        <div class="label">Recent Activity</div>
+        <div id="recentList" class="list"></div>
+      </section>
+    </section>
 
     <!-- Matches -->
     <section id="viewMatches" class="view hidden">
@@ -683,7 +622,7 @@ dialog.modal::backdrop{
             <img class="labelIcon" src="icons/assets/add.svg" alt="" aria-hidden="true" />
             Add / Edit match
           </div>
-          <button id="btnClearForm" class="btn ghost">Clear</button>
+          <button id="btnCancelAdd" class="btn ghost">Cancel</button>
         </div>
 
         <form id="matchForm" class="form">
@@ -826,6 +765,77 @@ dialog.modal::backdrop{
   <button id="btnClearFixtures" class="btn ghost sm">Clear imported</button>
 </div>
       
+      </section>
+    </section>
+
+    <!-- Settings -->
+    <section id="viewSettings" class="view hidden">
+      <div class="dashHeader">
+        <div class="label withIcon">
+          <img class="labelIcon" src="icons/assets/account.svg" alt="" aria-hidden="true" />
+          Settings
+        </div>
+      </div>
+
+      <section class="card settingsSection">
+        <div class="label">Account & Season</div>
+        <div class="acctBarFields">
+          <div class="acctField">
+            <div class="fieldLabel">Account</div>
+            <select id="accountSelect" class="select"></select>
+          </div>
+          <div class="acctField">
+            <div class="fieldLabel">Season</div>
+            <select id="seasonSelect" class="select" data-role="season"></select>
+          </div>
+        </div>
+        <div id="acctActions" class="acctBarActions" style="margin-top:12px;">
+          <button id="btnAddAccount" class="btn sm">Add Account</button>
+          <button type="button" id="btnEditAccount" class="btn sm">Edit</button>
+          <button type="button" id="btnDeleteAccount" class="btn danger sm">Delete</button>
+        </div>
+      </section>
+
+      <section class="card settingsSection backupCard" id="backupCard">
+        <div class="label withIcon">
+          <img class="labelIcon" src="icons/assets/backup.svg" alt="" aria-hidden="true" />
+          Data & Backup
+        </div>
+        <div id="backupNudge" class="item backupNudge hidden" role="status" aria-live="polite">
+          <div class="label">Backup reminder</div>
+          <div id="backupNudgeMessage" class="hint"></div>
+          <div class="row gap wrap backupNudgeActions">
+            <button id="btnBackupNudgeNow" class="btn primary sm">Backup now</button>
+            <button id="btnBackupNudgeLater" class="btn ghost sm">Later</button>
+          </div>
+        </div>
+        <div class="backupActions">
+          <button id="btnExportJSON" class="btn"><span class="icon"><img src="icons/assets/export.svg" alt="" aria-hidden="true" /></span> Export JSON</button>
+          <button id="btnExportCSV" class="btn"><span class="icon"><img src="icons/assets/export.svg" alt="" aria-hidden="true" /></span> Export CSV</button>
+          <label class="btn fileBtn">
+            <span class="icon"><img src="icons/assets/import.svg" alt="" aria-hidden="true" /></span> Import JSON
+            <input id="importFile" type="file" accept="application/json" hidden />
+          </label>
+        </div>
+        <div class="hint">“JSON” is best for restoring exactly. “CSV” is for spreadsheets.</div>
+      </section>
+
+      <section class="card settingsSection">
+        <div class="label">App Info</div>
+        <div class="list">
+          <button id="btnInfo" class="item clickable" style="text-align:left; width:100%;">
+            <div class="row space-between">
+              <div class="itemTitle">How to use</div>
+              <div class="hint">▸</div>
+            </div>
+          </button>
+          <button id="btnSupport" class="item clickable" style="text-align:left; width:100%;">
+            <div class="row space-between">
+              <div class="itemTitle">Support & Feedback</div>
+              <div class="hint">▸</div>
+            </div>
+          </button>
+        </div>
       </section>
     </section>
 
@@ -1005,9 +1015,9 @@ dialog.modal::backdrop{
       <img class="tabIcon" src="icons/assets/fixtures.svg" alt="" aria-hidden="true" />
       <span class="sr-only">Fixtures</span>
     </button>
-    <button class="tab" data-view="add" aria-label="Add" title="Add">
-      <img class="tabIcon" src="icons/assets/add.svg" alt="" aria-hidden="true" />
-      <span class="sr-only">Add</span>
+    <button class="tab" data-view="settings" aria-label="Settings" title="Settings">
+      <img class="tabIcon" src="icons/assets/account.svg" alt="" aria-hidden="true" />
+      <span class="sr-only">Settings</span>
     </button>
   </nav>
 
@@ -1492,11 +1502,6 @@ function setView(viewName) {
   const tabs = document.querySelectorAll(".tab");
   tabs.forEach(t => t.classList.toggle("active", t.dataset.view === viewName));
 
-  const acctActions = $("acctActions");
-  if (acctActions) {
-    acctActions.classList.toggle("hidden", viewName !== "dash");
-  }
-
   $("viewSetup").classList.toggle("hidden", viewName !== "setup");
   $("viewDash").classList.toggle("hidden", viewName !== "dash");
   $("viewMatches").classList.toggle("hidden", viewName !== "matches");
@@ -1504,6 +1509,7 @@ function setView(viewName) {
   $("infoPage").classList.toggle("hidden", viewName !== "info");
   if (viewName === "fixtures") { setTimeout(() => { bindFixturesControls(); renderFixtures(); }, 0); }
   if (viewName === "setup") { setTimeout(() => { try{ populateAllSeasonSelects(); }catch(e){} }, 0); }
+  $("viewSettings").classList.toggle("hidden", viewName !== "settings");
   $("viewFixtures").classList.toggle("hidden", viewName !== "fixtures");
   if (viewName === "fixtures") { setTimeout(() => { bindFixturesControls(); renderFixtures(); }, 0); }
   if (viewName === "dash") { showBackupNudge(); }
@@ -1676,6 +1682,10 @@ function renderDashboard() {
   attendanceMount.innerHTML = "";
   attendanceMount.appendChild(attendanceTable);
 
+  renderRecentActivity();
+}
+
+function renderRecentActivity() {
   // Recent list: last 6 updated
   const matches = getSeasonMatches(activeSeasonId())
     .slice()
@@ -1697,7 +1707,6 @@ if (matches.length === 0) {
   for (const m of matches) {
     root.appendChild(matchCard(m));
   }
-
 }
 
 function matchCard(m) {
@@ -1830,7 +1839,7 @@ function clearForm() {
   setCreditChip("unsure");
   $("notes").value = "";
   $("amountPaid").value = "";
-  $("btnDelete").hidden = true;
+  if($("btnDelete")) $("btnDelete").hidden = true;
 }
 
 function setCreditChip(val) {
@@ -1952,7 +1961,7 @@ function editMatch(id) {
   $("notes").value = m.notes || "";
   $("amountPaid").value = (m.amountPaid ?? "");
 
-  $("btnDelete").hidden = false;
+  if($("btnDelete")) $("btnDelete").hidden = false;
   state.lastAddSource = state.currentView === "fixtures" ? "fixture" : "matches";
   setView("add");
 }
@@ -2132,7 +2141,13 @@ function bindEvents() {
   onEl("matchSort","change", renderMatches);
 
   
-  $("btnClearForm").addEventListener("click", clearForm);
+  const btnCancelAdd = $("btnCancelAdd");
+  if (btnCancelAdd) {
+    btnCancelAdd.addEventListener("click", () => {
+      clearForm();
+      setView("dash");
+    });
+  }
 
   onEl("btnReloadFixtures","click", reloadFixturesHard);
   onEl("fixtureShow","change", renderFixtures);
@@ -2255,6 +2270,10 @@ onEl("btnSupport","click", openSupport);
 onEl("btnCloseSupport","click", closeSupport);
 onEl("btnBmac","click", ()=> window.open("https://buymeacoffee.com/lfctools", "_blank", "noopener"));
 onEl("btnInfo","click", () => setView("info"));
+onEl("btnAddManual","click", () => {
+  clearForm();
+  setView("add");
+});
 }
 
 function bindTopbarAutoHide() {
