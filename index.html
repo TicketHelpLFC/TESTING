@@ -41,23 +41,36 @@
   --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --shadow-card: 0 8px 32px rgba(0,0,0,0.3);
   --glow-card: none;
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body{
   margin: 0;
-  background-color: var(--bg);
-  background-image: 
-    radial-gradient(circle at 0% 0%, rgba(255, 59, 48, 0.15), transparent 40%),
-    radial-gradient(circle at 100% 100%, rgba(10, 132, 255, 0.15), transparent 40%);
-  background-attachment: fixed;
   color: var(--text);
   font-family: var(--font-main);
   letter-spacing: -0.015em;
   padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-color: var(--bg);
+  background-image: 
+    radial-gradient(circle at 0% 0%, rgba(255, 59, 48, 0.15), transparent 40%),
+    radial-gradient(circle at 100% 100%, rgba(10, 132, 255, 0.15), transparent 40%);
+  z-index: -1;
+  animation: bgPulse 20s ease-in-out infinite alternate;
+}
+@keyframes bgPulse {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(45deg); }
 }
 
 /* Header */
@@ -115,6 +128,8 @@ body{
   margin-bottom: 20px;
   border: none;
   box-shadow: var(--shadow-card);
+  transform: perspective(1000px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transition: transform 0.1s ease-out;
   animation: cardEntry 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 .view > .card:nth-of-type(1) { animation-delay: 0ms; }
@@ -123,8 +138,8 @@ body{
 .view > .card:nth-of-type(4) { animation-delay: 150ms; }
 
 @keyframes cardEntry {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: perspective(1000px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(20px); }
+  to { opacity: 1; transform: perspective(1000px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(0); }
 }
 
 /* Inputs */
@@ -531,7 +546,10 @@ dialog.modal::backdrop{
     <div class="topbarLeft">
       <img class="brandLogo" src="icon.svg" alt="TicketHelpLFC" />
     </div>
-    <div class="topbarTitle">Credit Tracker</div>
+    <div style="display:flex; flex-direction:column; align-items:center;">
+      <div class="topbarTitle" id="headerTitle" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Credit Tracker</div>
+      <div id="headerSubtitle" style="font-size:12px; color:var(--text-secondary); font-weight:500; line-height:1.1;"></div>
+    </div>
     <div class="headerActions">
       <button id="btnAddManual" class="iconBtn" aria-label="Add Match" title="Add Match">
         <img class="iconImg" src="icons/assets/add.svg" alt="" aria-hidden="true" />
@@ -2168,11 +2186,34 @@ function addSeason() {
   renderAll();
 }
 
+function updateHeader() {
+  const accId = activeAccountId();
+  const seasonId = activeSeasonId();
+  
+  const titleEl = $("headerTitle");
+  const subtitleEl = $("headerSubtitle");
+  
+  if (!titleEl || !subtitleEl) return;
+  
+  if (!accId) {
+    titleEl.textContent = "Credit Tracker";
+    subtitleEl.textContent = "";
+    return;
+  }
+  
+  const acc = state.data.accounts.find(a => a.id === accId);
+  const seasonTxt = seasonLabelFromId(seasonId);
+  
+  titleEl.textContent = acc ? acc.name : "Credit Tracker";
+  subtitleEl.textContent = seasonTxt || "";
+}
+
 function renderAll() {
   renderSeasonSelect();
   renderAccountSelect();
   renderDashboard();
   renderMatches();
+  updateHeader();
 }
 
 function setupPWA() {
@@ -2392,6 +2433,26 @@ function bindTopbarAutoHide() {
   }, { passive: true });
 }
 
+function initGyro() {
+  if (!window.DeviceOrientationEvent) return;
+  
+  let ticking = false;
+  window.addEventListener('deviceorientation', (e) => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        // Clamp and scale the tilt values for a subtle effect
+        const y = Math.min(Math.max((e.gamma || 0) / 15, -5), 5); // Left/Right
+        const x = Math.min(Math.max(((e.beta || 0) - 45) / 15, -5), 5); // Front/Back (centered at 45deg holding angle)
+        
+        document.documentElement.style.setProperty('--tilt-x', `${-x}deg`);
+        document.documentElement.style.setProperty('--tilt-y', `${y}deg`);
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+}
+
 function init() {
   if (window.__THLFC_INITED) return;
   window.__THLFC_INITED = true;
@@ -2400,6 +2461,7 @@ function init() {
   setupPWA();
   bindEvents();
   bindTopbarAutoHide();
+  initGyro();
   try { bindFixturesControls(); } catch(e) {}
   clearForm();
   renderAll();
