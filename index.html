@@ -730,14 +730,19 @@ dialog.modal::backdrop{
       </div>
       <section class="card">
         <div class="hint">All fixtures for this season and your credit status.</div>
-        <div style="margin-top:12px;">
-          <select id="creditsFilterComp" class="select">
+        <div class="row gap wrap" style="margin-top:12px;">
+          <select id="creditsFilterComp" class="select grow">
             <option value="">All Competitions</option>
             <option value="PL">Premier League</option>
             <option value="UCL">Champions League</option>
             <option value="FAC">FA Cup</option>
             <option value="LC">League Cup</option>
             <option value="OTHER">Other</option>
+          </select>
+          <select id="creditsFilterHA" class="select grow">
+            <option value="">All Venues</option>
+            <option value="H">Home</option>
+            <option value="A">Away</option>
           </select>
         </div>
         <div id="creditsChecklist" class="list" style="margin-top:12px;"></div>
@@ -1213,6 +1218,10 @@ dialog.modal::backdrop{
     <button class="tab" data-view="matches" aria-label="Matches" title="Matches">
       <img class="tabIcon" src="icons/assets/matches.svg" alt="" aria-hidden="true" />
       <span class="sr-only">Matches</span>
+    </button>
+    <button class="tab" data-view="credits" aria-label="Checklist" title="Checklist">
+      <img class="tabIcon" src="icons/assets/matches.svg" alt="" aria-hidden="true" />
+      <span class="sr-only">Checklist</span>
     </button>
     <button class="tab" data-view="fixtures" aria-label="Fixtures" title="Fixtures">
       <img class="tabIcon" src="icons/assets/fixtures.svg" alt="" aria-hidden="true" />
@@ -2516,6 +2525,7 @@ onEl("btnAddManual","click", () => {
   onEl("btnCloseAccountSwitcher", "click", closeAccountSwitcher);
   onEl("btnThemeToggle", "click", toggleTheme);
   onEl("creditsFilterComp", "change", renderCreditsChecklist);
+  onEl("creditsFilterHA", "change", renderCreditsChecklist);
 }
 
 function bindTopbarAutoHide() {
@@ -3208,6 +3218,7 @@ async function renderCreditsChecklist() {
   const list = $("creditsChecklist");
   const totalEl = $("creditsTotal");
   const filterEl = $("creditsFilterComp");
+  const haEl = $("creditsFilterHA");
 
   if (!list) return;
   list.innerHTML = '<div class="empty">Loading...</div>';
@@ -3221,6 +3232,10 @@ async function renderCreditsChecklist() {
   
   if (filterEl && filterEl.value) {
     seasonFixtures = seasonFixtures.filter(f => (f.competition || "OTHER") === filterEl.value);
+  }
+  
+  if (haEl && haEl.value) {
+    seasonFixtures = seasonFixtures.filter(f => (f.venue || "H") === haEl.value);
   }
 
   seasonFixtures.sort((a,b) => (a.date || "").localeCompare(b.date || ""));

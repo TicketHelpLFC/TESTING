@@ -1,4 +1,4 @@
-const CACHE = "thlfc-single-pwa-v5.4.0-credits-filter";
+const CACHE = "thlfc-single-pwa-v5.5.0-checklist-nav";
 const ASSETS = ["./","./index.html","./manifest.json","./sw.js","./icon.svg",
   "icons/icon-192.png",
   "icons/icon-512.png",
