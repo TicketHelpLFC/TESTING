@@ -975,6 +975,21 @@ dialog.modal::backdrop{
       </section>
     </section>
 
+    <!-- Sales / Ticketing -->
+    <section id="viewSales" class="view hidden">
+      <section class="card">
+        <div class="row space-between">
+          <div>
+            <div class="label">Ticket Sales & Ballots</div>
+            <div class="hint">Upcoming registrations, sales, and results.</div>
+          </div>
+          <button id="btnReloadSales" class="btn ghost sm">Refresh</button>
+        </div>
+        <div id="salesList" class="list" style="margin-top:12px;"></div>
+        <div id="salesEmpty" class="hint hidden" style="margin-top:12px;">No sales information found.</div>
+      </section>
+    </section>
+
     <!-- Settings -->
     <section id="viewSettings" class="view hidden">
       <div class="dashHeader" style="padding-left: 16px;">
@@ -1237,6 +1252,10 @@ dialog.modal::backdrop{
     <button class="tab" data-view="fixtures" aria-label="Fixtures" title="Fixtures">
       <img class="tabIcon" src="icons/assets/fixtures.svg" alt="" aria-hidden="true" />
       <span class="sr-only">Fixtures</span>
+    </button>
+    <button class="tab" data-view="sales" aria-label="Sales" title="Sales">
+      <svg class="tabIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M22 10V6a2 2 0 00-2-2H4c-1.1 0-2 .9-2 2v4c1.1 0 1.99.9 1.99 2s-.89 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2s.9-2 2-2zm-2-1.46c-1.19.69-2 1.99-2 3.46s.81 2.77 2 3.46V18H4v-2.54c1.19-.69 2-1.99 2-3.46s-.81-2.77-2-3.46V6h16v2.54z M11 15h2v2h-2v-2zm0-4h2v2h-2v-2zm0-4h2v2h-2V7z"/></svg>
+      <span class="sr-only">Sales</span>
     </button>
     <button class="tab" data-view="settings" aria-label="Profile" title="Profile">
       <img class="tabIcon" src="icons/assets/account.svg" alt="" aria-hidden="true" />
@@ -1739,6 +1758,7 @@ function setView(viewName) {
   $("viewMatches").classList.toggle("hidden", viewName !== "matches");
   $("viewAdd").classList.toggle("hidden", viewName !== "add");
   $("infoPage").classList.toggle("hidden", viewName !== "info");
+  $("viewSales").classList.toggle("hidden", viewName !== "sales");
   if (viewName === "fixtures") { setTimeout(() => { bindFixturesControls(); renderFixtures(); }, 0); }
   const vc = $("viewCredits");
   if(vc) vc.classList.toggle("hidden", viewName !== "credits");
@@ -1746,6 +1766,7 @@ function setView(viewName) {
   if (viewName === "setup") { setTimeout(() => { try{ populateAllSeasonSelects(); }catch(e){} }, 0); }
   $("viewSettings").classList.toggle("hidden", viewName !== "settings");
   $("viewFixtures").classList.toggle("hidden", viewName !== "fixtures");
+  if (viewName === "sales") { renderSales(); }
   if (viewName === "fixtures") { setTimeout(() => { bindFixturesControls(); renderFixtures(); }, 0); }
   if (viewName === "dash") { showBackupNudge(); }
 }
@@ -2414,6 +2435,7 @@ function bindEvents() {
   onEl("btnBackupData","click", () => {
     exportJSON();
   });
+  onEl("btnReloadSales", "click", () => reloadSalesHard());
   onEl("matchSort","change", renderMatches);
 
   
@@ -3481,6 +3503,113 @@ function bindFixturesControls(){
   if (fc) fc.onchange = () => renderFixtures();
   if (fh) fh.onchange = () => renderFixtures();
   if (fr) fr.onclick = reloadFixturesHard;
+}
+
+/* ---------- Sales / Ticketing Logic ---------- */
+
+const SALES_CSV_URL = "https://docs.google.com/spreadsheets/d/1iAviqT7Ww-j7YHXEa43YXlxqhZ4URMOlILHmp-L5sMs/export?format=csv";
+const SALES_CACHE_KEY = "thlfc_sales_cache_v1";
+const SALES_CACHE_TS_KEY = "thlfc_sales_cache_ts_v1";
+
+async function fetchSalesFromCSV() {
+  const res = await fetch(SALES_CSV_URL, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Sales CSV HTTP ${res.status}`);
+  const text = await res.text();
+  const rows = parseCSV(text);
+  if (!rows.length) return [];
+  
+  const headers = rows[0].map(h => String(h || "").trim().toLowerCase());
+  const dataRows = rows.slice(1);
+  
+  return dataRows.map(r => {
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = (r[i] || "").trim(); });
+    return obj;
+  }).filter(o => Object.values(o).some(v => v)); // Filter empty rows
+}
+
+async function loadSalesData() {
+  // 1. Try Cache
+  try {
+    const ts = Number(localStorage.getItem(SALES_CACHE_TS_KEY) || "0");
+    const raw = localStorage.getItem(SALES_CACHE_KEY);
+    if (raw && (Date.now() - ts) < 3600000) { // 1 hour cache
+      return JSON.parse(raw);
+    }
+  } catch(e){}
+
+  // 2. Fetch
+  try {
+    const data = await fetchSalesFromCSV();
+    localStorage.setItem(SALES_CACHE_KEY, JSON.stringify(data));
+    localStorage.setItem(SALES_CACHE_TS_KEY, String(Date.now()));
+    return data;
+  } catch(e) {
+    console.error("Sales fetch error", e);
+    // Fallback to cache even if old
+    const raw = localStorage.getItem(SALES_CACHE_KEY);
+    if (raw) return JSON.parse(raw);
+    return [];
+  }
+}
+
+async function reloadSalesHard() {
+  localStorage.removeItem(SALES_CACHE_KEY);
+  localStorage.removeItem(SALES_CACHE_TS_KEY);
+  await renderSales();
+  try{ showToast("Sales updated"); }catch(e){}
+}
+
+function guessSalesFields(obj) {
+  // Flexible mapping based on likely column names in your sheet
+  const keys = Object.keys(obj);
+  const find = (k) => keys.find(key => key.includes(k));
+  
+  const match = obj[find('match')] || obj[find('opponent')] || obj[find('event')] || "Event";
+  const date = obj[find('date')] || "";
+  const time = obj[find('time')] || "";
+  const type = obj[find('type')] || obj[find('sale')] || "";
+  const details = obj[find('details')] || obj[find('criteria')] || obj[find('info')] || obj[find('link')] || "";
+  const status = obj[find('status')] || obj[find('result')] || "";
+  
+  return { match, date, time, type, details, status };
+}
+
+async function renderSales() {
+  const list = $("salesList");
+  const empty = $("salesEmpty");
+  if (!list) return;
+  
+  list.innerHTML = '<div class="hint">Loading...</div>';
+  empty.classList.add("hidden");
+
+  const data = await loadSalesData();
+  list.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    empty.classList.remove("hidden");
+    return;
+  }
+
+  data.forEach(row => {
+    const item = guessSalesFields(row);
+    if (!item.match && !item.details) return;
+
+    const el = document.createElement("div");
+    el.className = "item";
+    el.innerHTML = `
+      <div class="row space-between" style="align-items:flex-start">
+        <div style="flex:1">
+          <div class="itemTitle" style="font-size:16px; margin-bottom:4px;">${item.match}</div>
+          <div class="hint" style="color:var(--text); font-weight:500;">${item.date} ${item.time ? '• ' + item.time : ''}</div>
+          ${item.type ? `<div class="badge neutral" style="margin-top:6px; display:inline-block;">${item.type}</div>` : ''}
+          ${item.details ? `<div class="hint" style="margin-top:8px; line-height:1.4;">${item.details}</div>` : ''}
+        </div>
+        ${item.status ? `<div class="badge ${item.status.toLowerCase().includes('open') ? 'good' : 'neutral'}">${item.status}</div>` : ''}
+      </div>
+    `;
+    list.appendChild(el);
+  });
 }
 
 function seasonLabel(startYY){
