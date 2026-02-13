@@ -593,6 +593,22 @@ dialog.modal::backdrop{
 .selectGhost { appearance: none; -webkit-appearance: none; background: transparent; border: none; color: var(--primary); font-size: 17px; text-align: right; padding: 0; margin: 0; width: auto; min-width: 100px; direction: rtl; }
 .selectGhost:focus { outline: none; background: transparent; box-shadow: none; }
 .selectGhost option { direction: ltr; color: #000; }
+
+.headerSelect {
+  background: rgba(255,255,255,0.1);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 6px 24px 6px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 8px auto;
+  max-width: 130px;
+}
 </style>
 </head>
 <body>
@@ -600,19 +616,13 @@ dialog.modal::backdrop{
     <div class="topbarLeft">
       <img class="brandLogo" src="icon.svg" alt="TicketHelpLFC" />
     </div>
-    <button id="btnHeaderSwitch" class="topbarCenter">
-      <div class="topbarTitleRow">
-        <span class="topbarTitle" id="headerTitle" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Credit Tracker</span>
-        <span class="headerChevron">▼</span>
-      </div>
-      <div id="headerSubtitle" class="topbarSubtitle"></div>
-    </button>
+    <div class="topbarCenter" style="display:flex; gap:8px; position:absolute; left:50%; transform:translateX(-50%);">
+      <select id="headerAccountSelect" class="headerSelect"></select>
+      <select id="headerSeasonSelect" class="headerSelect"></select>
+    </div>
     <div class="headerActions">
       <button id="btnThemeToggle" class="iconBtn" aria-label="Toggle Theme" title="Toggle Theme">
         <svg class="iconSvg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-      </button>
-      <button id="btnAddManual" class="iconBtn" aria-label="Add Match" title="Add Match">
-        <img class="iconImg" src="icons/assets/add.svg" alt="" aria-hidden="true" />
       </button>
       <button id="btnInstall" class="iconBtn" hidden>Install</button>
     </div>
@@ -953,6 +963,7 @@ dialog.modal::backdrop{
 
 <div class="row gap wrap" style="margin-top:14px;">
   <button id="btnReloadFixtures" class="btn ghost sm">Refresh</button>
+  <button id="btnFixturesAddManual" class="btn ghost sm">Add Manual Match</button>
   <label class="btn ghost fileBtn sm">
     <span class="btnIcon"><img src="icons/assets/import.svg" alt="" aria-hidden="true" /></span>
     Import ICS
@@ -1768,6 +1779,13 @@ function renderSeasonSelect() {
     sel.disabled = false;
   }
 
+  // Update header season select
+  const headerSel = $("headerSeasonSelect");
+  if (headerSel) {
+    headerSel.innerHTML = sel.innerHTML;
+    headerSel.value = sel.value;
+  }
+
   // mirror into modals if present
   const onboardSeason = $("onboardSeason");
   if (onboardSeason) {
@@ -1790,6 +1808,13 @@ function renderAccountSelect() {
   if (!state.data.activeAccountId && sel.value) {
     state.data.activeAccountId = sel.value;
     save();
+  }
+
+  // Update header account select
+  const headerSel = $("headerAccountSelect");
+  if (headerSel) {
+    headerSel.innerHTML = sel.innerHTML;
+    headerSel.value = sel.value;
   }
 }
 
@@ -2321,25 +2346,11 @@ function addSeason() {
 }
 
 function updateHeader() {
-  const accId = activeAccountId();
-  const seasonId = activeSeasonId();
-  
-  const titleEl = $("headerTitle");
-  const subtitleEl = $("headerSubtitle");
-  
-  if (!titleEl || !subtitleEl) return;
-  
-  if (!accId) {
-    titleEl.textContent = "Credit Tracker";
-    subtitleEl.textContent = "";
-    return;
-  }
-  
-  const acc = state.data.accounts.find(a => a.id === accId);
-  const seasonTxt = seasonLabelFromId(seasonId);
-  
-  titleEl.textContent = acc ? acc.name : "Credit Tracker";
-  subtitleEl.textContent = seasonTxt || "";
+  // Sync header selects with state if they exist
+  const hAcc = $("headerAccountSelect");
+  const hSea = $("headerSeasonSelect");
+  if (hAcc) hAcc.value = activeAccountId() || "";
+  if (hSea) hSea.value = activeSeasonId() || "";
 }
 
 function renderAll() {
@@ -2392,6 +2403,10 @@ function bindEvents() {
 
   onEl("accountSelect","change",(e)=> setActiveAccount(e.target.value));
   onEl("seasonSelect","change",(e)=> handleSeasonChange(e.target.value));
+  
+  onEl("headerAccountSelect","change",(e)=> setActiveAccount(e.target.value));
+  onEl("headerSeasonSelect","change",(e)=> handleSeasonChange(e.target.value));
+
   onEl("btnAddAccount","click", openSetupForNewAccount);
   onEl("btnEditAccount","click", editActiveAccount);
   onEl("btnDeleteAccount","click", deleteActiveAccount);
@@ -2530,12 +2545,11 @@ onEl("btnSupport","click", openSupport);
 onEl("btnCloseSupport","click", closeSupport);
 onEl("btnBmac","click", ()=> window.open("https://buymeacoffee.com/lfctools", "_blank", "noopener"));
 onEl("btnInfo","click", () => setView("info"));
-onEl("btnAddManual","click", () => {
+onEl("btnFixturesAddManual","click", () => {
   clearForm();
   setView("add");
 });
 
-  onEl("btnHeaderSwitch", "click", openAccountSwitcher);
   onEl("btnCloseAccountSwitcher", "click", closeAccountSwitcher);
   onEl("btnThemeToggle", "click", toggleTheme);
   onEl("creditsFilterComp", "change", () => {
