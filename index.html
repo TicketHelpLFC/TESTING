@@ -1731,6 +1731,7 @@ function setView(viewName) {
   if (viewName === "fixtures") { setTimeout(() => { bindFixturesControls(); renderFixtures(); }, 0); }
   const vc = $("viewCredits");
   if(vc) vc.classList.toggle("hidden", viewName !== "credits");
+  if (viewName === "credits") { renderCreditsChecklist(); }
   if (viewName === "setup") { setTimeout(() => { try{ populateAllSeasonSelects(); }catch(e){} }, 0); }
   $("viewSettings").classList.toggle("hidden", viewName !== "settings");
   $("viewFixtures").classList.toggle("hidden", viewName !== "fixtures");
@@ -1862,7 +1863,6 @@ function renderDashboard() {
   btnRow.innerHTML = `<button class="btn full sm" style="background:var(--surface-2); color:var(--text);">View Full Checklist</button>`;
   btnRow.querySelector("button").onclick = () => {
       setView("credits");
-      renderCreditsChecklist();
   };
   mount.appendChild(btnRow);
 
@@ -2538,8 +2538,14 @@ onEl("btnAddManual","click", () => {
   onEl("btnHeaderSwitch", "click", openAccountSwitcher);
   onEl("btnCloseAccountSwitcher", "click", closeAccountSwitcher);
   onEl("btnThemeToggle", "click", toggleTheme);
-  onEl("creditsFilterComp", "change", renderCreditsChecklist);
-  onEl("creditsFilterHA", "change", renderCreditsChecklist);
+  onEl("creditsFilterComp", "change", () => {
+    localStorage.setItem("thlfc_creditsFilterComp", $("creditsFilterComp").value);
+    renderCreditsChecklist();
+  });
+  onEl("creditsFilterHA", "change", () => {
+    localStorage.setItem("thlfc_creditsFilterHA", $("creditsFilterHA").value);
+    renderCreditsChecklist();
+  });
 }
 
 function bindTopbarAutoHide() {
@@ -2613,6 +2619,10 @@ function init() {
   try { bindFixturesControls(); } catch(e) {}
   clearForm();
   renderAll();
+  
+  if ($("creditsFilterComp")) $("creditsFilterComp").value = localStorage.getItem("thlfc_creditsFilterComp") || "";
+  if ($("creditsFilterHA")) $("creditsFilterHA").value = localStorage.getItem("thlfc_creditsFilterHA") || "";
+
   updateSetupModeUI();
   
   state.lastAddSource = localStorage.getItem("thlfc_lastAddSource") || "manual";
