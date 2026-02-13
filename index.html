@@ -3,9 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#0b0b0b" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="icons/icon-192.png">
@@ -16,26 +18,29 @@
 <style>
 :root{
   --bg: #000000;
-  --surface: #1C1C1E;
-  --surface-2: #2C2C2E;
-  --surface-3: #3A3A3C;
+  --surface: #1C1C1E; /* iOS System Gray 6 (Dark) */
+  --surface-2: #2C2C2E; /* iOS System Gray 5 (Dark) */
+  --surface-3: #3A3A3C; /* iOS System Gray 4 (Dark) */
+  --separator: #38383A; /* iOS Separator */
   --primary: #FF3B30; /* System Red */
   --primary-dim: rgba(255, 59, 48, 0.15);
   --text: #FFFFFF;
   --text-secondary: #8E8E93;
-  --border: rgba(255, 255, 255, 0.12);
-  --success: #00C853;
+  --text-tertiary: #48484A;
+  --border: #38383A;
+  --success: #30D158;
   --danger: #FF453A;
-  --warning: #FFCC00;
-  --radius-l: 22px;
-  --radius-m: 14px;
-  --radius-s: 8px;
-  --nav-height: 84px;
-  --header-height: 60px;
+  --warning: #FFD60A;
+  --blue: #0A84FF;
+  --radius-l: 12px; /* iOS Grouped Corner Radius */
+  --radius-m: 10px;
+  --radius-s: 6px;
+  --nav-height: 83px; /* Standard Tab Bar */
+  --header-height: 44px; /* Standard Nav Bar */
   --fab-size: 56px;
   --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --shadow-card: 0 16px 32px -8px rgba(0,0,0,0.5);
-  --glow-card: inset 0 0 0 1px rgba(255,255,255,0.12);
+  --shadow-card: 0 8px 32px rgba(0,0,0,0.3);
+  --glow-card: none;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -43,6 +48,10 @@
 body{
   margin: 0;
   background-color: var(--bg);
+  background-image: 
+    radial-gradient(circle at 0% 0%, rgba(255, 59, 48, 0.15), transparent 40%),
+    radial-gradient(circle at 100% 100%, rgba(10, 132, 255, 0.15), transparent 40%);
+  background-attachment: fixed;
   color: var(--text);
   font-family: var(--font-main);
   letter-spacing: -0.015em;
@@ -56,10 +65,12 @@ body{
   position: sticky; top: 0; z-index: 100;
   height: calc(var(--header-height) + env(safe-area-inset-top));
   padding-top: env(safe-area-inset-top);
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  background: rgba(28, 28, 30, 0.85); /* iOS Bar Color */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 0.5px solid rgba(0,0,0,0.3);
   display: flex; align-items: center; justify-content: space-between;
   padding-left: 20px; padding-right: 20px;
   transition: transform 0.3s ease;
@@ -67,61 +78,72 @@ body{
 .topbar.is-hidden { transform: translateY(-100%); }
 
 .topbarLeft { display: flex; align-items: center; gap: 12px; }
-.brandLogo { width: 32px; height: 32px; border-radius: 8px; }
+.brandLogo { width: 28px; height: 28px; border-radius: 6px; }
 .topbarTitle { font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
 .headerActions { display: flex; gap: 12px; }
 .iconBtn { 
-  background: var(--surface-2); border: none; 
-  width: 40px; height: 40px; border-radius: 50%; 
+  background: transparent; border: none; 
+  width: 44px; height: 44px; border-radius: 50%; 
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--text); transition: transform 0.2s;
+  cursor: pointer; color: var(--blue); transition: opacity 0.2s;
 }
-.iconBtn:active { transform: scale(0.92); }
-.iconImg { width: 20px; height: 20px; filter: invert(1); opacity: 0.9; }
+.iconBtn:active { opacity: 0.5; }
+.iconImg { width: 22px; height: 22px; filter: invert(38%) sepia(92%) saturate(3944%) hue-rotate(206deg) brightness(100%) contrast(104%); } /* iOS Blue Filter */
 
 /* Container */
 .container{
-  padding: 20px;
+  padding: 16px;
   max-width: 600px;
   margin: 0 auto;
   min-height: 80vh;
 }
 
 /* Typography */
-.label { font-size: 20px; font-weight: 700; margin-bottom: 12px; display: block; color: var(--text); letter-spacing: -0.02em; }
+.label { font-size: 22px; font-weight: 700; margin-bottom: 10px; display: block; color: var(--text); letter-spacing: 0.35px; }
 .label.withIcon { display: flex; align-items: center; gap: 6px; }
 .labelIcon { width: 18px; height: 18px; opacity: 0.7; filter: invert(1); }
 .hint { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-top: 6px; }
-.fieldLabel { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.fieldLabel { font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 400; text-transform: uppercase; letter-spacing: -0.08px; margin-left: 16px; margin-top: 16px;}
 
 /* Cards */
 .card{
-  background: var(--surface);
+  background: rgba(28, 28, 30, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-l);
-  padding: 24px;
+  padding: 16px;
   margin-bottom: 20px;
   border: none;
-  box-shadow: var(--shadow-card), var(--glow-card);
+  box-shadow: var(--shadow-card);
+  animation: cardEntry 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.view > .card:nth-of-type(1) { animation-delay: 0ms; }
+.view > .card:nth-of-type(2) { animation-delay: 50ms; }
+.view > .card:nth-of-type(3) { animation-delay: 100ms; }
+.view > .card:nth-of-type(4) { animation-delay: 150ms; }
+
+@keyframes cardEntry {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Inputs */
 .input,.select,.textarea{
   width:100%;
   background: var(--surface-2);
-  border: 1px solid transparent;
-  border-radius: var(--radius-m);
-  padding: 16px;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
   color:var(--text);
   font-size: 16px;
+  font-size: 17px;
   font-family: inherit;
   appearance: none;
-  transition: all 0.2s;
+  height: 44px;
 }
 .input:focus,.select:focus,.textarea:focus{
   outline:none;
-  background: var(--surface-3);
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px var(--primary-dim);
+  background: var(--surface-3); /* Slightly lighter on focus */
 }
 .select {
   background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23999%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
@@ -134,19 +156,20 @@ body{
 /* Buttons */
 .btn{
   display: inline-flex; align-items: center; justify-content: center;
-  padding: 12px 20px;
+  padding: 14px 20px;
   border-radius: 12px;
-  font-size: 16px; font-weight: 600;
+  font-size: 17px; font-weight: 600;
   border: none; cursor: pointer;
   transition: opacity 0.2s;
   background: var(--surface-2);
-  color:var(--text);
+  color: var(--blue);
   gap: 8px;
+  min-height: 50px;
 }
 .btn:active { opacity: 0.7; }
 .btn.primary { background: var(--primary); color: white; }
 .btn.success { background: var(--success); color: white; }
-.btn.danger { background: rgba(255, 69, 58, 0.15); color: var(--danger); }
+.btn.danger { background: var(--surface-2); color: var(--danger); }
 .btn.ghost { background: transparent; color: var(--primary); }
 .btn.sm { padding: 8px 14px; font-size: 14px; }
 .btn.full { width: 100%; }
@@ -155,10 +178,12 @@ body{
 /* Bottom Nav */
 .bottomNav{
   position: fixed; bottom: 0; left: 0; right: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border-top: 1px solid rgba(255,255,255,0.12);
+  background: rgba(28, 28, 30, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-top: 0.5px solid rgba(0,0,0,0.3);
   display: flex; justify-content: space-around;
   padding-bottom: env(safe-area-inset-bottom);
   height: calc(var(--nav-height) + env(safe-area-inset-bottom));
@@ -167,7 +192,7 @@ body{
 .tab{
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
   background: none; border: none; padding: 0;
-  color: var(--text-secondary); gap: 4px;
+  color: #999999; gap: 4px;
 }
 .tabIcon{ width: 24px; height: 24px; filter: invert(0.6); transition: 0.2s; }
 .tab.active .tabIcon { filter: invert(36%) sepia(68%) saturate(3000%) hue-rotate(340deg) brightness(100%) contrast(105%); }
@@ -175,22 +200,33 @@ body{
 .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
 
 /* Lists & Items */
-.list { display: flex; flex-direction: column; gap: 12px; }
-.item{
+.list { 
+  display: flex; flex-direction: column; 
   background: var(--surface);
   border-radius: 12px;
+  overflow: hidden;
+}
+.item{
+  background: var(--surface);
+  border-radius: 0;
   padding: 16px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
+  border-bottom: 0.5px solid var(--separator);
   position: relative;
 }
+.item:last-child { border-bottom: none; }
+.item:active { background: var(--surface-2); }
+
 .itemTop { display: flex; justify-content: space-between; margin-bottom: 8px; }
-.itemTitle { font-weight: 600; font-size: 16px; }
+.itemTitle { font-weight: 600; font-size: 17px; }
 .itemMeta { font-size: 13px; color: var(--text-secondary); }
 .itemCornerTags { margin-left: auto; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+/* Special styling for tracked fixtures in list */
 .item.fixtureTracked{
-  border-color: rgba(255, 214, 10, 0.5);
-  background: rgba(255, 214, 10, 0.05);
+  background: rgba(255, 214, 10, 0.1);
 }
+.item.fixtureTracked:active { background: rgba(255, 214, 10, 0.2); }
 
 /* Chips */
 .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
@@ -231,12 +267,12 @@ body{
   font-size:12px;
   text-align:left;
   font-weight:600;
-  padding:8px;
-  border-bottom: 1px solid var(--border);
+  padding:8px 16px;
+  border-bottom: 0.5px solid var(--separator);
 }
 .breakdownTable td{
-  padding:12px 8px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding:12px 16px;
+  border-bottom: 0.5px solid var(--separator);
   font-size: 14px;
 }
 .breakdownPill{
@@ -254,9 +290,11 @@ body{
 dialog.modal{
   border:none;
   padding:0;
-  background: #1c1c1e;
+  background: rgba(28, 28, 30, 0.85);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
   color: var(--text);
-  border-radius:20px;
+  border-radius: 14px;
   width:min(560px, 94vw);
   max-height:90vh;
   overflow:hidden;
@@ -291,20 +329,45 @@ dialog.modal::backdrop{
   background:#fff; /* avoids dark flash behind the iframe */
 }
 
-.toggleRow{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  width:100%;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius:14px;
-  padding:12px 14px;
-  cursor:pointer;
-  font-weight:700;
+/* iOS Switch */
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 8px 0;
 }
-.toggleRow:hover{
-  background: rgba(255,255,255,.04);
+.toggle input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 51px;
+  height: 31px;
+  background: #39393D;
+  border-radius: 15.5px;
+  position: relative;
+  transition: 0.3s;
+  outline: none;
+  flex-shrink: 0;
+}
+.toggle input::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 27px; height: 27px;
+  background: #fff;
+  border-radius: 50%;
+  transition: 0.3s;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+.toggle input:checked {
+  background: var(--success);
+}
+.toggle input:checked::after {
+  transform: translateX(20px);
+}
+.toggle span {
+  font-size: 17px;
+  color: var(--text);
 }
 
 /* Utilities */
@@ -314,7 +377,7 @@ dialog.modal::backdrop{
 .wrap { flex-wrap: wrap; }
 .grow { flex: 1; }
 .hidden { display: none !important; }
-.empty { color: var(--text-secondary); padding: 20px; text-align: center; }
+.empty { color: var(--text-secondary); padding: 30px; text-align: center; font-size: 15px; }
 
 /* Keep credit indicator tidy on long fixture names */
 .fixtureRow{
@@ -330,7 +393,7 @@ dialog.modal::backdrop{
 .pill{
   padding:6px 10px;
   border-radius:999px;
-  background: var(--surface-2);
+  background: var(--surface-3);
   font-weight:900;
   font-size:12px;
   display:inline-flex;
@@ -357,15 +420,15 @@ dialog.modal::backdrop{
 
 /* Only colour the H/A pill */
 .pill.ha-home{
-  background: rgba(227,27,35,.18);
-  color:#ffb3b8;
-  border-color: rgba(227,27,35,.55);
+  background: rgba(255, 59, 48, 0.15);
+  color: var(--danger);
+  border: none;
 }
 
 .pill.ha-away{
-  background: rgba(20,184,166,.16);
-  color:#87f1e5;
-  border-color: rgba(20,184,166,.55);
+  background: rgba(48, 209, 88, 0.15);
+  color: var(--success);
+  border: none;
 }
 
 /* Ensure title wraps nicely without pushing credit */
@@ -456,6 +519,11 @@ dialog.modal::backdrop{
   flex:1;
   min-width:0;
 }
+
+/* Specific overrides for Settings List */
+.settingsSection .item {
+  display: flex; align-items: center; justify-content: space-between;
+}
 </style>
 </head>
 <body>
@@ -514,20 +582,19 @@ dialog.modal::backdrop{
         <div id="setupExistingAccountFields" class="hidden" style="margin-top:10px;">
           <div class="fieldLabel">Choose existing account</div>
           <select id="setupExistingAccount" class="select"></select>
-
         
-          <div class="row wrap gap">
+          <div class="list" style="margin-top: 16px;">
             <label class="toggle">
-              <input type="checkbox" id="setupExistingLC" />
               <span>League Cup</span>
+              <input type="checkbox" id="setupExistingLC" />
             </label>
             <label class="toggle">
-              <input type="checkbox" id="setupExistingFAC" />
               <span>FA Cup</span>
+              <input type="checkbox" id="setupExistingFAC" />
             </label>
             <label class="toggle">
-              <input type="checkbox" id="setupExistingUCL" />
               <span>Champions League</span>
+              <input type="checkbox" id="setupExistingUCL" />
             </label>
           </div>
           <div class="hint" style="margin-top:8px;">This adds a new season for the selected account.</div>
@@ -791,7 +858,7 @@ dialog.modal::backdrop{
 
     <!-- Settings -->
     <section id="viewSettings" class="view hidden">
-      <div class="dashHeader">
+      <div class="dashHeader" style="padding-left: 16px;">
         <div class="label withIcon">
           <img class="labelIcon" src="icons/assets/account.svg" alt="" aria-hidden="true" />
           Settings
@@ -799,7 +866,7 @@ dialog.modal::backdrop{
       </div>
 
       <section class="card settingsSection">
-        <div class="label">Account & Season</div>
+        <div class="fieldLabel" style="margin-left:0; margin-top:0;">Account & Season</div>
         <div class="acctBarFields">
           <div class="acctField">
             <div class="fieldLabel">Account</div>
@@ -818,7 +885,7 @@ dialog.modal::backdrop{
       </section>
 
       <section class="card settingsSection backupCard" id="backupCard">
-        <div class="label withIcon">
+        <div class="label withIcon" style="font-size: 17px;">
           <img class="labelIcon" src="icons/assets/backup.svg" alt="" aria-hidden="true" />
           Data & Backup
         </div>
@@ -842,19 +909,15 @@ dialog.modal::backdrop{
       </section>
 
       <section class="card settingsSection">
-        <div class="label">App Info</div>
+        <div class="fieldLabel" style="margin-left:0; margin-top:0;">App Info</div>
         <div class="list">
           <button id="btnInfo" class="item clickable" style="text-align:left; width:100%;">
-            <div class="row space-between">
-              <div class="itemTitle">How to use</div>
-              <div class="hint">▸</div>
-            </div>
+            <div class="itemTitle">How to use</div>
+            <div class="hint" style="font-size: 16px; color: #666;">›</div>
           </button>
           <button id="btnSupport" class="item clickable" style="text-align:left; width:100%;">
-            <div class="row space-between">
-              <div class="itemTitle">Support & Feedback</div>
-              <div class="hint">▸</div>
-            </div>
+            <div class="itemTitle">Support & Feedback</div>
+            <div class="hint" style="font-size: 16px; color: #666;">›</div>
           </button>
         </div>
       </section>
@@ -928,9 +991,9 @@ dialog.modal::backdrop{
     </div>
     <button type="button" id="btnBmac" class="btn full">Support the Tools 🍺</button>
 
-    <div class="hr" style="margin-top:16px;"></div>
+    <div class="hr" style="margin-top:24px;"></div>
 
-    <h3 style="margin:0 0 6px;">Send feedback</h3>
+    <h3 style="margin:16px 0 6px;">Send feedback</h3>
     <div class="hint" style="margin-bottom:10px;">
       Fill this in and it’ll send straight to me via Google Forms.
     </div>
@@ -2376,18 +2439,18 @@ function renderSetupNames() {
       <input class="input" id="setupName_${i}" placeholder="${i === 1 ? "Me" : "Account " + i}" />
 
       <div class="fieldLabel" style="margin-top:10px;">AutoCup (Home) for this account</div>
-      <div class="row wrap gap">
+      <div class="list" style="margin-top: 8px;">
         <label class="toggle">
-          <input type="checkbox" id="setupAccLC_${i}" />
           <span>League Cup</span>
+          <input type="checkbox" id="setupAccLC_${i}" />
         </label>
         <label class="toggle">
-          <input type="checkbox" id="setupAccFAC_${i}" />
           <span>FA Cup</span>
+          <input type="checkbox" id="setupAccFAC_${i}" />
         </label>
         <label class="toggle">
-          <input type="checkbox" id="setupAccUCL_${i}" />
           <span>Champions League</span>
+          <input type="checkbox" id="setupAccUCL_${i}" />
         </label>
       </div>
 

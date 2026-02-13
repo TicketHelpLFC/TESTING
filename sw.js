@@ -1,4 +1,4 @@
-const CACHE = "thlfc-single-pwa-v4.0.0-glass";
+const CACHE = "thlfc-single-pwa-v4.3.0-animations";
 const ASSETS = ["./","./index.html","./manifest.json","./sw.js","./icon.svg",
   "icons/icon-192.png",
   "icons/icon-512.png",
