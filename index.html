@@ -3562,26 +3562,48 @@ async function reloadSalesHard() {
 
 function guessSalesFields(obj) {
   const keys = Object.keys(obj);
-  const find = (str) => keys.find(k => k.includes(str.toLowerCase()));
   
-  const match = obj[find('match')] || obj[find('opponent')] || obj[find('event')] || "";
+  // Helper to find value. 
+  // If we find "X Date" and "X Time", combine them.
+  // Otherwise look for "X".
+  const get = (term) => {
+    const t = term.toLowerCase();
+    const dateKey = keys.find(k => k.includes(t) && k.includes('date'));
+    const timeKey = keys.find(k => k.includes(t) && k.includes('time'));
+    
+    let val = "";
+    if (dateKey && obj[dateKey]) val += obj[dateKey];
+    if (timeKey && obj[timeKey]) val += (val ? " " : "") + obj[timeKey];
+    
+    if (val) return val;
+    
+    const genKey = keys.find(k => k.includes(t));
+    return genKey ? obj[genKey] : "";
+  };
+
+  // For date only fields
+  const getDate = (term) => {
+    const t = term.toLowerCase();
+    const dateKey = keys.find(k => k.includes(t) && k.includes('date'));
+    if (dateKey && obj[dateKey]) return obj[dateKey];
+    const genKey = keys.find(k => k.includes(t));
+    return genKey ? obj[genKey] : "";
+  };
   
-  // Registration
-  const regOpen = obj[find('registration open')] || obj[find('reg open')] || "";
-  const regClose = obj[find('registration close')] || obj[find('reg close')] || "";
+  const match = get('match') || get('opponent') || get('event') || "";
   
-  // Unique Links
-  const uniqueLinks = obj[find('unique link')] || obj[find('link date')] || "";
+  const regOpen = get('registration open') || get('reg open');
+  const regClose = get('registration close') || get('reg close');
   
-  // Local Ballot
-  const localOpen = obj[find('local ballot open')] || obj[find('local open')] || "";
-  const localClose = obj[find('local ballot close')] || obj[find('local close')] || "";
-  const localResults = obj[find('local ballot result')] || obj[find('local result')] || "";
+  const uniqueLinks = getDate('unique link') || getDate('link date');
   
-  // Sale
-  const saleCriteria = obj[find('sale criteria')] || obj[find('criteria')] || "";
-  const saleOpen = obj[find('sale open')] || "";
-  const saleClose = obj[find('sale close')] || "";
+  const localOpen = get('local ballot open') || get('local open');
+  const localClose = get('local ballot close') || get('local close');
+  const localResults = getDate('local ballot result') || getDate('local result');
+  
+  const saleCriteria = get('sale criteria') || get('criteria');
+  const saleOpen = get('sale open');
+  const saleClose = get('sale close');
 
   return { 
     match, 
@@ -3627,6 +3649,13 @@ async function renderSales() {
         </div>`;
     }
 
+    if (item.localOpen || item.localClose) {
+        html += `<div style="grid-column: span 2;">
+            <div class="fieldLabel" style="margin-top:0;">Local Ballot</div>
+            <div class="hint" style="margin-top:2px; color:var(--text); font-size:14px;">${item.localOpen} ${item.localClose ? '— ' + item.localClose : ''}</div>
+        </div>`;
+    }
+
     if (item.uniqueLinks) {
         html += `<div>
             <div class="fieldLabel" style="margin-top:0;">Unique Links</div>
@@ -3638,13 +3667,6 @@ async function renderSales() {
         html += `<div>
             <div class="fieldLabel" style="margin-top:0;">Local Results</div>
             <div class="hint" style="margin-top:2px; color:var(--text); font-size:14px;">${item.localResults}</div>
-        </div>`;
-    }
-
-    if (item.localOpen || item.localClose) {
-        html += `<div style="grid-column: span 2;">
-            <div class="fieldLabel" style="margin-top:0;">Local Ballot</div>
-            <div class="hint" style="margin-top:2px; color:var(--text); font-size:14px;">${item.localOpen} ${item.localClose ? '— ' + item.localClose : ''}</div>
         </div>`;
     }
     
