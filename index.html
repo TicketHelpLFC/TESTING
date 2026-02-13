@@ -730,7 +730,18 @@ dialog.modal::backdrop{
       </div>
       <section class="card">
         <div class="hint">All fixtures for this season and your credit status.</div>
+        <div style="margin-top:12px;">
+          <select id="creditsFilterComp" class="select">
+            <option value="">All Competitions</option>
+            <option value="PL">Premier League</option>
+            <option value="UCL">Champions League</option>
+            <option value="FAC">FA Cup</option>
+            <option value="LC">League Cup</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
         <div id="creditsChecklist" class="list" style="margin-top:12px;"></div>
+        <div id="creditsTotal" class="hint" style="text-align:center; margin-top:12px; font-weight:bold;"></div>
       </section>
     </section>
 
@@ -2504,6 +2515,7 @@ onEl("btnAddManual","click", () => {
   onEl("btnHeaderSwitch", "click", openAccountSwitcher);
   onEl("btnCloseAccountSwitcher", "click", closeAccountSwitcher);
   onEl("btnThemeToggle", "click", toggleTheme);
+  onEl("creditsFilterComp", "change", renderCreditsChecklist);
 }
 
 function bindTopbarAutoHide() {
@@ -3194,14 +3206,23 @@ function showToast(msg){
 
 async function renderCreditsChecklist() {
   const list = $("creditsChecklist");
+  const totalEl = $("creditsTotal");
+  const filterEl = $("creditsFilterComp");
+
   if (!list) return;
   list.innerHTML = '<div class="empty">Loading...</div>';
+  if (totalEl) totalEl.textContent = "";
 
   const fixtures = await loadFixturesData();
   const seasonId = activeSeasonId();
   const seasonTxt = seasonLabelFromId(seasonId);
   
-  const seasonFixtures = fixtures.filter(f => fixtureSeasonLabel(f) === seasonTxt);
+  let seasonFixtures = fixtures.filter(f => fixtureSeasonLabel(f) === seasonTxt);
+  
+  if (filterEl && filterEl.value) {
+    seasonFixtures = seasonFixtures.filter(f => (f.competition || "OTHER") === filterEl.value);
+  }
+
   seasonFixtures.sort((a,b) => (a.date || "").localeCompare(b.date || ""));
 
   const matches = getSeasonMatches(seasonId);
@@ -3215,9 +3236,12 @@ async function renderCreditsChecklist() {
   list.innerHTML = "";
   
   if (seasonFixtures.length === 0) {
-    list.innerHTML = '<div class="empty">No fixtures found for this season.</div>';
+    list.innerHTML = '<div class="empty">No fixtures found for this season matching filters.</div>';
+    if (totalEl) totalEl.textContent = "Credits: 0 / 0";
     return;
   }
+
+  let creditCount = 0;
 
   seasonFixtures.forEach(f => {
     const fid = (f.id || "").replace(/"/g,'');
@@ -3229,7 +3253,10 @@ async function renderCreditsChecklist() {
     
     let statusHtml = `<div class="badge" style="opacity:0.5; background:var(--surface-2);">Not Tracked</div>`;
     if (match) {
-      if (match.creditCredit === 'yes') statusHtml = `<div class="badge good">Credit</div>`;
+      if (match.creditCredit === 'yes') {
+        statusHtml = `<div class="badge good">Credit</div>`;
+        creditCount++;
+      }
       else if (match.creditCredit === 'no') statusHtml = `<div class="badge bad">No Credit</div>`;
       else statusHtml = `<div class="badge neutral">Unsure</div>`;
     }
@@ -3254,6 +3281,10 @@ async function renderCreditsChecklist() {
     };
     list.appendChild(el);
   });
+
+  if (totalEl) {
+    totalEl.textContent = `Credits: ${creditCount} / ${seasonFixtures.length}`;
+  }
 }
 
 /* Fixtures: ensure controls always re-render */
