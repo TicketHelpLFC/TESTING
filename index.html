@@ -42,8 +42,6 @@
   --font-main: "Plus Jakarta Sans", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --shadow-card: 0 10px 30px -10px rgba(0,0,0,0.5);
   --glow-card: none;
-  --tilt-x: 0deg;
-  --tilt-y: 0deg;
   --card-bg: rgba(24, 24, 27, 0.6);
   --bar-bg: rgba(9, 9, 11, 0.8);
   --modal-bg: rgba(24, 24, 27, 0.95);
@@ -155,8 +153,6 @@ body::before {
   margin-bottom: 24px;
   border: 1px solid rgba(255,255,255,0.05);
   box-shadow: var(--shadow-card);
-  transform: perspective(1000px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
-  transition: transform 0.1s ease-out;
   animation: cardEntry 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 .view > .card:nth-of-type(1) { animation-delay: 0ms; }
@@ -165,8 +161,8 @@ body::before {
 .view > .card:nth-of-type(4) { animation-delay: 150ms; }
 
 @keyframes cardEntry {
-  from { opacity: 0; transform: perspective(1000px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(20px); }
-  to { opacity: 1; transform: perspective(1000px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(0); }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Inputs */
@@ -721,6 +717,20 @@ dialog.modal::backdrop{
       <section class="card">
         <div class="label">Recent Activity</div>
         <div id="recentList" class="list"></div>
+      </section>
+    </section>
+
+    <!-- Credits Checklist -->
+    <section id="viewCredits" class="view hidden">
+      <div class="dashHeader">
+        <div class="label withIcon">
+          <img class="labelIcon" src="icons/assets/matches.svg" alt="" aria-hidden="true" />
+          Credits Checklist
+        </div>
+      </div>
+      <section class="card">
+        <div class="hint">All fixtures for this season and your credit status.</div>
+        <div id="creditsChecklist" class="list" style="margin-top:12px;"></div>
       </section>
     </section>
 
@@ -1690,6 +1700,8 @@ function setView(viewName) {
   $("viewAdd").classList.toggle("hidden", viewName !== "add");
   $("infoPage").classList.toggle("hidden", viewName !== "info");
   if (viewName === "fixtures") { setTimeout(() => { bindFixturesControls(); renderFixtures(); }, 0); }
+  const vc = $("viewCredits");
+  if(vc) vc.classList.toggle("hidden", viewName !== "credits");
   if (viewName === "setup") { setTimeout(() => { try{ populateAllSeasonSelects(); }catch(e){} }, 0); }
   $("viewSettings").classList.toggle("hidden", viewName !== "settings");
   $("viewFixtures").classList.toggle("hidden", viewName !== "fixtures");
@@ -1815,6 +1827,15 @@ function renderDashboard() {
   const mount = $("compBreakdown");
   mount.innerHTML = "";
   mount.appendChild(table);
+
+  const btnRow = document.createElement("div");
+  btnRow.style.marginTop = "16px";
+  btnRow.innerHTML = `<button class="btn full sm" style="background:var(--surface-2); color:var(--text);">View Full Checklist</button>`;
+  btnRow.querySelector("button").onclick = () => {
+      setView("credits");
+      renderCreditsChecklist();
+  };
+  mount.appendChild(btnRow);
 
   const attendance = computeAttendanceByCompetition(activeSeasonId());
   const attendanceTable = document.createElement("table");
@@ -2517,26 +2538,6 @@ function bindTopbarAutoHide() {
   }, { passive: true });
 }
 
-function initGyro() {
-  if (!window.DeviceOrientationEvent) return;
-  
-  let ticking = false;
-  window.addEventListener('deviceorientation', (e) => {
-    if (!ticking) {
-      window.requestAnimationFrame(() => {
-        // Clamp and scale the tilt values for a subtle effect
-        const y = Math.min(Math.max((e.gamma || 0) / 15, -5), 5); // Left/Right
-        const x = Math.min(Math.max(((e.beta || 0) - 45) / 15, -5), 5); // Front/Back (centered at 45deg holding angle)
-        
-        document.documentElement.style.setProperty('--tilt-x', `${-x}deg`);
-        document.documentElement.style.setProperty('--tilt-y', `${y}deg`);
-        ticking = false;
-      });
-      ticking = true;
-    }
-  });
-}
-
 function initTheme() {
   const saved = localStorage.getItem("thlfc_theme");
   if (saved) {
@@ -2572,7 +2573,6 @@ function init() {
   setupPWA();
   bindEvents();
   bindTopbarAutoHide();
-  initGyro();
   initTheme();
   try { bindFixturesControls(); } catch(e) {}
   clearForm();
@@ -3190,6 +3190,70 @@ function showToast(msg){
   document.body.appendChild(el);
   setTimeout(()=>{ el.style.opacity="0"; el.style.transition="opacity .25s"; }, 1200);
   setTimeout(()=>{ el.remove(); }, 1600);
+}
+
+async function renderCreditsChecklist() {
+  const list = $("creditsChecklist");
+  if (!list) return;
+  list.innerHTML = '<div class="empty">Loading...</div>';
+
+  const fixtures = await loadFixturesData();
+  const seasonId = activeSeasonId();
+  const seasonTxt = seasonLabelFromId(seasonId);
+  
+  const seasonFixtures = fixtures.filter(f => fixtureSeasonLabel(f) === seasonTxt);
+  seasonFixtures.sort((a,b) => (a.date || "").localeCompare(b.date || ""));
+
+  const matches = getSeasonMatches(seasonId);
+  const matchMap = new Map();
+  matches.forEach(m => {
+    if (m.fixtureKey) matchMap.set(m.fixtureKey, m);
+    const key = `${m.matchDate}|${m.competition}|${m.venue}|${m.opponent}`.toLowerCase();
+    matchMap.set(key, m);
+  });
+
+  list.innerHTML = "";
+  
+  if (seasonFixtures.length === 0) {
+    list.innerHTML = '<div class="empty">No fixtures found for this season.</div>';
+    return;
+  }
+
+  seasonFixtures.forEach(f => {
+    const fid = (f.id || "").replace(/"/g,'');
+    const key = `${f.date}|${f.competition}|${f.venue}|${f.opponent}`.toLowerCase();
+    const match = matchMap.get(fid) || matchMap.get(key);
+    
+    const el = document.createElement("div");
+    el.className = "item clickable";
+    
+    let statusHtml = `<div class="badge" style="opacity:0.5; background:var(--surface-2);">Not Tracked</div>`;
+    if (match) {
+      if (match.creditCredit === 'yes') statusHtml = `<div class="badge good">Credit</div>`;
+      else if (match.creditCredit === 'no') statusHtml = `<div class="badge bad">No Credit</div>`;
+      else statusHtml = `<div class="badge neutral">Unsure</div>`;
+    }
+
+    const when = formatDisplayDate(f.date);
+    
+    el.innerHTML = `
+      <div class="row space-between">
+        <div style="flex:1">
+          <div class="itemTitle" style="font-size:16px">${f.opponent} <span class="pill ${f.venue === 'H' ? 'ha-home' : 'ha-away'}" style="font-size:10px; padding:2px 6px; min-width:auto; margin-left:4px;">${f.venue}</span></div>
+          <div class="hint">${when} • ${f.competition}</div>
+        </div>
+        <div style="text-align:right">${statusHtml}</div>
+      </div>
+    `;
+    el.onclick = () => {
+        if (match) editMatch(match.id);
+        else {
+            state.lastAddSource = "credits";
+            prefillFromFixture(f);
+        }
+    };
+    list.appendChild(el);
+  });
 }
 
 /* Fixtures: ensure controls always re-render */
