@@ -1709,8 +1709,17 @@ function badgeForAction(m) {
   return { text: `${map[m.ticketAction] || "—"}`, cls: "neutral" };
 }
 
+function goBackFromAdd() {
+  const s = state.lastAddSource;
+  if (s === "credits") setView("credits");
+  else if (s === "fixtures" || s === "fixture") setView("fixtures");
+  else if (s === "dash") setView("dash");
+  else setView("matches");
+}
+
 function setView(viewName) {
   state.currentView = viewName;
+  try { localStorage.setItem("thlfc_lastView", viewName); } catch(e){}
   const tabs = document.querySelectorAll(".tab");
   tabs.forEach(t => t.classList.toggle("active", t.dataset.view === viewName));
 
@@ -2185,7 +2194,11 @@ function editMatch(id) {
   $("amountPaid").value = (m.amountPaid ?? "");
 
   if($("btnDelete")) $("btnDelete").hidden = false;
-  state.lastAddSource = state.currentView === "fixtures" ? "fixture" : "matches";
+  if (state.currentView === "credits") state.lastAddSource = "credits";
+  else if (state.currentView === "dash") state.lastAddSource = "dash";
+  else if (state.currentView === "fixtures") state.lastAddSource = "fixtures";
+  else state.lastAddSource = "matches";
+  localStorage.setItem("thlfc_lastAddSource", state.lastAddSource);
   setView("add");
 }
 
@@ -2199,7 +2212,7 @@ function deleteCurrentMatch() {
   save();
   clearForm();
   renderAll();
-  setView(state.lastAddSource === "fixture" ? "fixtures" : "matches");
+  goBackFromAdd();
 }
 
 function downloadFile(filename, text, mime="application/octet-stream") {
@@ -2372,6 +2385,7 @@ function bindEvents() {
       }
       if (v === "add") {
         state.lastAddSource = "manual";
+        localStorage.setItem("thlfc_lastAddSource", "manual");
       }
     });
 });
@@ -2391,7 +2405,7 @@ function bindEvents() {
   if (btnCancelAdd) {
     btnCancelAdd.addEventListener("click", () => {
       clearForm();
-      setView("dash");
+      goBackFromAdd();
     });
   }
 
@@ -2465,7 +2479,7 @@ const ce=document.getElementById("fixturesCount"); if(ce) ce.textContent = `Impo
     showBackupNudge();
     clearForm();
     renderAll();
-    setView(state.lastAddSource === "fixture" ? "fixtures" : "matches");
+    goBackFromAdd();
   });
 
   $("btnDelete").addEventListener("click", deleteCurrentMatch);
@@ -2600,7 +2614,14 @@ function init() {
   clearForm();
   renderAll();
   updateSetupModeUI();
-  setView("dash");
+  
+  state.lastAddSource = localStorage.getItem("thlfc_lastAddSource") || "manual";
+  const lastView = localStorage.getItem("thlfc_lastView");
+  if (lastView && ["dash","matches","credits","fixtures","settings","info","add"].includes(lastView)) {
+    setView(lastView);
+  } else {
+    setView("dash");
+  }
   showBackupNudge();
 
   if (!state.data.accounts || state.data.accounts.length === 0) {
@@ -3129,6 +3150,7 @@ const _trackedKeys = new Set(_matches.map(m => `${(m.matchDate||"")}|${(m.compet
         const id = el.getAttribute("data-fixture-id");
         const fx = filtered.find(x => x.id === id) || filtered[0];
         state.lastAddSource = "fixture";
+        localStorage.setItem("thlfc_lastAddSource", "fixture");
         setView("add");
         setTimeout(() => { prefillFromFixture(fx); }, 0);
         try{ showToast('Fixture loaded — complete ticket details then Save'); }catch(e){}
@@ -3160,7 +3182,6 @@ function prefillFromFixture(f) {
   $("matchDate").value = f.date || (f.datetime_utc ? f.datetime_utc.slice(0,10) : "");
   $("ticketAction").value = "credit";
   setCreditChip(defaultCreditFromAction("credit"));
-state.lastAddSource = "fixture";
   setView("add");
 }
 
@@ -3291,6 +3312,7 @@ async function renderCreditsChecklist() {
         if (match) editMatch(match.id);
         else {
             state.lastAddSource = "credits";
+            localStorage.setItem("thlfc_lastAddSource", "credits");
             prefillFromFixture(f);
         }
     };
