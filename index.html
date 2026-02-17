@@ -3639,44 +3639,33 @@ async function renderSales() {
     
     let html = `<div class="itemTitle" style="font-size:18px; margin-bottom:12px; border-bottom:1px solid var(--separator); padding-bottom:8px;">${item.match}</div>`;
     
-    // Grid layout for dates
-    html += `<div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">`;
-    
     if (item.regOpen || item.regClose) {
-        html += `<div style="grid-column: span 2;">
-            <div class="fieldLabel" style="margin-top:0; color:var(--primary);">Registration</div>
-            <div class="hint" style="margin-top:2px; color:var(--text); font-size:14px;">${item.regOpen} ${item.regClose ? '— ' + item.regClose : ''}</div>
-        </div>`;
-    }
-
-    if (item.localOpen || item.localClose) {
-        html += `<div style="grid-column: span 2;">
-            <div class="fieldLabel" style="margin-top:0;">Local Ballot</div>
-            <div class="hint" style="margin-top:2px; color:var(--text); font-size:14px;">${item.localOpen} ${item.localClose ? '— ' + item.localClose : ''}</div>
+        html += `<div style="margin-bottom:12px;">
+            <div class="fieldLabel" style="margin-top:0; font-size:15px; color:var(--primary);">Registration</div>
+            ${item.regOpen ? `<div class="row space-between" style="margin-bottom:4px;"><span class="hint" style="color:var(--text-secondary);">Open</span> <span class="hint" style="color:var(--text); font-weight:500;">${item.regOpen}</span></div>` : ''}
+            ${item.regClose ? `<div class="row space-between"><span class="hint" style="color:var(--text-secondary);">Closes</span> <span class="hint" style="color:var(--text); font-weight:500;">${item.regClose}</span></div>` : ''}
         </div>`;
     }
 
     if (item.uniqueLinks) {
-        html += `<div>
-            <div class="fieldLabel" style="margin-top:0;">Unique Links</div>
-            <div class="hint" style="margin-top:2px; color:var(--text); font-size:14px;">${item.uniqueLinks}</div>
+        html += `<div style="margin-bottom:12px;">
+             <div class="row space-between"><span class="fieldLabel" style="margin:0; font-size:14px;">Unique Links Sent</span> <span class="hint" style="color:var(--text); font-weight:500;">${item.uniqueLinks}</span></div>
         </div>`;
     }
-    
-    if (item.localResults) {
-        html += `<div>
-            <div class="fieldLabel" style="margin-top:0;">Local Results</div>
-            <div class="hint" style="margin-top:2px; color:var(--text); font-size:14px;">${item.localResults}</div>
-        </div>`;
-    }
-    
-    html += `</div>`; // End grid
 
-    if (item.saleCriteria || item.saleOpen || item.saleClose) {
+    if (item.localOpen || item.localClose || item.localResults) {
+        html += `<div style="margin-bottom:12px;">
+            <div class="fieldLabel" style="margin-top:0; font-size:15px; color:var(--primary);">Local Ballot</div>
+            ${item.localOpen ? `<div class="row space-between" style="margin-bottom:4px;"><span class="hint" style="color:var(--text-secondary);">Open</span> <span class="hint" style="color:var(--text); font-weight:500;">${item.localOpen}</span></div>` : ''}
+            ${item.localClose ? `<div class="row space-between" style="margin-bottom:4px;"><span class="hint" style="color:var(--text-secondary);">Closes</span> <span class="hint" style="color:var(--text); font-weight:500;">${item.localClose}</span></div>` : ''}
+            ${item.localResults ? `<div class="row space-between"><span class="hint" style="color:var(--text-secondary);">Results</span> <span class="hint" style="color:var(--text); font-weight:500;">${item.localResults}</span></div>` : ''}
+        </div>`;
+    }
+
+    if (item.saleCriteria || item.saleOpen) {
         html += `<div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--separator);">
-            <div class="fieldLabel" style="margin-top:0;">Sale Details</div>
-            ${item.saleCriteria ? `<div class="hint" style="margin-top:2px; color:var(--text); margin-bottom:4px; font-size:14px;">${item.saleCriteria}</div>` : ''}
-            ${(item.saleOpen || item.saleClose) ? `<div class="hint" style="color:var(--text-secondary); font-size:13px;">${item.saleOpen} ${item.saleClose ? '— ' + item.saleClose : ''}</div>` : ''}
+            ${item.saleCriteria ? `<div class="row space-between" style="margin-bottom:4px;"><span class="fieldLabel" style="margin:0; font-size:14px;">Sale Criteria</span> <span class="hint" style="color:var(--text); font-weight:500; text-align:right; max-width:60%;">${item.saleCriteria}</span></div>` : ''}
+            ${item.saleOpen ? `<div class="row space-between"><span class="fieldLabel" style="margin:0; font-size:14px;">Sale Opens</span> <span class="hint" style="color:var(--text); font-weight:500;">${item.saleOpen}</span></div>` : ''}
         </div>`;
     }
 
