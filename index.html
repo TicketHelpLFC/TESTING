@@ -77,7 +77,7 @@ body{
   font-family: var(--font-main);
   letter-spacing: -0.015em;
   padding-bottom: env(safe-area-inset-bottom);
-  padding-left: 90px;
+  padding-left: 0;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
@@ -112,23 +112,13 @@ body::before {
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid rgba(255,255,255,0.03);
   display: flex; align-items: center; justify-content: space-between;
-  padding-left: 20px; padding-right: 20px;
+  padding-left: 16px; padding-right: 16px;
 }
 .topbar.is-hidden { transform: translateY(-100%); }
 
 .topbarLeft { display: flex; align-items: center; gap: 12px; }
 .brandLogo { width: 32px; height: 32px; border-radius: 8px; }
 .topbarTitle { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
-.headerActions { display: flex; gap: 12px; }
-.iconBtn { 
-  background: transparent; border: none; 
-  width: 44px; height: 44px; border-radius: 50%; 
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--text); transition: opacity 0.2s;
-}
-.iconBtn:active { opacity: 0.5; }
-.iconImg { width: 22px; height: 22px; filter: invert(38%) sepia(92%) saturate(3944%) hue-rotate(206deg) brightness(100%) contrast(104%); } /* iOS Blue Filter */
-.iconSvg { width: 22px; height: 22px; stroke: currentColor; fill: none; }
 
 @media all and (display-mode: standalone) {
   #btnInstall {
@@ -226,32 +216,64 @@ body::before {
 
 [data-theme="light"] .btn .icon img { filter: invert(1); }
 
-/* Bottom Nav */
-.bottomNav{
+/* Sidebar */
+.sidebarOverlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000;
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.sidebarOverlay.visible { opacity: 1; pointer-events: auto; }
+
+.sidebar{
   position: fixed; top: 0; left: 0; bottom: 0;
-  right: auto;
-  width: 90px;
+  width: 280px;
   height: 100vh;
   background: var(--bar-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  border: none;
   border-right: 1px solid rgba(255,255,255,0.08);
-  border-radius: 0;
-  box-shadow: none;
-  display: flex; flex-direction: column; justify-content: flex-start;
-  padding-top: calc(env(safe-area-inset-top) + 20px);
-  padding-bottom: 20px;
-  gap: 24px;
-  z-index: 900;
+  display: flex; flex-direction: column;
+  padding: calc(env(safe-area-inset-top) + 20px) 20px 20px;
+  gap: 20px;
+  z-index: 1100;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 20px 0 50px rgba(0,0,0,0.3);
 }
-.tab{
-  flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: none; border: none; padding: 10px 0;
-  color: var(--text-tertiary); gap: 4px;
-  width: 100%;
+.sidebar.open { transform: translateX(0); }
+
+.sidebarHeader { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.sidebarLogo { width: 40px; height: 40px; border-radius: 10px; }
+.sidebarTitle { font-size: 20px; font-weight: 800; }
+
+.sidebarControls { display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px; border-bottom: 1px solid var(--separator); }
+.sidebarNav { display: flex; flex-direction: column; gap: 4px; flex: 1; overflow-y: auto; }
+
+.sidebarTab {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: transparent; border: none;
+  color: var(--text-secondary);
+  font-size: 16px; font-weight: 600;
+  cursor: pointer; text-align: left;
+  transition: all 0.2s;
+}
+.sidebarTab:hover { background: var(--surface-2); color: var(--text); }
+.sidebarTab.active { background: var(--primary-dim); color: var(--primary); }
+.sidebarTab .tabIcon { width: 20px; height: 20px; filter: invert(0.5); }
+.sidebarTab.active .tabIcon { filter: invert(38%) sepia(93%) saturate(3000%) hue-rotate(320deg) brightness(100%) contrast(100%); }
+
+.sidebarFooter { margin-top: auto; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--separator); padding-top: 20px; }
+
+.hamburger {
+  background: transparent; border: none; color: var(--text);
+  width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border-radius: 50%;
+}
+.hamburger:active { background: var(--surface-2); }
+.hamburger svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; }
+
 }
 .tabIcon{ width: 24px; height: 24px; filter: invert(0.5); transition: 0.2s; }
 .tab.active .tabIcon { filter: invert(38%) sepia(93%) saturate(3000%) hue-rotate(320deg) brightness(100%) contrast(100%); } /* Pink/Red Filter */
@@ -584,34 +606,12 @@ dialog.modal::backdrop{
   display: flex; align-items: center; justify-content: space-between;
 }
 
-/* Header Center Button */
-.topbarCenter {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  height: var(--header-height);
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  z-index: 120;
-  pointer-events: none;
-}
-.topbarCenter > * {
-  pointer-events: auto;
-}
-
-.topbarTitleRow { display: flex; align-items: center; gap: 4px; }
-.headerChevron { font-size: 10px; opacity: 0.5; transform: translateY(1px); transition: transform 0.2s; }
-.topbarSubtitle { font-size: 12px; color: var(--text-secondary); font-weight: 500; line-height: 1.1; margin-top: 2px; }
-
-/* Ghost Select */
+/* Selects in sidebar */
 .selectGhost { appearance: none; -webkit-appearance: none; background: transparent; border: none; color: var(--primary); font-size: 17px; text-align: right; padding: 0; margin: 0; width: auto; min-width: 100px; direction: rtl; }
 .selectGhost:focus { outline: none; background: transparent; box-shadow: none; }
 .selectGhost option { direction: ltr; color: #000; }
 
-.headerSelect {
+.sidebarSelect {
   background: var(--surface-2);
   color: var(--text);
   border: 1px solid var(--border);
@@ -624,30 +624,20 @@ dialog.modal::backdrop{
   background-repeat: no-repeat;
   background-position: right 8px center;
   background-size: 8px auto;
-  max-width: 110px;
+  width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  height: 40px;
 }
 </style>
 </head>
 <body>
   <header class="topbar">
     <div class="topbarLeft">
-      <img class="brandLogo" src="icon.svg" alt="TicketHelpLFC" />
-    </div>
-    <div class="topbarCenter">
-      <select id="headerAccountSelect" class="headerSelect"></select>
-      <select id="headerSeasonSelect" class="headerSelect"></select>
-    </div>
-    <div class="headerActions">
-      <button id="btnHeaderSupport" class="iconBtn" aria-label="Support" title="Support">
-        <svg class="iconSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      <button id="btnHamburger" class="hamburger" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
       </button>
-      <button id="btnThemeToggle" class="iconBtn" aria-label="Toggle Theme" title="Toggle Theme">
-        <svg class="iconSvg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-      </button>
-      <button id="btnInstall" class="btn ghost sm" style="min-height:32px; padding:4px 12px;" hidden>Install</button>
     </div>
   </header>
 
@@ -1244,27 +1234,46 @@ dialog.modal::backdrop{
 </dialog>
 </main>
 
-  <nav class="bottomNav" aria-label="Primary">
-    <button class="tab" data-view="settings" aria-label="Profile" title="Profile">
+  <div id="sidebarOverlay" class="sidebarOverlay"></div>
+  <nav id="sidebar" class="sidebar" aria-label="Primary">
+    <div class="sidebarHeader">
+      <img class="sidebarLogo" src="icon.svg" alt="LFC Tools" />
+      <div class="sidebarTitle">LFC Tools</div>
+    </div>
+
+    <div class="sidebarControls">
+      <select id="sidebarAccountSelect" class="sidebarSelect"></select>
+      <select id="sidebarSeasonSelect" class="sidebarSelect"></select>
+    </div>
+
+    <div class="sidebarNav">
+    <button class="sidebarTab" data-view="settings" aria-label="Profile">
       <img class="tabIcon" src="icons/assets/account.svg" alt="" aria-hidden="true" />
-      <span class="sr-only">Profile</span>
+      <span>Profile</span>
     </button>
-    <button class="tab active" data-view="dash" aria-label="Dashboard" title="Dashboard">
+    <button class="sidebarTab active" data-view="dash" aria-label="Dashboard">
       <img class="tabIcon" src="icons/assets/dashboard.svg" alt="" aria-hidden="true" />
-      <span class="sr-only">Dashboard</span>
+      <span>Dashboard</span>
     </button>
-    <button class="tab" data-view="credits" aria-label="Checklist" title="Checklist">
+    <button class="sidebarTab" data-view="credits" aria-label="Checklist">
       <svg class="tabIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-      <span class="sr-only">Checklist</span>
+      <span>Checklist</span>
     </button>
-    <button class="tab" data-view="matches" aria-label="Matches" title="Matches">
+    <button class="sidebarTab" data-view="matches" aria-label="Matches">
       <img class="tabIcon" src="icons/assets/matches.svg" alt="" aria-hidden="true" />
-      <span class="sr-only">Matches</span>
+      <span>Matches</span>
     </button>
-    <button class="tab" data-view="fixtures" aria-label="Fixtures" title="Fixtures">
+    <button class="sidebarTab" data-view="fixtures" aria-label="Fixtures">
       <img class="tabIcon" src="icons/assets/fixtures.svg" alt="" aria-hidden="true" />
-      <span class="sr-only">Fixtures</span>
+      <span>Fixtures</span>
     </button>
+    </div>
+
+    <div class="sidebarFooter">
+      <button id="btnSidebarSupport" class="btn ghost full sm" style="justify-content:flex-start">💬 Support</button>
+      <button id="btnThemeToggle" class="btn ghost full sm" style="justify-content:flex-start">🌗 Theme</button>
+      <button id="btnInstall" class="btn ghost full sm" style="justify-content:flex-start" hidden>⬇️ Install</button>
+    </div>
   </nav>
 
   <div class="hint" style="text-align:center;margin:20px 0;">Powered by LFC Tools</div>
@@ -1757,6 +1766,9 @@ function setView(viewName) {
   const tabs = document.querySelectorAll(".tab");
   tabs.forEach(t => t.classList.toggle("active", t.dataset.view === viewName));
 
+  const sbTabs = document.querySelectorAll(".sidebarTab");
+  sbTabs.forEach(t => t.classList.toggle("active", t.dataset.view === viewName));
+
   $("viewSetup").classList.toggle("hidden", viewName !== "setup");
   $("viewDash").classList.toggle("hidden", viewName !== "dash");
   $("viewMatches").classList.toggle("hidden", viewName !== "matches");
@@ -1771,6 +1783,7 @@ function setView(viewName) {
   $("viewFixtures").classList.toggle("hidden", viewName !== "fixtures");
   if (viewName === "fixtures") { setTimeout(() => { bindFixturesControls(); renderFixtures(); }, 0); }
   if (viewName === "dash") { showBackupNudge(); }
+  closeSidebar();
 }
 
 
@@ -1802,11 +1815,11 @@ function renderSeasonSelect() {
     sel.disabled = false;
   }
 
-  // Update header season select
-  const headerSel = $("headerSeasonSelect");
-  if (headerSel) {
-    headerSel.innerHTML = sel.innerHTML;
-    headerSel.value = sel.value;
+  // Update sidebar season select
+  const sbSel = $("sidebarSeasonSelect");
+  if (sbSel) {
+    sbSel.innerHTML = sel.innerHTML;
+    sbSel.value = sel.value;
   }
 
   // mirror into modals if present
@@ -1833,11 +1846,11 @@ function renderAccountSelect() {
     save();
   }
 
-  // Update header account select
-  const headerSel = $("headerAccountSelect");
-  if (headerSel) {
-    headerSel.innerHTML = sel.innerHTML;
-    headerSel.value = sel.value;
+  // Update sidebar account select
+  const sbSel = $("sidebarAccountSelect");
+  if (sbSel) {
+    sbSel.innerHTML = sel.innerHTML;
+    sbSel.value = sel.value;
   }
 }
 
@@ -2370,10 +2383,10 @@ function addSeason() {
 
 function updateHeader() {
   // Sync header selects with state if they exist
-  const hAcc = $("headerAccountSelect");
-  const hSea = $("headerSeasonSelect");
-  if (hAcc) hAcc.value = activeAccountId() || "";
-  if (hSea) hSea.value = activeSeasonId() || "";
+  const sbAcc = $("sidebarAccountSelect");
+  const sbSea = $("sidebarSeasonSelect");
+  if (sbAcc) sbAcc.value = activeAccountId() || "";
+  if (sbSea) sbSea.value = activeSeasonId() || "";
 }
 
 function renderAll() {
@@ -2411,8 +2424,7 @@ function onEl(id, evt, fn, opts) {
 }
 
 function bindEvents() {
-  document.querySelectorAll(".tab").forEach(tab => {
-    tab.addEventListener("click", () => {
+  const handleTabClick = (tab) => {
       const v = tab.dataset.view;
       setView(v);
       if (v === "fixtures") {
@@ -2422,14 +2434,17 @@ function bindEvents() {
         state.lastAddSource = "manual";
         localStorage.setItem("thlfc_lastAddSource", "manual");
       }
-    });
-});
+  };
+  document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", () => handleTabClick(tab)));
+  document.querySelectorAll(".sidebarTab").forEach(tab => tab.addEventListener("click", () => handleTabClick(tab)));
 
   onEl("accountSelect","change",(e)=> setActiveAccount(e.target.value));
   onEl("seasonSelect","change",(e)=> handleSeasonChange(e.target.value));
   
-  onEl("headerAccountSelect","change",(e)=> setActiveAccount(e.target.value));
-  onEl("headerSeasonSelect","change",(e)=> handleSeasonChange(e.target.value));
+  onEl("sidebarAccountSelect","change",(e)=> setActiveAccount(e.target.value));
+  onEl("sidebarSeasonSelect","change",(e)=> handleSeasonChange(e.target.value));
+  onEl("btnHamburger","click", toggleSidebar);
+  onEl("sidebarOverlay","click", closeSidebar);
 
   onEl("btnAddAccount","click", openSetupForNewAccount);
   onEl("btnEditAccount","click", editActiveAccount);
@@ -2566,7 +2581,7 @@ onEl("btnSettings","click", openSettings);
   onEl("btnSetupCreate","click", () => { try { saveSetup(); } catch(e){ alert("Setup error: " + (e && e.message ? e.message : e)); console.error(e); } });
 
 onEl("btnSupport","click", openSupport);
-onEl("btnHeaderSupport","click", openSupport);
+onEl("btnSidebarSupport","click", openSupport);
 onEl("btnCloseSupport","click", closeSupport);
 onEl("btnBmac","click", ()=> window.open("https://buymeacoffee.com/lfctools", "_blank", "noopener"));
 onEl("btnInfo","click", () => setView("info"));
@@ -2608,9 +2623,9 @@ function updateThemeIcon() {
   const btn = document.getElementById("btnThemeToggle");
   if (!btn) return;
   if (current === "light") {
-    btn.innerHTML = `<svg class="iconSvg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+    btn.textContent = "🌙 Dark Mode";
   } else {
-    btn.innerHTML = `<svg class="iconSvg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+    btn.textContent = "☀️ Light Mode";
   }
 }
 
@@ -4078,6 +4093,19 @@ onEl("btnToggleFeedback","click", ()=>{
   const open = panel.classList.toggle("hidden") === false;
   arrow.textContent = open ? "▾" : "▸";
 });
+
+function toggleSidebar() {
+  const sb = $("sidebar");
+  const ov = $("sidebarOverlay");
+  if (sb) sb.classList.toggle("open");
+  if (ov) ov.classList.toggle("visible");
+}
+function closeSidebar() {
+  const sb = $("sidebar");
+  const ov = $("sidebarOverlay");
+  if (sb) sb.classList.remove("open");
+  if (ov) ov.classList.remove("visible");
+}
 </script>
 </body>
 </html>
