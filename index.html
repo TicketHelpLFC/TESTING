@@ -112,7 +112,6 @@ body::before {
   border-bottom: 1px solid rgba(255,255,255,0.03);
   display: flex; align-items: center; justify-content: space-between;
   padding-left: 20px; padding-right: 20px;
-  transition: transform 0.3s ease;
 }
 .topbar.is-hidden { transform: translateY(-100%); }
 
@@ -147,7 +146,8 @@ body::before {
 /* Typography */
 .label { font-size: 24px; font-weight: 700; margin-bottom: 12px; display: block; color: var(--text); letter-spacing: -0.02em; }
 .label.withIcon { display: flex; align-items: center; gap: 6px; }
-.labelIcon { width: 18px; height: 18px; opacity: 0.7; filter: invert(1); }
+.labelIcon { width: 18px; height: 18px; opacity: 0.7; }
+[data-theme="light"] .labelIcon { filter: invert(1); }
 .hint { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-top: 6px; }
 .fieldLabel { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500; letter-spacing: 0.02em; margin-left: 4px; margin-top: 16px;}
 
@@ -222,6 +222,8 @@ body::before {
 .btn.sm { padding: 8px 14px; font-size: 14px; }
 .btn.full { width: 100%; }
 .fileBtn { display: inline-flex; align-items: center; gap: 6px; }
+
+[data-theme="light"] .btn .icon img { filter: invert(1); }
 
 /* Bottom Nav */
 .bottomNav{
@@ -2573,38 +2575,6 @@ onEl("btnFixturesAddManual","click", () => {
   });
 }
 
-function bindTopbarAutoHide() {
-  const topbar = document.querySelector(".topbar");
-  if (!topbar) return;
-  let lastY = window.scrollY || 0;
-  let ticking = false;
-  const downThreshold = 10;
-  const upThreshold = 6;
-
-  const update = () => {
-    const currentY = window.scrollY || 0;
-    const delta = currentY - lastY;
-
-    if (currentY <= 0) {
-      topbar.classList.remove("is-hidden");
-    } else if (delta > downThreshold) {
-      topbar.classList.add("is-hidden");
-    } else if (delta < -upThreshold) {
-      topbar.classList.remove("is-hidden");
-    }
-
-    lastY = currentY;
-    ticking = false;
-  };
-
-  window.addEventListener("scroll", () => {
-    if (!ticking) {
-      window.requestAnimationFrame(update);
-      ticking = true;
-    }
-  }, { passive: true });
-}
-
 function initTheme() {
   const saved = localStorage.getItem("thlfc_theme");
   if (saved) {
@@ -2639,7 +2609,6 @@ function init() {
   ensureFirstSeen();
   setupPWA();
   bindEvents();
-  bindTopbarAutoHide();
   initTheme();
   try { bindFixturesControls(); } catch(e) {}
   clearForm();
