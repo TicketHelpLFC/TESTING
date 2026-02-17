@@ -1035,8 +1035,9 @@ dialog.modal::backdrop{
           Sales & Reminders
         </div>
       </div>
-      <section class="card" style="padding:0; overflow:hidden; min-height:600px;">
-        <iframe src="https://calendar.google.com/calendar/embed?src=lfcticketupdates%40gmail.com&ctz=Europe%2FLondon" style="border: 0" width="100%" height="600" frameborder="0" scrolling="no" loading="lazy"></iframe>
+      <section class="card">
+        <div id="salesList" class="list"></div>
+        <div id="salesEmpty" class="empty hidden">No upcoming sales found.</div>
       </section>
     </section>
 
@@ -1839,6 +1840,7 @@ function setView(viewName) {
   $("viewSettings").classList.toggle("hidden", viewName !== "settings");
   $("viewFixtures").classList.toggle("hidden", viewName !== "fixtures");
   $("viewSales").classList.toggle("hidden", viewName !== "sales");
+  if (viewName === "sales") { renderSales(); }
   if (viewName === "fixtures") { setTimeout(() => { bindFixturesControls(); renderFixtures(); }, 0); }
   if (viewName === "dash") { showBackupNudge(); }
   closeSidebar();
@@ -3665,25 +3667,32 @@ function guessSalesFields(obj) {
   };
 }
 
+function formatSalesDateTime(d, t){
+  if(!d) return "";
+  return t ? `${d} ${t}` : d;
+}
+function formatSalesDate(s){ return s||""; }
+
 async function renderSales() {
   const list = $("salesList");
   const empty = $("salesEmpty");
   if (!list) return;
   
   list.innerHTML = '<div class="hint">Loading...</div>';
-  empty.classList.add("hidden");
+  if(empty) empty.classList.add("hidden");
 
   const data = await loadSalesData();
   list.innerHTML = "";
 
   if (!data || data.length === 0) {
-    empty.classList.remove("hidden");
+    if(empty) empty.classList.remove("hidden");
     return;
   }
 
-  data.forEach(row => {
-    const item = guessSalesFields(row);
-    if (!item.match) return;
+  const items = data.map(row => guessSalesFields(row)).filter(x => x.match);
+  items.sort((a,b) => (a.match||"").localeCompare(b.match||""));
+
+  items.forEach(item => {
 
     const el = document.createElement("div");
     el.className = "item";
