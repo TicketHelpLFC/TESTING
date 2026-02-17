@@ -621,6 +621,9 @@ dialog.modal::backdrop{
       <select id="headerSeasonSelect" class="headerSelect"></select>
     </div>
     <div class="headerActions">
+      <button id="btnHeaderSupport" class="iconBtn" aria-label="Support" title="Support">
+        <svg class="iconSvg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      </button>
       <button id="btnThemeToggle" class="iconBtn" aria-label="Toggle Theme" title="Toggle Theme">
         <svg class="iconSvg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
       </button>
@@ -1035,11 +1038,11 @@ dialog.modal::backdrop{
       <section class="card settingsSection">
         <div class="fieldLabel" style="margin-left:0; margin-top:0;">App Info</div>
         <div class="list">
-          <button id="btnInfo" class="item clickable" style="text-align:left; width:100%;">
+          <button id="btnInfo" class="item clickable" style="text-align:left; width:100%; color:var(--text);">
             <div class="itemTitle">How to use</div>
             <div class="hint" style="font-size: 16px; color: #666;">›</div>
           </button>
-          <button id="btnSupport" class="item clickable" style="text-align:left; width:100%;">
+          <button id="btnSupport" class="item clickable" style="text-align:left; width:100%; color:var(--text);">
             <div class="itemTitle">Support & Feedback</div>
             <div class="hint" style="font-size: 16px; color: #666;">›</div>
           </button>
@@ -2543,6 +2546,7 @@ onEl("btnSettings","click", openSettings);
   onEl("btnSetupCreate","click", () => { try { saveSetup(); } catch(e){ alert("Setup error: " + (e && e.message ? e.message : e)); console.error(e); } });
 
 onEl("btnSupport","click", openSupport);
+onEl("btnHeaderSupport","click", openSupport);
 onEl("btnCloseSupport","click", closeSupport);
 onEl("btnBmac","click", ()=> window.open("https://buymeacoffee.com/lfctools", "_blank", "noopener"));
 onEl("btnInfo","click", () => setView("info"));
@@ -3328,7 +3332,6 @@ async function renderCreditsChecklist() {
       <div class="row space-between">
         <div style="flex:1">
           <div class="itemTitle" style="font-size:16px">${f.opponent} <span class="pill ${f.venue === 'H' ? 'ha-home' : 'ha-away'}" style="font-size:10px; padding:2px 6px; min-width:auto; margin-left:4px;">${f.venue}</span></div>
-          <div class="hint">${when} • ${f.competition}</div>
         </div>
         <div style="text-align:right">${statusHtml}</div>
       </div>
