@@ -975,21 +975,6 @@ dialog.modal::backdrop{
       </section>
     </section>
 
-    <!-- Sales / Ticketing -->
-    <section id="viewSales" class="view hidden">
-      <section class="card">
-        <div class="row space-between">
-          <div>
-            <div class="label">Ticket Sales & Ballots</div>
-            <div class="hint">Upcoming registrations, sales, and results.</div>
-          </div>
-          <button id="btnReloadSales" class="btn ghost sm">Refresh</button>
-        </div>
-        <div id="salesList" class="list" style="margin-top:12px;"></div>
-        <div id="salesEmpty" class="hint hidden" style="margin-top:12px;">No sales information found.</div>
-      </section>
-    </section>
-
     <!-- Settings -->
     <section id="viewSettings" class="view hidden">
       <div class="dashHeader" style="padding-left: 16px;">
@@ -1241,21 +1226,17 @@ dialog.modal::backdrop{
       <img class="tabIcon" src="icons/assets/dashboard.svg" alt="" aria-hidden="true" />
       <span class="sr-only">Dashboard</span>
     </button>
+    <button class="tab" data-view="credits" aria-label="Checklist" title="Checklist">
+      <svg class="tabIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      <span class="sr-only">Checklist</span>
+    </button>
     <button class="tab" data-view="matches" aria-label="Matches" title="Matches">
       <img class="tabIcon" src="icons/assets/matches.svg" alt="" aria-hidden="true" />
       <span class="sr-only">Matches</span>
     </button>
-    <button class="tab" data-view="credits" aria-label="Checklist" title="Checklist">
-      <img class="tabIcon" src="icons/assets/matches.svg" alt="" aria-hidden="true" />
-      <span class="sr-only">Checklist</span>
-    </button>
     <button class="tab" data-view="fixtures" aria-label="Fixtures" title="Fixtures">
       <img class="tabIcon" src="icons/assets/fixtures.svg" alt="" aria-hidden="true" />
       <span class="sr-only">Fixtures</span>
-    </button>
-    <button class="tab" data-view="sales" aria-label="Sales" title="Sales">
-      <svg class="tabIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M22 10V6a2 2 0 00-2-2H4c-1.1 0-2 .9-2 2v4c1.1 0 1.99.9 1.99 2s-.89 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2s.9-2 2-2zm-2-1.46c-1.19.69-2 1.99-2 3.46s.81 2.77 2 3.46V18H4v-2.54c1.19-.69 2-1.99 2-3.46s-.81-2.77-2-3.46V6h16v2.54z M11 15h2v2h-2v-2zm0-4h2v2h-2v-2zm0-4h2v2h-2V7z"/></svg>
-      <span class="sr-only">Sales</span>
     </button>
     <button class="tab" data-view="settings" aria-label="Profile" title="Profile">
       <img class="tabIcon" src="icons/assets/account.svg" alt="" aria-hidden="true" />
@@ -1758,7 +1739,6 @@ function setView(viewName) {
   $("viewMatches").classList.toggle("hidden", viewName !== "matches");
   $("viewAdd").classList.toggle("hidden", viewName !== "add");
   $("infoPage").classList.toggle("hidden", viewName !== "info");
-  $("viewSales").classList.toggle("hidden", viewName !== "sales");
   if (viewName === "fixtures") { setTimeout(() => { bindFixturesControls(); renderFixtures(); }, 0); }
   const vc = $("viewCredits");
   if(vc) vc.classList.toggle("hidden", viewName !== "credits");
@@ -1766,7 +1746,6 @@ function setView(viewName) {
   if (viewName === "setup") { setTimeout(() => { try{ populateAllSeasonSelects(); }catch(e){} }, 0); }
   $("viewSettings").classList.toggle("hidden", viewName !== "settings");
   $("viewFixtures").classList.toggle("hidden", viewName !== "fixtures");
-  if (viewName === "sales") { renderSales(); }
   if (viewName === "fixtures") { setTimeout(() => { bindFixturesControls(); renderFixtures(); }, 0); }
   if (viewName === "dash") { showBackupNudge(); }
 }
@@ -2435,7 +2414,6 @@ function bindEvents() {
   onEl("btnBackupData","click", () => {
     exportJSON();
   });
-  onEl("btnReloadSales", "click", () => reloadSalesHard());
   onEl("matchSort","change", renderMatches);
 
   
