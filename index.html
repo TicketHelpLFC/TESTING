@@ -17,37 +17,37 @@
   <link rel="stylesheet" href="styles.css" />
 <style>
 :root{
-  --bg: #09090b;
-  --surface: #18181b;
-  --surface-2: #27272a;
-  --surface-3: #3f3f46;
-  --separator: #27272a;
-  --primary: #f43f5e; /* Rose */
-  --primary-gradient: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
-  --primary-dim: rgba(244, 63, 94, 0.15);
+  --bg: #000000;
+  --surface: #1c1c1e;
+  --surface-2: #2c2c2e;
+  --surface-3: #3a3a3c;
+  --separator: #38383a;
+  --primary: #ff2d55;
+  --primary-gradient: linear-gradient(135deg, #ff2d55 0%, #ff3b30 100%);
+  --primary-dim: rgba(255, 45, 85, 0.15);
   --text: #FFFFFF;
-  --text-secondary: #a1a1aa;
-  --text-tertiary: #71717a;
-  --border: rgba(255,255,255,0.06);
-  --success: #10b981;
-  --danger: #f43f5e;
-  --warning: #f59e0b;
-  --blue: #3b82f6;
-  --radius-l: 24px;
-  --radius-m: 16px;
+  --text-secondary: #ebebf599;
+  --text-tertiary: #ebebf54d;
+  --border: rgba(255,255,255,0.1);
+  --success: #30d158;
+  --danger: #ff453a;
+  --warning: #ff9f0a;
+  --blue: #0a84ff;
+  --radius-l: 18px;
+  --radius-m: 12px;
   --radius-s: 8px;
-  --nav-height: 70px;
-  --header-height: 60px;
+  --nav-height: 60px;
+  --header-height: 50px;
   --fab-size: 56px;
-  --font-main: "Plus Jakarta Sans", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --shadow-card: 0 10px 30px -10px rgba(0,0,0,0.5);
+  --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
   --glow-card: none;
-  --card-bg: rgba(24, 24, 27, 0.6);
-  --bar-bg: rgba(9, 9, 11, 0.8);
-  --modal-bg: rgba(24, 24, 27, 0.95);
-  --input-bg: var(--surface-2);
-  --grad-1: rgba(244, 63, 94, 0.15);
-  --grad-2: rgba(139, 92, 246, 0.1);
+  --card-bg: #1c1c1e;
+  --bar-bg: rgba(28, 28, 30, 0.85);
+  --modal-bg: #1c1c1e;
+  --input-bg: #2c2c2e;
+  --grad-1: rgba(255, 45, 85, 0.15);
+  --grad-2: rgba(10, 132, 255, 0.1);
   --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
 }
@@ -55,20 +55,20 @@
 [data-theme="light"] {
   --bg: #f2f2f7;
   --surface: #ffffff;
-  --surface-2: #e4e4e7;
-  --surface-3: #d4d4d8;
-  --separator: #d4d4d8;
-  --text: #18181b;
-  --text-secondary: #52525b;
-  --text-tertiary: #71717a;
-  --border: rgba(0,0,0,0.08);
-  --card-bg: rgba(255, 255, 255, 0.75);
-  --bar-bg: rgba(244, 244, 245, 0.85);
-  --modal-bg: rgba(255, 255, 255, 0.95);
-  --input-bg: #ffffff;
-  --shadow-card: 0 10px 30px -10px rgba(0,0,0,0.08);
-  --grad-1: rgba(244, 63, 94, 0.08);
-  --grad-2: rgba(139, 92, 246, 0.05);
+  --surface-2: #e5e5ea;
+  --surface-3: #d1d1d6;
+  --separator: #c6c6c8;
+  --text: #000000;
+  --text-secondary: #3c3c4399;
+  --text-tertiary: #3c3c434d;
+  --border: rgba(0,0,0,0.1);
+  --card-bg: #ffffff;
+  --bar-bg: rgba(255, 255, 255, 0.85);
+  --modal-bg: #ffffff;
+  --input-bg: #f2f2f7;
+  --shadow-card: 0 4px 12px rgba(0,0,0,0.05);
+  --grad-1: rgba(255, 45, 85, 0.05);
+  --grad-2: rgba(10, 132, 255, 0.05);
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -85,19 +85,7 @@ body{
 }
 
 body::before {
-  content: "";
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background-color: var(--bg);
-  background-image: 
-    radial-gradient(circle at 0% 0%, var(--grad-1), transparent 50%),
-    radial-gradient(circle at 100% 100%, var(--grad-2), transparent 50%);
-  z-index: -1;
-  animation: bgPulse 20s ease-in-out infinite alternate;
-}
-@keyframes bgPulse {
-  0% { filter: hue-rotate(0deg); }
-  100% { filter: hue-rotate(45deg); }
+  display: none;
 }
 
 [hidden] { display: none !important; }
@@ -114,7 +102,7 @@ body::before {
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid rgba(255,255,255,0.03);
   display: flex; align-items: center; justify-content: space-between;
-  padding-left: 16px; padding-right: 16px;
+  padding: 0 16px;
 }
 .topbar.is-hidden { transform: translateY(-100%); }
 
@@ -144,7 +132,7 @@ body::before {
   padding: 16px;
   max-width: 600px;
   margin: 0 auto;
-  min-height: 80vh;
+  padding-bottom: 100px; /* Space for bottom nav */
 }
 
 /* Typography */
@@ -157,13 +145,11 @@ body::before {
 
 /* Cards */
 .card{
-  background: var(--card-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: var(--surface);
   border-radius: var(--radius-l);
-  padding: 24px;
-  margin-bottom: 24px;
-  border: 1px solid rgba(255,255,255,0.05);
+  padding: 20px;
+  margin-bottom: 16px;
+  border: none;
   box-shadow: var(--shadow-card);
   animation: cardEntry 0.5s var(--ease-out) both;
 }
@@ -229,6 +215,30 @@ body::before {
 
 [data-theme="light"] .btn .icon img { filter: invert(1); }
 
+/* Bottom Nav */
+.bottomNav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--bar-bg);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--separator);
+  display: flex; justify-content: space-around;
+  padding-bottom: env(safe-area-inset-bottom);
+  height: calc(55px + env(safe-area-inset-bottom));
+  z-index: 900;
+}
+.bottomTab {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: none; border: none; padding: 4px 0 0 0;
+  color: var(--text-secondary); font-size: 10px; font-weight: 500; gap: 4px;
+  cursor: pointer;
+}
+.bottomTab.active { color: var(--primary); }
+.bottomTab img, .bottomTab svg { width: 24px; height: 24px; opacity: 0.5; transition: 0.2s; }
+.bottomTab.active img, .bottomTab.active svg { opacity: 1; filter: invert(38%) sepia(93%) saturate(3000%) hue-rotate(320deg) brightness(100%) contrast(100%); stroke: var(--primary); }
+[data-theme="light"] .bottomTab img { filter: invert(0.6); }
+[data-theme="light"] .bottomTab.active img { filter: invert(38%) sepia(93%) saturate(3000%) hue-rotate(320deg) brightness(100%) contrast(100%); }
+
+
 /* Sidebar */
 .sidebarOverlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000;
@@ -287,6 +297,18 @@ body::before {
 }
 .hamburger:active { background: var(--surface-2); }
 .hamburger svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; }
+
+@media (min-width: 800px) {
+  .bottomNav { display: none; }
+  .sidebar { transform: translateX(0); box-shadow: none; border-right: 1px solid var(--separator); }
+  .sidebarOverlay { display: none !important; }
+  .hamburger { display: none; }
+  .container { margin-left: 280px; max-width: 800px; padding-bottom: 40px; }
+}
+@media (max-width: 799px) {
+  .sidebar { display: none; } /* Use bottom nav on mobile */
+  .sidebar.open { display: flex; } /* Allow opening if needed, but we prefer bottom nav */
+}
 
 }
 .tabIcon{ width: 24px; height: 24px; filter: invert(0.5); transition: 0.2s; }
@@ -1095,6 +1117,12 @@ dialog.modal::backdrop{
             <div class="itemTitle">Support & Feedback</div>
             <div class="hint" style="font-size: 16px; color: #666;">›</div>
           </button>
+          <button id="btnThemeToggleSettings" class="item clickable" style="text-align:left; width:100%; color:var(--text);">
+            <div class="row space-between">
+              <div class="itemTitle">Theme</div>
+              <div class="hint" id="themeLabel">Auto</div>
+            </div>
+          </button>
         </div>
       </section>
     </section>
@@ -1314,6 +1342,29 @@ dialog.modal::backdrop{
       <button id="btnThemeToggle" class="btn ghost full sm" style="justify-content:flex-start">🌗 Theme</button>
       <button id="btnInstall" class="btn ghost full sm" style="justify-content:flex-start" hidden>⬇️ Install</button>
     </div>
+  </nav>
+
+  <nav class="bottomNav">
+    <button class="bottomTab" data-view="dash">
+      <img src="icons/assets/dashboard.svg" alt="" />
+      <span>Home</span>
+    </button>
+    <button class="bottomTab" data-view="matches">
+      <img src="icons/assets/matches.svg" alt="" />
+      <span>Matches</span>
+    </button>
+    <button class="bottomTab" data-view="fixtures">
+      <img src="icons/assets/fixtures.svg" alt="" />
+      <span>Fixtures</span>
+    </button>
+    <button class="bottomTab" data-view="credits">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      <span>Checklist</span>
+    </button>
+    <button class="bottomTab" data-view="settings">
+      <img src="icons/assets/account.svg" alt="" />
+      <span>Profile</span>
+    </button>
   </nav>
 
   <div class="hint" style="text-align:center;margin:20px 0;">Powered by LFC Tools</div>
@@ -1808,6 +1859,9 @@ function setView(viewName) {
 
   const sbTabs = document.querySelectorAll(".sidebarTab");
   sbTabs.forEach(t => t.classList.toggle("active", t.dataset.view === viewName));
+
+  const bTabs = document.querySelectorAll(".bottomTab");
+  bTabs.forEach(t => t.classList.toggle("active", t.dataset.view === viewName));
 
   $("viewSetup").classList.toggle("hidden", viewName !== "setup");
   $("viewDash").classList.toggle("hidden", viewName !== "dash");
@@ -2485,6 +2539,7 @@ function bindEvents() {
   };
   document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", () => handleTabClick(tab)));
   document.querySelectorAll(".sidebarTab").forEach(tab => tab.addEventListener("click", () => handleTabClick(tab)));
+  document.querySelectorAll(".bottomTab").forEach(tab => tab.addEventListener("click", () => handleTabClick(tab)));
 
   onEl("accountSelect","change",(e)=> setActiveAccount(e.target.value));
   onEl("seasonSelect","change",(e)=> handleSeasonChange(e.target.value));
@@ -2497,6 +2552,7 @@ function bindEvents() {
   onEl("btnAddAccount","click", openSetupForNewAccount);
   onEl("btnEditAccount","click", editActiveAccount);
   onEl("btnDeleteAccount","click", deleteActiveAccount);
+  onEl("btnThemeToggleSettings","click", toggleTheme);
   onEl("btnSidebarBackup", "click", exportJSON);
   onEl("btnBackupData","click", () => {
     exportJSON();
@@ -2660,23 +2716,28 @@ function initTheme() {
   updateThemeIcon();
 }
 
+function updateThemeIcon() {
+  const current = document.documentElement.getAttribute("data-theme");
+  const btn = document.getElementById("btnThemeToggle");
+  const btn2 = document.getElementById("btnThemeToggleSettings");
+  const label = document.getElementById("themeLabel");
+  
+  const text = current === "light" ? "Dark Mode" : "Light Mode";
+  const labelText = current === "light" ? "Light" : "Dark";
+  
+  if (btn) btn.textContent = current === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+  if (btn2) {
+     // btn2 is the row in settings
+  }
+  if (label) label.textContent = labelText;
+}
+
 function toggleTheme() {
   const current = document.documentElement.getAttribute("data-theme");
   const next = current === "light" ? "dark" : "light";
   document.documentElement.setAttribute("data-theme", next);
   localStorage.setItem("thlfc_theme", next);
   updateThemeIcon();
-}
-
-function updateThemeIcon() {
-  const current = document.documentElement.getAttribute("data-theme");
-  const btn = document.getElementById("btnThemeToggle");
-  if (!btn) return;
-  if (current === "light") {
-    btn.textContent = "🌙 Dark Mode";
-  } else {
-    btn.textContent = "☀️ Light Mode";
-  }
 }
 
 function init() {
