@@ -122,6 +122,17 @@ body::before {
 .brandLogo { width: 32px; height: 32px; border-radius: 8px; }
 .topbarTitle { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
 
+.topbarCenter {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 0;
+  height: var(--header-height);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.topbarAccount { font-size: 15px; font-weight: 700; line-height: 1.2; }
+.topbarSeason { font-size: 11px; color: var(--text-secondary); font-weight: 600; line-height: 1.2; }
+
 @media all and (display-mode: standalone) {
   #btnInstall {
     display: none !important;
@@ -662,6 +673,10 @@ dialog.modal::backdrop{
       <button id="btnHamburger" class="hamburger" aria-label="Menu">
         <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
       </button>
+    </div>
+    <div class="topbarCenter">
+      <div id="headerAccountName" class="topbarAccount"></div>
+      <div id="headerSeasonLabel" class="topbarSeason"></div>
     </div>
   </header>
 
@@ -2412,6 +2427,14 @@ function updateHeader() {
   const sbSea = $("sidebarSeasonSelect");
   if (sbAcc) sbAcc.value = activeAccountId() || "";
   if (sbSea) sbSea.value = activeSeasonId() || "";
+
+  const hAcc = $("headerAccountName");
+  const hSea = $("headerSeasonLabel");
+  const accId = activeAccountId();
+  const acc = state.data.accounts.find(a => a.id === accId);
+  if (hAcc) hAcc.textContent = acc ? acc.name : "LFC Tools";
+  const seaId = activeSeasonId();
+  if (hSea) hSea.textContent = seaId ? seasonLabelFromId(seaId) : "";
 }
 
 function renderAll() {
