@@ -48,6 +48,8 @@
   --input-bg: var(--surface-2);
   --grad-1: rgba(244, 63, 94, 0.15);
   --grad-2: rgba(139, 92, 246, 0.1);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 [data-theme="light"] {
@@ -152,7 +154,7 @@ body::before {
   margin-bottom: 24px;
   border: 1px solid rgba(255,255,255,0.05);
   box-shadow: var(--shadow-card);
-  animation: cardEntry 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: cardEntry 0.5s var(--ease-out) both;
 }
 .view > .card:nth-of-type(1) { animation-delay: 0ms; }
 .view > .card:nth-of-type(2) { animation-delay: 50ms; }
@@ -160,8 +162,8 @@ body::before {
 .view > .card:nth-of-type(4) { animation-delay: 150ms; }
 
 @keyframes cardEntry {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* Inputs */
@@ -205,7 +207,7 @@ body::before {
   min-height: 52px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
-.btn:active { opacity: 0.7; }
+.btn:active { transform: scale(0.96); }
 .btn.primary { background: var(--primary-gradient); color: white; box-shadow: 0 8px 20px -4px rgba(244, 63, 94, 0.4); }
 .btn.success { background: var(--success); color: white; }
 .btn.danger { background: var(--surface-2); color: var(--danger); }
@@ -260,6 +262,7 @@ body::before {
   transition: all 0.2s;
 }
 .sidebarTab:hover { background: var(--surface-2); color: var(--text); }
+.sidebarTab:active { transform: scale(0.96); }
 .sidebarTab.active { background: var(--primary-dim); color: var(--primary); }
 .sidebarTab .tabIcon { width: 20px; height: 20px; filter: invert(0.5); }
 .sidebarTab.active .tabIcon { filter: invert(38%) sepia(93%) saturate(3000%) hue-rotate(320deg) brightness(100%) contrast(100%); }
@@ -294,9 +297,21 @@ body::before {
   border: none;
   border-bottom: 1px solid var(--separator);
   position: relative;
+  animation: itemEntry 0.4s var(--ease-out) both;
 }
 .item:last-child { border-bottom: none; }
-.item:active { background: var(--surface-2); }
+.item:active { background: var(--surface-2); transform: scale(0.98); }
+
+@keyframes itemEntry {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.list .item:nth-child(1) { animation-delay: 50ms; }
+.list .item:nth-child(2) { animation-delay: 100ms; }
+.list .item:nth-child(3) { animation-delay: 150ms; }
+.list .item:nth-child(4) { animation-delay: 200ms; }
+.list .item:nth-child(5) { animation-delay: 250ms; }
+.list .item:nth-child(n+6) { animation-delay: 300ms; }
 
 .itemTop { display: flex; justify-content: space-between; margin-bottom: 8px; }
 .itemTitle { font-weight: 600; font-size: 18px; }
@@ -324,6 +339,7 @@ body::before {
 .chip.active[data-credit="yes"] { background: var(--success); color: #000; }
 .chip.active[data-credit="no"] { background: var(--danger); }
 .chip.active[data-credit="unsure"] { background: #0a84ff; }
+.chip:active { transform: scale(0.95); }
 
 /* Badges */
 .itemBadges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
@@ -380,6 +396,14 @@ dialog.modal{
   max-height:90vh;
   overflow:hidden;
   box-shadow: 0 20px 40px rgba(0,0,0,.5);
+  transform-origin: center center;
+}
+dialog.modal[open] {
+  animation: modalIn 0.4s var(--ease-spring) forwards;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 dialog.modal::backdrop{
   background: rgba(0,0,0,.7);
