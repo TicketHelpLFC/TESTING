@@ -97,6 +97,8 @@ body::before {
   100% { filter: hue-rotate(45deg); }
 }
 
+[hidden] { display: none !important; }
+
 /* Header */
 .topbar{
   position: sticky; top: 0; z-index: 100;
@@ -127,6 +129,12 @@ body::before {
 .iconBtn:active { opacity: 0.5; }
 .iconImg { width: 22px; height: 22px; filter: invert(38%) sepia(92%) saturate(3944%) hue-rotate(206deg) brightness(100%) contrast(104%); } /* iOS Blue Filter */
 .iconSvg { width: 22px; height: 22px; stroke: currentColor; fill: none; }
+
+@media all and (display-mode: standalone) {
+  #btnInstall {
+    display: none !important;
+  }
+}
 
 /* Container */
 .container{
@@ -621,13 +629,11 @@ dialog.modal::backdrop{
       <select id="headerSeasonSelect" class="headerSelect"></select>
     </div>
     <div class="headerActions">
-      <button id="btnHeaderSupport" class="iconBtn" aria-label="Support" title="Support">
-        <svg class="iconSvg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-      </button>
+      <button id="btnHeaderSupport" class="btn ghost sm" style="min-height:32px; padding:4px 12px;">Support</button>
       <button id="btnThemeToggle" class="iconBtn" aria-label="Toggle Theme" title="Toggle Theme">
         <svg class="iconSvg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
       </button>
-      <button id="btnInstall" class="iconBtn" hidden>Install</button>
+      <button id="btnInstall" class="btn ghost sm" style="min-height:32px; padding:4px 12px;" hidden>Install</button>
     </div>
   </header>
 
