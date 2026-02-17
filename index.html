@@ -2600,6 +2600,7 @@ onEl("btnFixturesAddManual","click", () => {
     localStorage.setItem("thlfc_creditsFilterHA", $("creditsFilterHA").value);
     renderCreditsChecklist();
   });
+  bindSwipeGestures();
 }
 
 function initTheme() {
@@ -4093,6 +4094,41 @@ onEl("btnToggleFeedback","click", ()=>{
   const open = panel.classList.toggle("hidden") === false;
   arrow.textContent = open ? "▾" : "▸";
 });
+
+function bindSwipeGestures() {
+  let touchStartX = 0;
+  let touchStartY = 0;
+  const edgeThreshold = 40; 
+  const minSwipeDistance = 50;
+
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  }, {passive: true});
+
+  document.addEventListener('touchend', (e) => {
+    const touchEndX = e.changedTouches[0].screenX;
+    const touchEndY = e.changedTouches[0].screenY;
+    const xDiff = touchEndX - touchStartX;
+    const yDiff = Math.abs(touchEndY - touchStartY);
+
+    if (yDiff > Math.abs(xDiff)) return; // Ignore vertical
+
+    const sb = $("sidebar");
+    if (!sb) return;
+    const isOpen = sb.classList.contains("open");
+
+    // Swipe Right to Open (must start near left edge)
+    if (!isOpen && xDiff > minSwipeDistance && touchStartX < edgeThreshold) {
+      toggleSidebar();
+    }
+    
+    // Swipe Left to Close (can start anywhere if open)
+    if (isOpen && xDiff < -minSwipeDistance) {
+      closeSidebar();
+    }
+  }, {passive: true});
+}
 
 function toggleSidebar() {
   const sb = $("sidebar");
