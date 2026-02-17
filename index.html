@@ -76,7 +76,8 @@ body{
   color: var(--text);
   font-family: var(--font-main);
   letter-spacing: -0.015em;
-  padding-bottom: calc(var(--nav-height) + 40px + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: 90px;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
@@ -227,24 +228,30 @@ body::before {
 
 /* Bottom Nav */
 .bottomNav{
-  position: fixed; bottom: 24px; left: 24px; right: 24px;
+  position: fixed; top: 0; left: 0; bottom: 0;
+  right: auto;
+  width: 90px;
+  height: 100vh;
   background: var(--bar-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 35px;
-  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
-  display: flex; justify-content: space-around;
-  padding-bottom: env(safe-area-inset-bottom);
-  height: calc(var(--nav-height) + env(safe-area-inset-bottom));
+  border: none;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  border-radius: 0;
+  box-shadow: none;
+  display: flex; flex-direction: column; justify-content: flex-start;
+  padding-top: calc(env(safe-area-inset-top) + 20px);
+  padding-bottom: 20px;
+  gap: 24px;
   z-index: 900;
 }
 .tab{
-  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: none; border: none; padding: 0;
+  flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: none; border: none; padding: 10px 0;
   color: var(--text-tertiary); gap: 4px;
+  width: 100%;
 }
 .tabIcon{ width: 24px; height: 24px; filter: invert(0.5); transition: 0.2s; }
 .tab.active .tabIcon { filter: invert(38%) sepia(93%) saturate(3000%) hue-rotate(320deg) brightness(100%) contrast(100%); } /* Pink/Red Filter */
@@ -1238,6 +1245,10 @@ dialog.modal::backdrop{
 </main>
 
   <nav class="bottomNav" aria-label="Primary">
+    <button class="tab" data-view="settings" aria-label="Profile" title="Profile">
+      <img class="tabIcon" src="icons/assets/account.svg" alt="" aria-hidden="true" />
+      <span class="sr-only">Profile</span>
+    </button>
     <button class="tab active" data-view="dash" aria-label="Dashboard" title="Dashboard">
       <img class="tabIcon" src="icons/assets/dashboard.svg" alt="" aria-hidden="true" />
       <span class="sr-only">Dashboard</span>
@@ -1253,10 +1264,6 @@ dialog.modal::backdrop{
     <button class="tab" data-view="fixtures" aria-label="Fixtures" title="Fixtures">
       <img class="tabIcon" src="icons/assets/fixtures.svg" alt="" aria-hidden="true" />
       <span class="sr-only">Fixtures</span>
-    </button>
-    <button class="tab" data-view="settings" aria-label="Profile" title="Profile">
-      <img class="tabIcon" src="icons/assets/account.svg" alt="" aria-hidden="true" />
-      <span class="sr-only">Profile</span>
     </button>
   </nav>
 
