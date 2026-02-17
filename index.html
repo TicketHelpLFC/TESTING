@@ -307,8 +307,15 @@ body::before {
   .container { margin-left: 280px; max-width: 800px; padding-bottom: 40px; }
 }
 @media (max-width: 799px) {
-  .sidebar { display: none; } /* Use bottom nav on mobile */
-  .sidebar.open { display: flex; } /* Allow opening if needed, but we prefer bottom nav */
+  .sidebar {
+    visibility: hidden;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0.3s;
+    will-change: transform;
+  }
+  .sidebar.open {
+    visibility: visible;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s;
+  }
 }
 
 }
