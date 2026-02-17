@@ -780,7 +780,7 @@ dialog.modal::backdrop{
           <div>
             <div class="label withIcon">
               <img class="labelIcon" src="icons/assets/matches.svg" alt="" aria-hidden="true" />
-              Matches
+              My Matches
             </div>
             <div class="hint">Search, sort, and filter all saved matches.</div>
           </div>
@@ -993,7 +993,7 @@ dialog.modal::backdrop{
       <div class="dashHeader" style="padding-left: 16px;">
         <div class="label withIcon">
           <img class="labelIcon" src="icons/assets/account.svg" alt="" aria-hidden="true" />
-          Settings
+          Profile Settings
         </div>
       </div>
 
@@ -1261,7 +1261,7 @@ dialog.modal::backdrop{
     </button>
     <button class="sidebarTab" data-view="matches" aria-label="Matches">
       <img class="tabIcon" src="icons/assets/matches.svg" alt="" aria-hidden="true" />
-      <span>Matches</span>
+      <span>My Matches</span>
     </button>
     <button class="sidebarTab" data-view="fixtures" aria-label="Fixtures">
       <img class="tabIcon" src="icons/assets/fixtures.svg" alt="" aria-hidden="true" />
@@ -1270,6 +1270,7 @@ dialog.modal::backdrop{
     </div>
 
     <div class="sidebarFooter">
+      <button id="btnSidebarBackup" class="btn ghost full sm" style="justify-content:flex-start">📦 Backup Data</button>
       <button id="btnSidebarSupport" class="btn ghost full sm" style="justify-content:flex-start">💬 Support</button>
       <button id="btnThemeToggle" class="btn ghost full sm" style="justify-content:flex-start">🌗 Theme</button>
       <button id="btnInstall" class="btn ghost full sm" style="justify-content:flex-start" hidden>⬇️ Install</button>
@@ -2449,6 +2450,7 @@ function bindEvents() {
   onEl("btnAddAccount","click", openSetupForNewAccount);
   onEl("btnEditAccount","click", editActiveAccount);
   onEl("btnDeleteAccount","click", deleteActiveAccount);
+  onEl("btnSidebarBackup", "click", exportJSON);
   onEl("btnBackupData","click", () => {
     exportJSON();
   });
