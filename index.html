@@ -104,6 +104,7 @@ body::before {
   border-bottom: 1px solid rgba(255,255,255,0.03);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 16px;
+  gap: 10px;
 }
 .topbar.is-hidden { transform: translateY(-100%); }
 
@@ -111,16 +112,20 @@ body::before {
 .brandLogo { width: 32px; height: 32px; border-radius: 8px; }
 .topbarTitle { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
 
-.topbarCenter {
-  position: absolute;
-  left: 0; right: 0;
-  bottom: 0;
-  height: var(--header-height);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  pointer-events: none;
+.topbarControls {
+  display: flex; align-items: center; gap: 8px;
 }
-.topbarAccount { font-size: 15px; font-weight: 700; line-height: 1.2; }
-.topbarSeason { font-size: 11px; color: var(--text-secondary); font-weight: 600; line-height: 1.2; }
+.topSelect {
+  background: var(--surface-2); color: var(--text); border: none; border-radius: 8px;
+  padding: 6px 24px 6px 10px; font-size: 13px; font-weight: 600; appearance: none; height: 32px; max-width: 120px;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23888%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat; background-position: right 6px center; background-size: 8px auto;
+}
+.iconBtn {
+  background: transparent; border: none; padding: 6px; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; color: var(--text); cursor: pointer;
+}
+.iconBtn svg { width: 20px; height: 20px; }
 
 @media all and (display-mode: standalone) {
   #btnInstall {
@@ -218,14 +223,17 @@ body::before {
 
 /* Bottom Nav */
 .bottomNav {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  background: var(--bar-bg);
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  width: min(92%, 400px);
+  background: rgba(28, 28, 30, 0.90);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid var(--separator);
-  display: flex; justify-content: space-around;
-  padding-bottom: env(safe-area-inset-bottom);
-  height: calc(55px + env(safe-area-inset-bottom));
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px;
+  display: flex; justify-content: space-around; align-items: center;
+  padding: 0 10px;
+  height: 64px;
   z-index: 900;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
 }
 .bottomTab {
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -240,82 +248,8 @@ body::before {
 [data-theme="light"] .bottomTab.active img { filter: invert(38%) sepia(93%) saturate(3000%) hue-rotate(320deg) brightness(100%) contrast(100%); }
 
 
-/* Sidebar */
-.sidebarOverlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000;
-  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-  opacity: 0; pointer-events: none; transition: opacity 0.3s;
-}
-.sidebarOverlay.visible { opacity: 1; pointer-events: auto; }
-
-.sidebar{
-  position: fixed; top: 0; left: 0; bottom: 0;
-  width: 280px;
-  height: 100vh;
-  background: var(--bar-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-right: 1px solid rgba(255,255,255,0.08);
-  display: flex; flex-direction: column;
-  padding: calc(env(safe-area-inset-top) + 20px) 20px 20px;
-  gap: 20px;
-  z-index: 1100;
-  transform: translateX(-100%);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 20px 0 50px rgba(0,0,0,0.3);
-}
-.sidebar.open { transform: translateX(0); }
-
-.sidebarHeader { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-.sidebarLogo { width: 40px; height: 40px; border-radius: 10px; }
-.sidebarTitle { font-size: 20px; font-weight: 800; }
-
-.sidebarControls { display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px; border-bottom: 1px solid var(--separator); }
-.sidebarNav { display: flex; flex-direction: column; gap: 4px; flex: 1; overflow-y: auto; }
-
-.sidebarTab {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 16px;
-  border-radius: 12px;
-  background: transparent; border: none;
-  color: var(--text-secondary);
-  font-size: 16px; font-weight: 600;
-  cursor: pointer; text-align: left;
-  transition: all 0.2s;
-}
-.sidebarTab:hover { background: var(--surface-2); color: var(--text); }
-.sidebarTab:active { transform: scale(0.96); }
-.sidebarTab.active { background: var(--primary-dim); color: var(--primary); }
-.sidebarTab .tabIcon { width: 20px; height: 20px; filter: invert(0.5); }
-.sidebarTab.active .tabIcon { filter: invert(38%) sepia(93%) saturate(3000%) hue-rotate(320deg) brightness(100%) contrast(100%); }
-
-.sidebarFooter { margin-top: auto; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--separator); padding-top: 20px; }
-
-.hamburger {
-  background: transparent; border: none; color: var(--text);
-  width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; border-radius: 50%;
-}
-.hamburger:active { background: var(--surface-2); }
-.hamburger svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; }
-
 @media (min-width: 800px) {
-  .bottomNav { display: none; }
-  .sidebar { transform: translateX(0); box-shadow: none; border-right: 1px solid var(--separator); }
-  .sidebarOverlay { display: none !important; }
-  .hamburger { display: none; }
-  .container { margin-left: 280px; max-width: 800px; padding-bottom: 40px; }
-}
-@media (max-width: 799px) {
-  .sidebar {
-    visibility: hidden;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0.3s;
-    will-change: transform;
-  }
-  .sidebar.open {
-    visibility: visible;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s;
-  }
+  .container { margin: 0 auto; max-width: 800px; padding-bottom: 100px; }
 }
 
 }
@@ -700,13 +634,18 @@ dialog.modal::backdrop{
 <body>
   <header class="topbar">
     <div class="topbarLeft">
-      <button id="btnHamburger" class="hamburger" aria-label="Menu">
-        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-      </button>
+      <img class="brandLogo" src="icon.svg" alt="LFC Tools" />
+      <div class="topbarTitle">LFC Tools</div>
     </div>
-    <div class="topbarCenter">
-      <div id="headerAccountName" class="topbarAccount"></div>
-      <div id="headerSeasonLabel" class="topbarSeason"></div>
+    <div class="topbarControls">
+      <select id="topbarAccountSelect" class="topSelect"></select>
+      <select id="topbarSeasonSelect" class="topSelect"></select>
+      <button id="btnThemeToggleTop" class="iconBtn" aria-label="Theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+      <button id="btnSupportTop" class="iconBtn" aria-label="Support">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+      </button>
     </div>
   </header>
 
@@ -1309,47 +1248,27 @@ dialog.modal::backdrop{
 </dialog>
 </main>
 
-  <div id="sidebarOverlay" class="sidebarOverlay"></div>
-  <nav id="sidebar" class="sidebar" aria-label="Primary">
-    <div class="sidebarHeader">
-      <img class="sidebarLogo" src="icon.svg" alt="LFC Tools" />
-      <div class="sidebarTitle">LFC Tools</div>
-    </div>
-
-    <div class="sidebarControls">
-      <select id="sidebarAccountSelect" class="sidebarSelect"></select>
-      <select id="sidebarSeasonSelect" class="sidebarSelect"></select>
-    </div>
-
-    <div class="sidebarNav">
-    <button class="sidebarTab" data-view="settings" aria-label="Profile">
-      <img class="tabIcon" src="icons/assets/account.svg" alt="" aria-hidden="true" />
-      <span>Profile</span>
+  <nav class="bottomNav">
+    <button class="bottomTab active" data-view="dash">
+      <img src="icons/assets/dashboard.svg" alt="" />
+      <span>Dash</span>
     </button>
-    <button class="sidebarTab active" data-view="dash" aria-label="Dashboard">
-      <img class="tabIcon" src="icons/assets/dashboard.svg" alt="" aria-hidden="true" />
-      <span>Dashboard</span>
-    </button>
-    <button class="sidebarTab" data-view="credits" aria-label="Checklist">
-      <svg class="tabIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    <button class="bottomTab" data-view="credits">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
       <span>Checklist</span>
     </button>
-    <button class="sidebarTab" data-view="matches" aria-label="Matches">
-      <img class="tabIcon" src="icons/assets/matches.svg" alt="" aria-hidden="true" />
-      <span>My Matches</span>
+    <button class="bottomTab" data-view="matches">
+      <img src="icons/assets/matches.svg" alt="" />
+      <span>Matches</span>
     </button>
-    <button class="sidebarTab" data-view="fixtures" aria-label="Fixtures">
-      <img class="tabIcon" src="icons/assets/fixtures.svg" alt="" aria-hidden="true" />
+    <button class="bottomTab" data-view="fixtures">
+      <img src="icons/assets/fixtures.svg" alt="" />
       <span>Fixtures</span>
     </button>
-    </div>
-
-    <div class="sidebarFooter">
-      <button id="btnSidebarBackup" class="btn ghost full sm" style="justify-content:flex-start">📦 Backup Data</button>
-      <button id="btnSidebarSupport" class="btn ghost full sm" style="justify-content:flex-start">💬 Support</button>
-      <button id="btnThemeToggle" class="btn ghost full sm" style="justify-content:flex-start">🌗 Theme</button>
-      <button id="btnInstall" class="btn ghost full sm" style="justify-content:flex-start" hidden>⬇️ Install</button>
-    </div>
+    <button class="bottomTab" data-view="settings">
+      <img src="icons/assets/account.svg" alt="" />
+      <span>Profile</span>
+    </button>
   </nav>
 
   <div class="hint" style="text-align:center;margin:20px 0;">Powered by LFC Tools</div>
@@ -1841,9 +1760,6 @@ function setView(viewName) {
   const tabs = document.querySelectorAll(".tab");
   tabs.forEach(t => t.classList.toggle("active", t.dataset.view === viewName));
 
-  const sbTabs = document.querySelectorAll(".sidebarTab");
-  sbTabs.forEach(t => t.classList.toggle("active", t.dataset.view === viewName));
-
   const bTabs = document.querySelectorAll(".bottomTab");
   bTabs.forEach(t => t.classList.toggle("active", t.dataset.view === viewName));
 
@@ -1861,7 +1777,6 @@ function setView(viewName) {
   $("viewFixtures").classList.toggle("hidden", viewName !== "fixtures");
   if (viewName === "fixtures") { setTimeout(() => { bindFixturesControls(); renderFixtures(); }, 0); }
   if (viewName === "dash") { showBackupNudge(); }
-  closeSidebar();
 }
 
 
@@ -1893,8 +1808,8 @@ function renderSeasonSelect() {
     sel.disabled = false;
   }
 
-  // Update sidebar season select
-  const sbSel = $("sidebarSeasonSelect");
+  // Update topbar season select
+  const sbSel = $("topbarSeasonSelect");
   if (sbSel) {
     sbSel.innerHTML = sel.innerHTML;
     sbSel.value = sel.value;
@@ -1924,8 +1839,8 @@ function renderAccountSelect() {
     save();
   }
 
-  // Update sidebar account select
-  const sbSel = $("sidebarAccountSelect");
+  // Update topbar account select
+  const sbSel = $("topbarAccountSelect");
   if (sbSel) {
     sbSel.innerHTML = sel.innerHTML;
     sbSel.value = sel.value;
@@ -2461,18 +2376,12 @@ function addSeason() {
 
 function updateHeader() {
   // Sync header selects with state if they exist
-  const sbAcc = $("sidebarAccountSelect");
-  const sbSea = $("sidebarSeasonSelect");
+  const sbAcc = $("topbarAccountSelect");
+  const sbSea = $("topbarSeasonSelect");
   if (sbAcc) sbAcc.value = activeAccountId() || "";
   if (sbSea) sbSea.value = activeSeasonId() || "";
 
-  const hAcc = $("headerAccountName");
-  const hSea = $("headerSeasonLabel");
-  const accId = activeAccountId();
-  const acc = state.data.accounts.find(a => a.id === accId);
-  if (hAcc) hAcc.textContent = acc ? acc.name : "LFC Tools";
-  const seaId = activeSeasonId();
-  if (hSea) hSea.textContent = seaId ? seasonLabelFromId(seaId) : "";
+  // Removed text labels as they are replaced by selects
 }
 
 function renderAll() {
@@ -2522,22 +2431,18 @@ function bindEvents() {
       }
   };
   document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", () => handleTabClick(tab)));
-  document.querySelectorAll(".sidebarTab").forEach(tab => tab.addEventListener("click", () => handleTabClick(tab)));
   document.querySelectorAll(".bottomTab").forEach(tab => tab.addEventListener("click", () => handleTabClick(tab)));
 
   onEl("accountSelect","change",(e)=> setActiveAccount(e.target.value));
   onEl("seasonSelect","change",(e)=> handleSeasonChange(e.target.value));
   
-  onEl("sidebarAccountSelect","change",(e)=> setActiveAccount(e.target.value));
-  onEl("sidebarSeasonSelect","change",(e)=> handleSeasonChange(e.target.value));
-  onEl("btnHamburger","click", toggleSidebar);
-  onEl("sidebarOverlay","click", closeSidebar);
+  onEl("topbarAccountSelect","change",(e)=> setActiveAccount(e.target.value));
+  onEl("topbarSeasonSelect","change",(e)=> handleSeasonChange(e.target.value));
 
   onEl("btnAddAccount","click", openSetupForNewAccount);
   onEl("btnEditAccount","click", editActiveAccount);
   onEl("btnDeleteAccount","click", deleteActiveAccount);
   onEl("btnThemeToggleSettings","click", toggleTheme);
-  onEl("btnSidebarBackup", "click", exportJSON);
   onEl("btnBackupData","click", () => {
     exportJSON();
   });
@@ -2670,7 +2575,7 @@ onEl("btnSettings","click", openSettings);
   onEl("btnSetupCreate","click", () => { try { saveSetup(); } catch(e){ alert("Setup error: " + (e && e.message ? e.message : e)); console.error(e); } });
 
 onEl("btnSupport","click", openSupport);
-onEl("btnSidebarSupport","click", openSupport);
+onEl("btnSupportTop","click", openSupport);
 onEl("btnCloseSupport","click", closeSupport);
 onEl("btnBmac","click", ()=> window.open("https://buymeacoffee.com/lfctools", "_blank", "noopener"));
 onEl("btnInfo","click", () => setView("info"));
@@ -2680,7 +2585,7 @@ onEl("btnFixturesAddManual","click", () => {
 });
 
   onEl("btnCloseAccountSwitcher", "click", closeAccountSwitcher);
-  onEl("btnThemeToggle", "click", toggleTheme);
+  onEl("btnThemeToggleTop", "click", toggleTheme);
   onEl("creditsFilterComp", "change", () => {
     localStorage.setItem("thlfc_creditsFilterComp", $("creditsFilterComp").value);
     renderCreditsChecklist();
@@ -2689,7 +2594,6 @@ onEl("btnFixturesAddManual","click", () => {
     localStorage.setItem("thlfc_creditsFilterHA", $("creditsFilterHA").value);
     renderCreditsChecklist();
   });
-  bindSwipeGestures();
 }
 
 function initTheme() {
@@ -2702,14 +2606,12 @@ function initTheme() {
 
 function updateThemeIcon() {
   const current = document.documentElement.getAttribute("data-theme");
-  const btn = document.getElementById("btnThemeToggle");
   const btn2 = document.getElementById("btnThemeToggleSettings");
   const label = document.getElementById("themeLabel");
   
   const text = current === "light" ? "Dark Mode" : "Light Mode";
   const labelText = current === "light" ? "Light" : "Dark";
   
-  if (btn) btn.textContent = current === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
   if (btn2) {
      // btn2 is the row in settings
   }
@@ -4015,53 +3917,6 @@ onEl("btnToggleFeedback","click", ()=>{
   arrow.textContent = open ? "▾" : "▸";
 });
 
-function bindSwipeGestures() {
-  let touchStartX = 0;
-  let touchStartY = 0;
-  const edgeThreshold = 40; 
-  const minSwipeDistance = 50;
-
-  document.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
-  }, {passive: true});
-
-  document.addEventListener('touchend', (e) => {
-    const touchEndX = e.changedTouches[0].screenX;
-    const touchEndY = e.changedTouches[0].screenY;
-    const xDiff = touchEndX - touchStartX;
-    const yDiff = Math.abs(touchEndY - touchStartY);
-
-    if (yDiff > Math.abs(xDiff)) return; // Ignore vertical
-
-    const sb = $("sidebar");
-    if (!sb) return;
-    const isOpen = sb.classList.contains("open");
-
-    // Swipe Right to Open (must start near left edge)
-    if (!isOpen && xDiff > minSwipeDistance && touchStartX < edgeThreshold) {
-      toggleSidebar();
-    }
-    
-    // Swipe Left to Close (can start anywhere if open)
-    if (isOpen && xDiff < -minSwipeDistance) {
-      closeSidebar();
-    }
-  }, {passive: true});
-}
-
-function toggleSidebar() {
-  const sb = $("sidebar");
-  const ov = $("sidebarOverlay");
-  if (sb) sb.classList.toggle("open");
-  if (ov) ov.classList.toggle("visible");
-}
-function closeSidebar() {
-  const sb = $("sidebar");
-  const ov = $("sidebarOverlay");
-  if (sb) sb.classList.remove("open");
-  if (ov) ov.classList.remove("visible");
-}
 </script>
 </body>
 </html>
