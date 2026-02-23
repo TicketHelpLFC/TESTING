@@ -1011,7 +1011,7 @@ dialog.modal::backdrop{
       </div>
 
       <section class="card settingsSection">
-        <div class="fieldLabel" style="margin-left:16px; margin-top:0;">Add account or season</div>
+        <div class="fieldLabel" style="margin-left:16px; margin-top:0;">Manage accounts</div>
         <div class="list">
           <div class="item">
             <div class="row space-between" style="width:100%">
@@ -1254,6 +1254,10 @@ dialog.modal::backdrop{
 </main>
 
   <nav class="bottomNav">
+    <button class="bottomTab" data-view="settings">
+      <img src="icons/assets/account.svg" alt="" />
+      <span>Profile</span>
+    </button>
     <button class="bottomTab active" data-view="dash">
       <img src="icons/assets/dashboard.svg" alt="" />
       <span>Dash</span>
@@ -1269,10 +1273,6 @@ dialog.modal::backdrop{
     <button class="bottomTab" data-view="fixtures">
       <img src="icons/assets/fixtures.svg" alt="" />
       <span>Fixtures</span>
-    </button>
-    <button class="bottomTab" data-view="settings">
-      <img src="icons/assets/account.svg" alt="" />
-      <span>Profile</span>
     </button>
   </nav>
 
@@ -3294,53 +3294,88 @@ async function renderCreditsChecklist() {
 
   seasonFixtures.sort((a,b) => (a.date || "").localeCompare(b.date || ""));
 
-  const matches = getSeasonMatches(seasonId);
-  const matchMap = new Map();
-  matches.forEach(m => {
-    if (m.fixtureKey) matchMap.set(m.fixtureKey, m);
+  // Multi-user: get all matches for this season
+  const allMatches = state.data.matches.filter(m => m.seasonId === seasonId);
+  const accounts = state.data.accounts || [];
+  
+  // Build lookup: fixtureKey -> { accountId -> match }
+  const matchLookup = {}; 
+  
+  allMatches.forEach(m => {
+    // Index by fixtureKey (ID)
+    if (m.fixtureKey) {
+      if (!matchLookup[m.fixtureKey]) matchLookup[m.fixtureKey] = {};
+      matchLookup[m.fixtureKey][m.accountId] = m;
+    }
+    // Index by composite key
     const key = `${m.matchDate}|${m.competition}|${m.venue}|${m.opponent}`.toLowerCase();
-    matchMap.set(key, m);
+    if (!matchLookup[key]) matchLookup[key] = {};
+    matchLookup[key][m.accountId] = m;
   });
 
   list.innerHTML = "";
   
   if (seasonFixtures.length === 0) {
     list.innerHTML = '<div class="empty">No fixtures found for this season matching filters.</div>';
-    if (totalEl) totalEl.textContent = "Credits: 0 / 0";
+    if (totalEl) totalEl.textContent = "";
     return;
   }
-
-  let creditCount = 0;
 
   seasonFixtures.forEach(f => {
     const fid = (f.id || "").replace(/"/g,'');
     const key = `${f.date}|${f.competition}|${f.venue}|${f.opponent}`.toLowerCase();
-    const match = matchMap.get(fid) || matchMap.get(key);
+    
+    // Get matches for this fixture (try ID then composite)
+    const matchesByAcc = matchLookup[fid] || matchLookup[key] || {};
     
     const el = document.createElement("div");
     el.className = "item clickable";
     
-    let statusHtml = `<div class="badge" style="opacity:0.5; background:var(--surface-2);">Not Tracked</div>`;
-    if (match) {
-      if (match.creditCredit === 'yes') {
-        statusHtml = `<div class="badge good">Credit</div>`;
-        creditCount++;
-      }
-      else if (match.creditCredit === 'no') statusHtml = `<div class="badge bad">No Credit</div>`;
-      else statusHtml = `<div class="badge neutral">Unsure</div>`;
-    }
-
     const when = formatDisplayDate(f.date);
     
+    // Build badges
+    let statusHtml = '';
+    if (accounts.length <= 1) {
+        // Single account view (classic)
+        const accId = activeAccountId();
+        const match = matchesByAcc[accId];
+        if (match) {
+            if (match.creditCredit === 'yes') statusHtml = `<div class="badge good">Credit</div>`;
+            else if (match.creditCredit === 'no') statusHtml = `<div class="badge bad">No Credit</div>`;
+            else statusHtml = `<div class="badge neutral">Unsure</div>`;
+        } else {
+            statusHtml = `<div class="badge" style="opacity:0.5; background:var(--surface-2);">Not Tracked</div>`;
+        }
+    } else {
+        // Multi-user view
+        statusHtml = `<div class="row gap" style="justify-content:flex-end; flex-wrap:wrap;">`;
+        accounts.forEach(acc => {
+            const m = matchesByAcc[acc.id];
+            const initial = (acc.name || "?").substring(0,2).toUpperCase();
+            let cls = "neutral";
+            let style = "opacity:0.5; background:var(--surface-2);";
+            if (m) {
+                style = "";
+                if (m.creditCredit === 'yes') cls = "good";
+                else if (m.creditCredit === 'no') cls = "bad";
+            }
+            statusHtml += `<div class="badge ${cls}" style="${style}; min-width:28px; text-align:center; padding:4px 6px;" title="${acc.name}">${initial}</div>`;
+        });
+        statusHtml += `</div>`;
+    }
+
     el.innerHTML = `
       <div class="row space-between">
         <div style="flex:1">
           <div class="itemTitle" style="font-size:16px">${f.opponent} <span class="pill ${f.venue === 'H' ? 'ha-home' : 'ha-away'}" style="font-size:10px; padding:2px 6px; min-width:auto; margin-left:4px;">${f.venue}</span></div>
+          <div class="hint">${when}</div>
         </div>
         <div style="text-align:right">${statusHtml}</div>
       </div>
     `;
     el.onclick = () => {
+        const accId = activeAccountId();
+        const match = matchesByAcc[accId];
         if (match) editMatch(match.id);
         else {
             state.lastAddSource = "credits";
@@ -3352,7 +3387,29 @@ async function renderCreditsChecklist() {
   });
 
   if (totalEl) {
-    totalEl.textContent = `Credits: ${creditCount} / ${seasonFixtures.length}`;
+      if (accounts.length <= 1) {
+          const accId = activeAccountId();
+          let count = 0;
+          seasonFixtures.forEach(f => {
+             const fid = (f.id || "").replace(/"/g,'');
+             const key = `${f.date}|${f.competition}|${f.venue}|${f.opponent}`.toLowerCase();
+             const m = matchLookup[fid]?.[accId] || matchLookup[key]?.[accId];
+             if (m && m.creditCredit === 'yes') count++;
+          });
+          totalEl.textContent = `Credits: ${count} / ${seasonFixtures.length}`;
+      } else {
+          const parts = accounts.map(acc => {
+              let count = 0;
+              seasonFixtures.forEach(f => {
+                 const fid = (f.id || "").replace(/"/g,'');
+                 const key = `${f.date}|${f.competition}|${f.venue}|${f.opponent}`.toLowerCase();
+                 const m = matchLookup[fid]?.[acc.id] || matchLookup[key]?.[acc.id];
+                 if (m && m.creditCredit === 'yes') count++;
+              });
+              return `${acc.name}: ${count}`;
+          });
+          totalEl.textContent = parts.join(" • ");
+      }
   }
 }
 
