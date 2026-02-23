@@ -351,6 +351,11 @@ body::before {
   padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: var(--surface-2);
 }
 .breakdownPill.autocup { background: rgba(255, 214, 10, 0.15); color: #ffd60a; }
+.breakdownPill.comp-pl{border-color: rgba(155,89,182,.7); color: #d9c3f4; background: rgba(155,89,182,.12)}
+.breakdownPill.comp-ucl{border-color: rgba(52,152,219,.7); color: #b9dcf6; background: rgba(52,152,219,.15)}
+.breakdownPill.comp-lc{border-color: rgba(46,204,113,.7); color: #c9f2de; background: rgba(46,204,113,.12)}
+.breakdownPill.comp-fac{border-color: rgba(227,27,35,.7); color: #ffc2c5; background: rgba(227,27,35,.12)}
+.breakdownPill.comp-other{border-color: rgba(154,160,166,.45); color: var(--text); background: rgba(154,160,166,.10)}
 
 /* Account bar layout (mobile-first) */
 .acctBar{ display: flex; flex-direction: column; gap: 16px; }
@@ -1006,7 +1011,7 @@ dialog.modal::backdrop{
       </div>
 
       <section class="card settingsSection">
-        <div class="fieldLabel" style="margin-left:16px; margin-top:0;">Account & Season</div>
+        <div class="fieldLabel" style="margin-left:16px; margin-top:0;">Add account or season</div>
         <div class="list">
           <div class="item">
             <div class="row space-between" style="width:100%">
@@ -1065,7 +1070,7 @@ dialog.modal::backdrop{
             <div class="hint" style="font-size: 16px; color: #666;">›</div>
           </button>
           <button id="btnThemeToggleSettings" class="item clickable" style="text-align:left; width:100%; color:var(--text);">
-            <div class="row space-between">
+            <div class="row space-between" style="width:100%">
               <div class="itemTitle">Theme</div>
               <div class="hint" id="themeLabel">Auto</div>
             </div>
