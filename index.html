@@ -634,6 +634,16 @@ dialog.modal::backdrop{
   text-overflow: ellipsis;
   height: 40px;
 }
+
+.profile-header { display: flex; align-items: center; gap: 20px; margin-bottom: 24px; }
+.profile-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--surface-2); color: var(--primary); font-size: 28px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex-shrink: 0; }
+.profile-info { flex: 1; min-width: 0; }
+.profile-name { font-size: 24px; font-weight: 800; line-height: 1.1; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.profile-season { font-size: 14px; color: var(--text-secondary); font-weight: 600; }
+.profile-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+.p-stat-card { background: var(--surface-2); padding: 16px; border-radius: 18px; text-align: center; border: 1px solid var(--border); }
+.p-stat-val { font-size: 22px; font-weight: 800; color: var(--text); }
+.p-stat-lbl { font-size: 12px; color: var(--text-secondary); margin-top: 4px; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -1007,33 +1017,55 @@ dialog.modal::backdrop{
       <div class="dashHeader" style="padding-left: 16px;">
         <div class="label withIcon">
           <img class="labelIcon" src="icons/assets/account.svg" alt="" aria-hidden="true" />
-          Profile Settings
+          Profile
         </div>
       </div>
 
-      <section class="card settingsSection">
-        <div class="fieldLabel" style="margin-left:16px; margin-top:0;">Manage accounts</div>
+      <div style="padding: 0 16px;">
+        <!-- Hidden selects to maintain logic compatibility -->
+        <div class="hidden">
+          <select id="accountSelect"></select>
+          <select id="seasonSelect" data-role="season"></select>
+        </div>
+
+        <div class="profile-header">
+          <div class="profile-avatar" id="pAvatar"></div>
+          <div class="profile-info">
+            <div class="profile-name" id="pName"></div>
+            <div class="profile-season" id="pSeason"></div>
+          </div>
+          <button id="btnProfileSwitch" class="btn sm ghost" style="border:1px solid var(--border); color:var(--text);">Switch</button>
+        </div>
+
+        <div class="profile-stats">
+          <div class="p-stat-card">
+            <div class="p-stat-val" id="pCredits">0</div>
+            <div class="p-stat-lbl">Credits</div>
+          </div>
+          <div class="p-stat-card">
+            <div class="p-stat-val" id="pSpend">£0</div>
+            <div class="p-stat-lbl">Spend</div>
+          </div>
+        </div>
+
         <div class="list">
-          <div class="item">
-            <div class="row space-between" style="width:100%">
-              <div class="itemTitle">Account</div>
-              <select id="accountSelect" class="selectGhost"></select>
-            </div>
-          </div>
-          <div class="item">
-            <div class="row space-between" style="width:100%">
-              <div class="itemTitle">Season</div>
-              <select id="seasonSelect" class="selectGhost" data-role="season"></select>
-            </div>
-          </div>
+           <button id="btnEditAccount" class="item clickable" style="width:100%; text-align:left;">
+             <div class="row gap">
+               <div class="itemTitle" style="font-size:16px;">Edit details</div>
+             </div>
+           </button>
+           <button id="btnAddAccount" class="item clickable" style="width:100%; text-align:left;">
+             <div class="row gap">
+               <div class="itemTitle" style="font-size:16px;">Add account</div>
+             </div>
+           </button>
+           <button id="btnDeleteAccount" class="item clickable" style="width:100%; text-align:left;">
+             <div class="row gap">
+               <div class="itemTitle" style="font-size:16px; color:var(--danger);">Delete account</div>
+             </div>
+           </button>
         </div>
-        
-        <div class="list" style="margin-top:20px;">
-           <button id="btnAddAccount" class="item clickable" style="color:var(--primary); text-align:center; width:100%; justify-content:center;">Add Account</button>
-           <button id="btnEditAccount" class="item clickable" style="color:var(--primary); text-align:center; width:100%; justify-content:center;">Edit Current Account</button>
-           <button id="btnDeleteAccount" class="item clickable" style="color:var(--danger); text-align:center; width:100%; justify-content:center;">Delete Current Account</button>
-        </div>
-      </section>
+      </div>
 
       <section class="card settingsSection backupCard" id="backupCard">
         <div class="label withIcon" style="font-size: 17px;">
@@ -1853,6 +1885,25 @@ function renderAccountSelect() {
   }
 }
 
+function renderProfilePage() {
+  const accId = activeAccountId();
+  const acc = state.data.accounts.find(a => a.id === accId);
+  if (!acc) return;
+
+  setText("pName", acc.name);
+  setText("pSeason", seasonLabelFromId(activeSeasonId()));
+  
+  const initials = (acc.name || "?").substring(0, 2).toUpperCase();
+  const av = $("pAvatar");
+  if(av) av.textContent = initials;
+
+  const totals = computeTotals(activeSeasonId());
+  const spend = computeSpend(activeSeasonId());
+  
+  setText("pCredits", totals.total);
+  setText("pSpend", formatGBP(spend.total));
+}
+
 function renderDashboard() {
   if (!activeAccountId()) {
     if ($("statHome")) setText("statHome", "0");
@@ -2396,6 +2447,7 @@ function renderAll() {
   renderDashboard();
   renderMatches();
   renderCreditsChecklist();
+  renderProfilePage();
   updateHeader();
 }
 
@@ -2449,6 +2501,7 @@ function bindEvents() {
   onEl("btnEditAccount","click", editActiveAccount);
   onEl("btnDeleteAccount","click", deleteActiveAccount);
   onEl("btnThemeToggleSettings","click", toggleTheme);
+  onEl("btnProfileSwitch", "click", openAccountSwitcher);
   onEl("btnBackupData","click", () => {
     exportJSON();
   });
