@@ -225,9 +225,9 @@ body::before {
 .bottomNav {
   position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
   width: min(92%, 400px);
-  background: rgba(28, 28, 30, 0.90);
+  background: var(--bar-bg);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid var(--border);
   border-radius: 24px;
   display: flex; justify-content: space-around; align-items: center;
   padding: 0 10px;
@@ -525,6 +525,7 @@ dialog.modal::backdrop{
 
 .backupCard{
   padding:10px;
+  margin-top: 24px;
 }
 .backupCard .label{
   font-size:13px;
@@ -1053,12 +1054,12 @@ dialog.modal::backdrop{
         <div class="list">
            <button id="btnEditAccount" class="item clickable" style="width:100%;">
              <div class="row gap">
-               <div class="itemTitle" style="font-size:16px;">Edit details</div>
+               <div class="itemTitle" style="font-size:16px;">Edit Details</div>
              </div>
            </button>
            <button id="btnAddAccount" class="item clickable" style="width:100%;">
              <div class="row gap">
-               <div class="itemTitle" style="font-size:16px;">Add account</div>
+               <div class="itemTitle" style="font-size:16px;">Add new account or season</div>
              </div>
            </button>
            <button id="btnDeleteAccount" class="item clickable" style="width:100%;">
