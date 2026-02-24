@@ -781,6 +781,7 @@ dialog.modal::backdrop{
             <option value="A">Away</option>
           </select>
         </div>
+        <div id="creditsAccountFilters" class="chips" style="margin-top:12px;"></div>
         <div id="creditsChecklist" class="list" style="margin-top:12px;"></div>
         <div id="creditsTotal" class="hint" style="text-align:center; margin-top:12px; font-weight:bold;"></div>
       </section>
@@ -3268,6 +3269,53 @@ function showToast(msg){
   setTimeout(()=>{ el.remove(); }, 1600);
 }
 
+function getCreditsVisibleAccountIds() {
+  const raw = localStorage.getItem("thlfc_creditsAccountIds");
+  if (raw) {
+    try { return JSON.parse(raw); } catch(e) {}
+  }
+  return (state.data.accounts || []).map(a => a.id);
+}
+
+function toggleCreditsAccountVisibility(accId) {
+  let current = getCreditsVisibleAccountIds();
+  if (current.includes(accId)) {
+    current = current.filter(id => id !== accId);
+  } else {
+    current.push(accId);
+  }
+  localStorage.setItem("thlfc_creditsAccountIds", JSON.stringify(current));
+  renderCreditsAccountFilters();
+  renderCreditsChecklist();
+}
+
+function renderCreditsAccountFilters() {
+  const container = $("creditsAccountFilters");
+  if (!container) return;
+  container.innerHTML = "";
+  
+  const accounts = state.data.accounts || [];
+  if (accounts.length <= 1) {
+    container.classList.add("hidden");
+    return;
+  }
+  container.classList.remove("hidden");
+  
+  const visible = getCreditsVisibleAccountIds();
+  
+  accounts.forEach(acc => {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "chip";
+    chip.style.fontSize = "13px";
+    chip.style.padding = "6px 12px";
+    if (visible.includes(acc.id)) chip.classList.add("active");
+    chip.textContent = acc.name;
+    chip.onclick = () => toggleCreditsAccountVisibility(acc.id);
+    container.appendChild(chip);
+  });
+}
+
 async function renderCreditsChecklist() {
   const list = $("creditsChecklist");
   const totalEl = $("creditsTotal");
@@ -3275,6 +3323,9 @@ async function renderCreditsChecklist() {
   const haEl = $("creditsFilterHA");
 
   if (!list) return;
+  
+  renderCreditsAccountFilters();
+
   list.innerHTML = '<div class="empty">Loading...</div>';
   if (totalEl) totalEl.textContent = "";
 
@@ -3313,6 +3364,9 @@ async function renderCreditsChecklist() {
     matchLookup[key][m.accountId] = m;
   });
 
+  const visibleIds = getCreditsVisibleAccountIds();
+  const displayAccounts = accounts.filter(a => visibleIds.includes(a.id));
+
   list.innerHTML = "";
   
   if (seasonFixtures.length === 0) {
@@ -3349,9 +3403,9 @@ async function renderCreditsChecklist() {
     } else {
         // Multi-user view
         statusHtml = `<div class="row gap" style="justify-content:flex-end; flex-wrap:wrap;">`;
-        accounts.forEach(acc => {
+        displayAccounts.forEach(acc => {
             const m = matchesByAcc[acc.id];
-            const initial = (acc.name || "?").substring(0,2).toUpperCase();
+            const name = acc.name || "?";
             let cls = "neutral";
             let style = "opacity:0.5; background:var(--surface-2);";
             if (m) {
@@ -3359,7 +3413,7 @@ async function renderCreditsChecklist() {
                 if (m.creditCredit === 'yes') cls = "good";
                 else if (m.creditCredit === 'no') cls = "bad";
             }
-            statusHtml += `<div class="badge ${cls}" style="${style}; min-width:28px; text-align:center; padding:4px 6px;" title="${acc.name}">${initial}</div>`;
+            statusHtml += `<div class="badge ${cls}" style="${style}; padding:4px 8px;" title="${name}">${name}</div>`;
         });
         statusHtml += `</div>`;
     }
@@ -3398,7 +3452,7 @@ async function renderCreditsChecklist() {
           });
           totalEl.textContent = `Credits: ${count} / ${seasonFixtures.length}`;
       } else {
-          const parts = accounts.map(acc => {
+          const parts = displayAccounts.map(acc => {
               let count = 0;
               seasonFixtures.forEach(f => {
                  const fid = (f.id || "").replace(/"/g,'');
