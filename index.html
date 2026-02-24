@@ -647,6 +647,23 @@ dialog.modal::backdrop{
 .p-stat-card { background: var(--surface-2); padding: 16px; border-radius: 18px; text-align: center; border: 1px solid var(--border); }
 .p-stat-val { font-size: 22px; font-weight: 800; color: var(--text); }
 .p-stat-lbl { font-size: 12px; color: var(--text-secondary); margin-top: 4px; font-weight: 600; }
+
+/* Light mode visibility overrides */
+[data-theme="light"] .badge.good { background: var(--success); color: #fff; }
+[data-theme="light"] .badge.bad { background: var(--danger); color: #fff; }
+[data-theme="light"] .badge.attended-yes { background: var(--success); color: #fff; }
+[data-theme="light"] .badge.attended-no { background: var(--warning); color: #fff; }
+
+[data-theme="light"] .breakdownPill.autocup { background: #ffd60a; color: #000; }
+[data-theme="light"] .breakdownPill.comp-pl, [data-theme="light"] .pill.comp-pill.comp-pl { background: #9b59b6; color: #fff; border-color: transparent; }
+[data-theme="light"] .breakdownPill.comp-ucl, [data-theme="light"] .pill.comp-pill.comp-ucl { background: #3498db; color: #fff; border-color: transparent; }
+[data-theme="light"] .breakdownPill.comp-lc, [data-theme="light"] .pill.comp-pill.comp-lc { background: #2ecc71; color: #fff; border-color: transparent; }
+[data-theme="light"] .breakdownPill.comp-fac, [data-theme="light"] .pill.comp-pill.comp-fac { background: #e31b23; color: #fff; border-color: transparent; }
+[data-theme="light"] .breakdownPill.comp-other, [data-theme="light"] .pill.comp-pill.comp-other { background: #9aa0a6; color: #fff; border-color: transparent; }
+
+[data-theme="light"] .pill.ha-home { background: var(--danger); color: #fff; }
+[data-theme="light"] .pill.ha-away { background: var(--success); color: #fff; }
+[data-theme="light"] .item.fixtureTracked { background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); }
 </style>
 </head>
 <body>
