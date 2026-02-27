@@ -37,7 +37,7 @@
   --radius-m: 12px;
   --radius-s: 8px;
   --nav-height: 60px;
-  --header-height: 50px;
+  --header-height: 64px;
   --fab-size: 56px;
   --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
@@ -102,19 +102,19 @@ body::before {
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid rgba(255,255,255,0.03);
-  display: flex; align-items: center; justify-content: space-between;
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center;
   padding: 0 16px;
   gap: 10px;
 }
 .topbar.is-hidden { transform: translateY(-100%); }
 
 .topbarLeft { display: flex; align-items: center; gap: 12px; }
+.topbarCenter { display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; }
+.topbarRight { display: flex; align-items: center; gap: 8px; }
 .brandLogo { width: 32px; height: 32px; border-radius: 8px; }
 .topbarTitle { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+@media (max-width: 380px) { .topbarTitle { display: none; } }
 
-.topbarControls {
-  display: flex; align-items: center; gap: 8px;
-}
 .topSelect {
   background: var(--surface-2); color: var(--text); border: none; border-radius: 8px;
   padding: 6px 24px 6px 10px; font-size: 13px; font-weight: 600; appearance: none; height: 32px; max-width: 120px;
@@ -639,7 +639,8 @@ dialog.modal::backdrop{
 }
 
 .profile-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
-.profile-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--surface-2); color: var(--primary); font-size: 28px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex-shrink: 0; }
+.profile-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--surface-2); color: var(--primary); font-size: 28px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex-shrink: 0; background-size: cover; background-position: center; cursor: pointer; position: relative; }
+.profile-avatar::after { content: '+'; position: absolute; bottom: 0; right: 0; background: var(--primary); color: white; width: 24px; height: 24px; border-radius: 50%; font-size: 18px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--surface); }
 .profile-info { flex: 1; min-width: 0; }
 .profile-name { font-size: 24px; font-weight: 800; line-height: 1.1; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .profile-season { font-size: 14px; color: var(--text-secondary); font-weight: 600; }
@@ -672,9 +673,11 @@ dialog.modal::backdrop{
       <img class="brandLogo" src="icon.svg" alt="LFC Tools" />
       <div class="topbarTitle">LFC Tools</div>
     </div>
-    <div class="topbarControls">
+    <div class="topbarCenter">
       <select id="topbarAccountSelect" class="topSelect"></select>
       <select id="topbarSeasonSelect" class="topSelect"></select>
+    </div>
+    <div class="topbarRight">
       <button id="btnThemeToggleTop" class="iconBtn" aria-label="Theme">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
       </button>
@@ -1050,6 +1053,7 @@ dialog.modal::backdrop{
 
         <div class="profile-header">
           <div class="profile-avatar" id="pAvatar"></div>
+          <input type="file" id="pAvatarInput" accept="image/*" hidden />
           <div class="profile-info">
             <div class="profile-name" id="pName"></div>
             <div class="profile-season" id="pSeason"></div>
@@ -1915,7 +1919,15 @@ function renderProfilePage() {
   
   const initials = (acc.name || "?").substring(0, 2).toUpperCase();
   const av = $("pAvatar");
-  if(av) av.textContent = initials;
+  if(av) {
+    if (acc.avatar) {
+      av.style.backgroundImage = `url(${acc.avatar})`;
+      av.textContent = "";
+    } else {
+      av.style.backgroundImage = "none";
+      av.textContent = initials;
+    }
+  }
 
   const totals = computeTotals(activeSeasonId());
   
@@ -2675,6 +2687,12 @@ onEl("btnFixturesAddManual","click", () => {
     localStorage.setItem("thlfc_creditsFilterHA", $("creditsFilterHA").value);
     renderCreditsChecklist();
   });
+  
+  onEl("pAvatar", "click", () => {
+    const inp = $("pAvatarInput");
+    if(inp) inp.click();
+  });
+  onEl("pAvatarInput", "change", handleAvatarChange);
 }
 
 function initTheme() {
@@ -4075,6 +4093,42 @@ async function deleteActiveAccount(){
   renderAccountSelect();
   renderAll();
   showToast("Account deleted");
+}
+
+function handleAvatarChange(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const MAX_SIZE = 300;
+      let w = img.width;
+      let h = img.height;
+      
+      if (w > h) { if (w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; } }
+      else { if (h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; } }
+      
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      
+      const accId = activeAccountId();
+      const acc = state.data.accounts.find(a => a.id === accId);
+      if (acc) {
+        acc.avatar = canvas.toDataURL('image/jpeg', 0.8);
+        save();
+        renderProfilePage();
+        showToast("Profile picture updated");
+      }
+    };
+    img.src = evt.target.result;
+  };
+  reader.readAsDataURL(file);
+  e.target.value = "";
 }
 
 
