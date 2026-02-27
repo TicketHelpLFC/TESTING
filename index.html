@@ -332,12 +332,12 @@ body::before {
 .badge{
   display: inline-block; padding: 4px 8px; border-radius: 6px;
   font-size: 11px; font-weight: 700; text-transform: uppercase;
-  background: var(--surface-2); color: var(--text-secondary);
+  background: var(--surface-2); color: #fff;
 }
-.badge.good { background: rgba(48, 209, 88, 0.15); color: var(--success); }
-.badge.bad { background: rgba(255, 69, 58, 0.15); color: var(--danger); }
-.badge.attended-yes { background: rgba(255,255,255,0.1); color: #fff; }
-.badge.attended-no { background: rgba(255, 149, 0, 0.15); color: #ff9f0a; }
+.badge.good { background: rgba(48, 209, 88, 0.75); color: #fff; }
+.badge.bad { background: rgba(255, 69, 58, 0.75); color: #fff; }
+.badge.attended-yes { background: rgba(48, 209, 88, 0.75); color: #fff; }
+.badge.attended-no { background: rgba(255, 159, 10, 0.75); color: #fff; }
 
 /* Breakdown Table */
 .breakdownTable{
@@ -361,12 +361,12 @@ body::before {
 .breakdownPill{
   padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: var(--surface-2);
 }
-.breakdownPill.autocup { background: rgba(255, 214, 10, 0.15); color: #ffd60a; }
-.breakdownPill.comp-pl{border-color: rgba(155,89,182,.7); color: #d9c3f4; background: rgba(155,89,182,.12)}
-.breakdownPill.comp-ucl{border-color: rgba(52,152,219,.7); color: #b9dcf6; background: rgba(52,152,219,.15)}
-.breakdownPill.comp-lc{border-color: rgba(46,204,113,.7); color: #c9f2de; background: rgba(46,204,113,.12)}
-.breakdownPill.comp-fac{border-color: rgba(227,27,35,.7); color: #ffc2c5; background: rgba(227,27,35,.12)}
-.breakdownPill.comp-other{border-color: rgba(154,160,166,.45); color: var(--text); background: rgba(154,160,166,.10)}
+.breakdownPill.autocup { background: rgba(255, 214, 10, 0.75); color: #000; }
+.breakdownPill.comp-pl{border-color: transparent; color: #fff; background: rgba(155,89,182,.75)}
+.breakdownPill.comp-ucl{border-color: transparent; color: #fff; background: rgba(52,152,219,.75)}
+.breakdownPill.comp-lc{border-color: transparent; color: #fff; background: rgba(46,204,113,.75)}
+.breakdownPill.comp-fac{border-color: transparent; color: #fff; background: rgba(227,27,35,.75)}
+.breakdownPill.comp-other{border-color: transparent; color: #fff; background: rgba(154,160,166,.75)}
 
 /* Account bar layout (mobile-first) */
 .acctBar{ display: flex; flex-direction: column; gap: 16px; }
@@ -508,22 +508,22 @@ dialog.modal::backdrop{
   padding:5px 8px;
   min-width:auto;
 }
-.pill.comp-pill.comp-pl{border-color: rgba(155,89,182,.7); color: #d9c3f4; background: rgba(155,89,182,.12)}
-.pill.comp-pill.comp-ucl{border-color: rgba(52,152,219,.7); color: #b9dcf6; background: rgba(52,152,219,.15)}
-.pill.comp-pill.comp-lc{border-color: rgba(46,204,113,.7); color: #c9f2de; background: rgba(46,204,113,.12)}
-.pill.comp-pill.comp-fac{border-color: rgba(227,27,35,.7); color: #ffc2c5; background: rgba(227,27,35,.12)}
-.pill.comp-pill.comp-other{border-color: rgba(154,160,166,.45); color: var(--text); background: rgba(154,160,166,.10)}
+.pill.comp-pill.comp-pl{border-color: transparent; color: #fff; background: rgba(155,89,182,.75)}
+.pill.comp-pill.comp-ucl{border-color: transparent; color: #fff; background: rgba(52,152,219,.75)}
+.pill.comp-pill.comp-lc{border-color: transparent; color: #fff; background: rgba(46,204,113,.75)}
+.pill.comp-pill.comp-fac{border-color: transparent; color: #fff; background: rgba(227,27,35,.75)}
+.pill.comp-pill.comp-other{border-color: transparent; color: #fff; background: rgba(154,160,166,.75)}
 
 /* Only colour the H/A pill */
 .pill.ha-home{
-  background: rgba(244, 63, 94, 0.15);
-  color: var(--danger);
+  background: rgba(255, 69, 58, 0.75);
+  color: #fff;
   border: none;
 }
 
 .pill.ha-away{
-  background: rgba(48, 209, 88, 0.12);
-  color: var(--success);
+  background: rgba(48, 209, 88, 0.75);
+  color: #fff;
   border: none;
 }
 
@@ -659,20 +659,20 @@ dialog.modal::backdrop{
 .p-stat-lbl { font-size: 12px; color: var(--text-secondary); margin-top: 4px; font-weight: 600; }
 
 /* Light mode visibility overrides */
-[data-theme="light"] .badge.good { background: var(--success); color: #fff; }
-[data-theme="light"] .badge.bad { background: var(--danger); color: #fff; }
-[data-theme="light"] .badge.attended-yes { background: var(--success); color: #fff; }
-[data-theme="light"] .badge.attended-no { background: var(--warning); color: #fff; }
+[data-theme="light"] .badge.good { background: rgba(48, 209, 88, 0.75); color: #fff; }
+[data-theme="light"] .badge.bad { background: rgba(255, 69, 58, 0.75); color: #fff; }
+[data-theme="light"] .badge.attended-yes { background: rgba(48, 209, 88, 0.75); color: #fff; }
+[data-theme="light"] .badge.attended-no { background: rgba(255, 159, 10, 0.75); color: #fff; }
 
-[data-theme="light"] .breakdownPill.autocup { background: #ffd60a; color: #000; }
-[data-theme="light"] .breakdownPill.comp-pl, [data-theme="light"] .pill.comp-pill.comp-pl { background: #9b59b6; color: #fff; border-color: transparent; }
-[data-theme="light"] .breakdownPill.comp-ucl, [data-theme="light"] .pill.comp-pill.comp-ucl { background: #3498db; color: #fff; border-color: transparent; }
-[data-theme="light"] .breakdownPill.comp-lc, [data-theme="light"] .pill.comp-pill.comp-lc { background: #2ecc71; color: #fff; border-color: transparent; }
-[data-theme="light"] .breakdownPill.comp-fac, [data-theme="light"] .pill.comp-pill.comp-fac { background: #e31b23; color: #fff; border-color: transparent; }
-[data-theme="light"] .breakdownPill.comp-other, [data-theme="light"] .pill.comp-pill.comp-other { background: #9aa0a6; color: #fff; border-color: transparent; }
+[data-theme="light"] .breakdownPill.autocup { background: rgba(255, 214, 10, 0.75); color: #000; }
+[data-theme="light"] .breakdownPill.comp-pl, [data-theme="light"] .pill.comp-pill.comp-pl { background: rgba(155,89,182,.75); color: #fff; border-color: transparent; }
+[data-theme="light"] .breakdownPill.comp-ucl, [data-theme="light"] .pill.comp-pill.comp-ucl { background: rgba(52,152,219,.75); color: #fff; border-color: transparent; }
+[data-theme="light"] .breakdownPill.comp-lc, [data-theme="light"] .pill.comp-pill.comp-lc { background: rgba(46,204,113,.75); color: #fff; border-color: transparent; }
+[data-theme="light"] .breakdownPill.comp-fac, [data-theme="light"] .pill.comp-pill.comp-fac { background: rgba(227,27,35,.75); color: #fff; border-color: transparent; }
+[data-theme="light"] .breakdownPill.comp-other, [data-theme="light"] .pill.comp-pill.comp-other { background: rgba(154,160,166,.75); color: #fff; border-color: transparent; }
 
-[data-theme="light"] .pill.ha-home { background: var(--danger); color: #fff; }
-[data-theme="light"] .pill.ha-away { background: var(--success); color: #fff; }
+[data-theme="light"] .pill.ha-home { background: rgba(255, 69, 58, 0.75); color: #fff; }
+[data-theme="light"] .pill.ha-away { background: rgba(48, 209, 88, 0.75); color: #fff; }
 [data-theme="light"] .item.fixtureTracked { background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); }
 </style>
 </head>
