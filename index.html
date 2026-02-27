@@ -3472,6 +3472,12 @@ async function renderCreditsChecklist() {
 
   list.innerHTML = "";
   
+  if (accounts.length > 1 && displayAccounts.length === 0) {
+    list.innerHTML = '<div class="empty">Select account to show</div>';
+    if (totalEl) totalEl.textContent = "";
+    return;
+  }
+
   if (seasonFixtures.length === 0) {
     list.innerHTML = '<div class="empty">No fixtures found for this season matching filters.</div>';
     if (totalEl) totalEl.textContent = "";
