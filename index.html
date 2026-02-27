@@ -674,6 +674,20 @@ dialog.modal::backdrop{
 [data-theme="light"] .pill.ha-home { background: rgba(255, 69, 58, 0.75); color: #fff; }
 [data-theme="light"] .pill.ha-away { background: rgba(48, 209, 88, 0.75); color: #fff; }
 [data-theme="light"] .item.fixtureTracked { background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); }
+
+.pageTitle {
+  font-size: 26px;
+  font-weight: 800;
+  margin: 4px 0 16px 0;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  letter-spacing: -0.02em;
+}
+.pageTitle .labelIcon { width: 28px; height: 28px; opacity: 0.7; }
+[data-theme="light"] .pageTitle .labelIcon { filter: invert(1); }
 </style>
 </head>
 <body>
@@ -699,8 +713,11 @@ dialog.modal::backdrop{
   <main class="container">
     <!-- Setup (no popup) -->
     <section id="viewSetup" class="view hidden">
+      <div class="pageTitle">
+        Setup
+      </div>
       <section class="card">
-        <div class="label">Add account details below</div>
+        <div class="label" style="margin-top:0;">Add account details below</div>
         <div class="hint">Set up the accounts you want to track. Include AutoCup and season, then click save.</div>
       </section>
 
@@ -764,11 +781,8 @@ dialog.modal::backdrop{
 
     <!-- Dashboard -->
     <section id="viewDash" class="view">
-      <div class="dashHeader">
-        <div class="label withIcon">
-          <img class="labelIcon" src="icons/assets/dashboard.svg" alt="" aria-hidden="true" />
-          Dashboard
-        </div>
+      <div class="pageTitle">
+        <div class="row gap"><img class="labelIcon" src="icons/assets/dashboard.svg" alt="" aria-hidden="true" /> Dashboard</div>
       </div>
 
       <!-- Per-competition credits first -->
@@ -800,11 +814,8 @@ dialog.modal::backdrop{
 
     <!-- Credits Checklist -->
     <section id="viewCredits" class="view hidden">
-      <div class="dashHeader">
-        <div class="label withIcon">
-          <img class="labelIcon" src="icons/assets/matches.svg" alt="" aria-hidden="true" />
-          Credits Checklist
-        </div>
+      <div class="pageTitle">
+        <div class="row gap"><img class="labelIcon" src="icons/assets/matches.svg" alt="" aria-hidden="true" /> Credits Checklist</div>
       </div>
       <section class="card">
         <div class="hint">All fixtures for this season and your credit status.</div>
@@ -831,16 +842,11 @@ dialog.modal::backdrop{
 
     <!-- Matches -->
     <section id="viewMatches" class="view hidden">
+      <div class="pageTitle">
+        <div class="row gap"><img class="labelIcon" src="icons/assets/matches.svg" alt="" aria-hidden="true" /> My Matches</div>
+      </div>
       <section class="card">
-        <div class="row space-between">
-          <div>
-            <div class="label withIcon">
-              <img class="labelIcon" src="icons/assets/matches.svg" alt="" aria-hidden="true" />
-              My Matches
-            </div>
-            <div class="hint">Search, sort, and filter all saved matches.</div>
-          </div>
-        </div>
+        <div class="hint" style="margin-top:0;">Search, sort, and filter all saved matches.</div>
 
         <div class="row wrap gap" style="margin-top:12px;">
           <input id="searchInput" class="input grow" placeholder="Search opponent / notes…" />
@@ -891,14 +897,11 @@ dialog.modal::backdrop{
 
     <!-- Add/Edit -->
     <section id="viewAdd" class="view hidden">
+      <div class="pageTitle">
+        <div class="row gap"><img class="labelIcon" src="icons/assets/add.svg" alt="" aria-hidden="true" /> Add / Edit match</div>
+        <button id="btnCancelAdd" class="btn ghost sm">Cancel</button>
+      </div>
       <section class="card">
-        <div class="row space-between">
-          <div class="label withIcon">
-            <img class="labelIcon" src="icons/assets/add.svg" alt="" aria-hidden="true" />
-            Add / Edit match
-          </div>
-          <button id="btnCancelAdd" class="btn ghost">Cancel</button>
-        </div>
 
         <form id="matchForm" class="form">
           <input type="hidden" id="matchId" />
@@ -986,16 +989,11 @@ dialog.modal::backdrop{
 
     <!-- Fixtures -->
     <section id="viewFixtures" class="view hidden">
+      <div class="pageTitle">
+        <div class="row gap"><img class="labelIcon" src="icons/assets/fixtures.svg" alt="" aria-hidden="true" /> Fixtures</div>
+      </div>
       <section class="card">
-        <div class="row space-between">
-          <div>
-            <div class="label withIcon">
-              <img class="labelIcon" src="icons/assets/fixtures.svg" alt="" aria-hidden="true" />
-              Fixtures
-            </div>
-            <div class="hint">Tap a fixture to pre-fill the Add screen.</div>
-          </div>
-        </div>
+        <div class="hint" style="margin-top:0;">Tap a fixture to pre-fill the Add screen.</div>
 
         <div class="grid2">
           <div>
@@ -1046,20 +1044,18 @@ dialog.modal::backdrop{
 
     <!-- Settings -->
     <section id="viewSettings" class="view hidden">
-      <div class="dashHeader" style="padding-left: 16px;">
-        <div class="label withIcon">
-          <img class="labelIcon" src="icons/assets/account.svg" alt="" aria-hidden="true" />
-          Profile
-        </div>
+      <div class="pageTitle">
+        <div class="row gap"><img class="labelIcon" src="icons/assets/account.svg" alt="" aria-hidden="true" /> Profile</div>
       </div>
 
-      <div style="padding: 0 16px;">
+      <div>
         <!-- Hidden selects to maintain logic compatibility -->
         <div class="hidden">
           <select id="accountSelect"></select>
           <select id="seasonSelect" data-role="season"></select>
         </div>
 
+        <section class="card">
         <div class="profile-header">
           <div class="profile-avatar" id="pAvatar"></div>
           <input type="file" id="pAvatarInput" accept="image/*" hidden />
@@ -1071,7 +1067,7 @@ dialog.modal::backdrop{
           <button id="btnProfileSwitch" class="btn sm ghost" style="border:1px solid var(--border); color:var(--text);">Switch</button>
         </div>
 
-        <div class="profile-stats">
+        <div class="profile-stats" style="margin-bottom:0;">
           <div class="p-stat-card">
             <div class="p-stat-val" id="pCredits">0</div>
             <div class="p-stat-lbl">Credits</div>
@@ -1081,6 +1077,7 @@ dialog.modal::backdrop{
             <div class="p-stat-lbl">Attended</div>
           </div>
         </div>
+        </section>
 
         <div class="list">
            <button id="btnEditAccount" class="item clickable" style="width:100%;">
@@ -1148,6 +1145,7 @@ dialog.modal::backdrop{
 
     <!-- Info -->
     <section id="infoPage" class="view hidden infoPage">
+      <section class="card">
       <h1>How to Use the Credit Tracker</h1>
 
       <h2>Adding an Account</h2>
@@ -1195,6 +1193,7 @@ dialog.modal::backdrop{
       </ul>
 
       <p>Built for Liverpool supporters. Completely free. YNWA.</p>
+      </section>
     </section>
 
 <!-- Support & Feedback -->
