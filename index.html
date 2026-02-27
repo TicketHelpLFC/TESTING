@@ -93,9 +93,8 @@ body::before {
   background-color: var(--bg);
   background-image: 
     radial-gradient(circle at 15% 20%, rgba(255, 49, 65, 0.12) 0%, transparent 45%),
-    radial-gradient(circle at 85% 80%, rgba(255, 49, 65, 0.08) 0%, transparent 45%),
-    url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ff3141' fill-opacity='0.04' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 100% 100%, 100% 100%, 40px 40px;
+    radial-gradient(circle at 85% 80%, rgba(255, 49, 65, 0.08) 0%, transparent 45%);
+  background-size: 100% 100%;
   background-attachment: fixed;
 }
 
@@ -1067,6 +1066,7 @@ dialog.modal::backdrop{
           <div class="profile-info">
             <div class="profile-name" id="pName"></div>
             <div class="profile-season" id="pSeason"></div>
+            <button id="btnRemoveAvatar" class="btn ghost sm" style="padding:0; height:auto; min-height:0; font-size:12px; color:var(--danger); margin-top:6px; background:transparent; box-shadow:none; justify-content:flex-start;" hidden>Remove photo</button>
           </div>
           <button id="btnProfileSwitch" class="btn sm ghost" style="border:1px solid var(--border); color:var(--text);">Switch</button>
         </div>
@@ -1929,13 +1929,16 @@ function renderProfilePage() {
   
   const initials = (acc.name || "?").substring(0, 2).toUpperCase();
   const av = $("pAvatar");
+  const btnRemove = $("btnRemoveAvatar");
   if(av) {
     if (acc.avatar) {
       av.style.backgroundImage = `url(${acc.avatar})`;
       av.textContent = "";
+      if(btnRemove) btnRemove.hidden = false;
     } else {
       av.style.backgroundImage = "none";
       av.textContent = initials;
+      if(btnRemove) btnRemove.hidden = true;
     }
   }
 
@@ -2703,6 +2706,17 @@ onEl("btnFixturesAddManual","click", () => {
     if(inp) inp.click();
   });
   onEl("pAvatarInput", "change", handleAvatarChange);
+  onEl("btnRemoveAvatar", "click", () => {
+    if(confirm("Remove profile picture?")){
+      const acc = state.data.accounts.find(a => a.id === activeAccountId());
+      if(acc){
+        delete acc.avatar;
+        save();
+        renderProfilePage();
+        showToast("Photo removed");
+      }
+    }
+  });
 }
 
 function initTheme() {
